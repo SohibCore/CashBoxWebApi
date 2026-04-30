@@ -39,7 +39,7 @@ namespace CashBox.Service.Services.ConractorAccountServices
 
         public async Task<List<ContractorAccountDto>> GetAsync(int id)
         {
-            var contractor = _context.ContractorAccounts.Find(id);
+            var contractor = await _context.ContractorAccounts.FindAsync(id);
             if (contractor == null)
                 throw new Exception("Error");
 

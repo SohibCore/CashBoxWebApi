@@ -58,9 +58,12 @@ namespace CashBox.Service.Services.CorrencyServices
             if (corrency == null)
                 throw new KeyNotFoundException($"{id} topilmadi");
 
-            corrency.FullName = updateCorrencyDto.FullName;
-            corrency.ShortName = updateCorrencyDto.ShortName;
-            corrency.Code = updateCorrencyDto.Code;
+            if(updateCorrencyDto is not null)
+            {
+                corrency.FullName = updateCorrencyDto.FullName;
+                corrency.ShortName = updateCorrencyDto.ShortName;
+                corrency.Code = updateCorrencyDto.Code;
+            }
 
             await _context.SaveChangesAsync();
         }
