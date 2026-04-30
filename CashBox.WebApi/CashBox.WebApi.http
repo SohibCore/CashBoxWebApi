@@ -1,0 +1,6 @@
+@CashBox.WebApi_HostAddress = http://localhost:5107
+
+GET {{CashBox.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

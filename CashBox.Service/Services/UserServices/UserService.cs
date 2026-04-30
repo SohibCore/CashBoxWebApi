@@ -1,0 +1,120 @@
+﻿using CashBox.Repository.Dtos.UserDtos;
+using Microsoft.EntityFrameworkCore;
+using Repository.Data;
+
+namespace CashBox.Service.Services.UserServices
+{
+
+    public class UserService : IUserService
+    {
+        private readonly AppDbContext _context;
+        public UserService(AppDbContext context) // Dependency Injection orqali AppDbContext ni qabul qilamiz
+        {
+            _context = context;
+        }
+        public async Task<UserDto> GetAsync(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+                throw new KeyNotFoundException($"{id} topilmadi");
+
+            return new UserDto
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                FullName = user.FullName,
+                ShortName = user.ShortName,
+                Pinfl = user.Pinfl,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address,
+                OrganizationId = user.OrganizationId,
+                DateOfBirth = user.DateOfBirth,
+                PassportSeries = user.PassportSeries
+            };
+        }
+        public async Task CreateAsync(CreateUserDto createUserDto)
+        {
+            var user = new RepositoryLayer.Entity.User
+            {
+                UserName = createUserDto.UserName,
+                Password = createUserDto.Password,
+                FullName = createUserDto.FullName,
+                ShortName = createUserDto.ShortName,
+                Pinfl = createUserDto.Pinfl,
+                PhoneNumber = createUserDto.PhoneNumber,
+                Address = createUserDto.Address,
+                OrganizationId = createUserDto.OrganizationId,
+                DateOfBirth = createUserDto.DateOfBirth,
+                PassportSeries = createUserDto.PassportSeries,
+            };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateAsync(int id, UpdateUserDto updateUserDto)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+                throw new KeyNotFoundException($"{id} topilmadi");
+
+            user.UserName = updateUserDto.UserName; //Bazadagi UserNameni frontdan kelgan yangi dataga o'zgartirish
+            user.FullName = updateUserDto.FullName;
+            user.Password = updateUserDto.Password;
+            user.ShortName = updateUserDto.ShortName;
+            user.Pinfl = updateUserDto.Pinfl;
+            user.PhoneNumber = updateUserDto.PhoneNumber;
+            user.Address = updateUserDto.Address;
+            user.OrganizationId = updateUserDto.OrganizationId;
+            user.DateOfBirth = updateUserDto.DateOfBirth;
+            user.PassportSeries = updateUserDto.PassportSeries;
+
+            await _context.SaveChangesAsync();
+        }
+        public async Task DeleteAsync(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+                throw new KeyNotFoundException($"{id} topilmadi");
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<UserDto>> GetListAsync(UserFilterDto userFilterDto)
+        {
+            var user = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(userFilterDto.UserName))
+                user = user.Where(x => x.UserName.Contains(userFilterDto.UserName));
+            if (!string.IsNullOrWhiteSpace(userFilterDto.FullName))
+                user = user.Where(x => x.FullName.Contains(userFilterDto.FullName));
+            if (!string.IsNullOrWhiteSpace(userFilterDto.ShortName))
+                user = user.Where(x => x.ShortName.Contains(userFilterDto.ShortName));
+            if (!string.IsNullOrWhiteSpace(userFilterDto.Pinfl))
+                user = user.Where(x => x.Pinfl.Contains(userFilterDto.Pinfl));
+            if (!string.IsNullOrWhiteSpace(userFilterDto.PhoneNumber))
+                user = user.Where(x => x.PhoneNumber.Contains(userFilterDto.PhoneNumber));
+            if (!string.IsNullOrWhiteSpace(userFilterDto.PassportSeries))
+                user = user.Where(x => x.PassportSeries.Contains(userFilterDto.PassportSeries));
+            if (userFilterDto.OrganizationId != 0 && userFilterDto.OrganizationId != null)
+                user = user.Where(x => x.OrganizationId == userFilterDto.OrganizationId);
+            if (userFilterDto.DateOfBirth != DateTime.MinValue && userFilterDto.DateOfBirth != null)
+                user = user.Where(x => x.DateOfBirth == userFilterDto.DateOfBirth);
+
+            return await user.Select(u => new UserDto
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                FullName = u.FullName,
+                ShortName = u.ShortName,
+                Pinfl = u.Pinfl,
+                PhoneNumber = u.PhoneNumber,
+                OrganizationId = u.OrganizationId,
+                DateOfBirth = u.DateOfBirth,
+                PassportSeries = u.PassportSeries
+            }).ToListAsync();
+        }
+    }
+}

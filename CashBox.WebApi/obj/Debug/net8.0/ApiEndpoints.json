@@ -1,0 +1,501 @@
+[
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.ContractorAccountController",
+    "Method": "Create",
+    "RelativePath": "api/ContractorAccount/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createContractorAccountDto",
+        "Type": "CashBox.Repository.Dtos.ContractorAccount.CreateContractorAccountDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.ContractorAccountController",
+    "Method": "Delete",
+    "RelativePath": "api/ContractorAccount/Delete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.ContractorAccountController",
+    "Method": "Get",
+    "RelativePath": "api/ContractorAccount/Get",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.ContractorAccountController",
+    "Method": "Update",
+    "RelativePath": "api/ContractorAccount/Update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "updateContractorAccountDto",
+        "Type": "CashBox.Repository.Dtos.ContractorAccount.UpdateContractorAccountDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.CorrencyController",
+    "Method": "Create",
+    "RelativePath": "api/Corrency/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createCorrencyDto",
+        "Type": "CashBox.Repository.Dtos.CorrencyDtos.CreateCorrencyDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.CorrencyController",
+    "Method": "Delete",
+    "RelativePath": "api/Corrency/Delete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.CorrencyController",
+    "Method": "Get",
+    "RelativePath": "api/Corrency/Get",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.CorrencyController",
+    "Method": "Update",
+    "RelativePath": "api/Corrency/Update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "updateCorrencyDto",
+        "Type": "CashBox.Repository.Dtos.CorrencyDtos.UpdateCorrencyDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.CorrencyRateController",
+    "Method": "Create",
+    "RelativePath": "api/CorrencyRate/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createCorrencyRateDto",
+        "Type": "CashBox.Repository.Dtos.CorrencyRateDtos.CreateCurrencyRateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.CorrencyRateController",
+    "Method": "Delete",
+    "RelativePath": "api/CorrencyRate/Delete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.CorrencyRateController",
+    "Method": "Get",
+    "RelativePath": "api/CorrencyRate/Get",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.CorrencyRateController",
+    "Method": "Update",
+    "RelativePath": "api/CorrencyRate/Update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "updateCorrencyRateDto",
+        "Type": "CashBox.Repository.Dtos.CorrencyRateDtos.UpdateCurrencyRateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.DistrictController",
+    "Method": "Create",
+    "RelativePath": "api/District/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createDistrictDto",
+        "Type": "CashBox.Repository.Dtos.DistrictDtos.CreateDistrictDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.DistrictController",
+    "Method": "Delete",
+    "RelativePath": "api/District/Delete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.DistrictController",
+    "Method": "Get",
+    "RelativePath": "api/District/Get",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.DistrictController",
+    "Method": "Update",
+    "RelativePath": "api/District/Update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "updateDistrictDto",
+        "Type": "CashBox.Repository.Dtos.DistrictDtos.UpdateDistrictDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.OrganizationController",
+    "Method": "Create",
+    "RelativePath": "api/Organization/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createOrganizationDto",
+        "Type": "CashBox.Repository.Dtos.OrganizationDtos.CreateOrganizationDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.OrganizationController",
+    "Method": "Delete",
+    "RelativePath": "api/Organization/Delete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.OrganizationController",
+    "Method": "Get",
+    "RelativePath": "api/Organization/Get",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.OrganizationController",
+    "Method": "Update",
+    "RelativePath": "api/Organization/Update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "updateOrganizationDto",
+        "Type": "CashBox.Repository.Dtos.OrganizationDtos.UpdateOrganizationDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.RegionController",
+    "Method": "Create",
+    "RelativePath": "api/Region/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createRegionDto",
+        "Type": "CashBox.Repository.Dtos.RegionDtos.CreateRegionDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.RegionController",
+    "Method": "Delete",
+    "RelativePath": "api/Region/Delete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.RegionController",
+    "Method": "Get",
+    "RelativePath": "api/Region/Get",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.RegionController",
+    "Method": "Update",
+    "RelativePath": "api/Region/Update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "updateRegionDto",
+        "Type": "CashBox.Repository.Dtos.RegionDtos.UpdateRegionDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.UserController",
+    "Method": "Create",
+    "RelativePath": "api/User/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createUserDto",
+        "Type": "CashBox.Repository.Dtos.UserDtos.CreateUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.UserController",
+    "Method": "Delete",
+    "RelativePath": "api/User/Delete/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.UserController",
+    "Method": "Get",
+    "RelativePath": "api/User/Get/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.UserController",
+    "Method": "GetList",
+    "RelativePath": "api/User/GetList",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userFilterDto",
+        "Type": "CashBox.Repository.Dtos.UserDtos.UserFilterDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CashBox.WebApi.Controllers.UserController",
+    "Method": "Update",
+    "RelativePath": "api/User/Update/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "updateUserDto",
+        "Type": "CashBox.Repository.Dtos.UserDtos.UpdateUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

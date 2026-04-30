@@ -1,0 +1,14 @@
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\bin\Debug\net8.0\CashBox.Repository.deps.json
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\bin\Debug\net8.0\CashBox.Repository.dll
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\bin\Debug\net8.0\CashBox.Repository.pdb
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\CashBox.Repository.GeneratedMSBuildEditorConfig.editorconfig
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\CashBox.Repository.AssemblyInfoInputs.cache
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\CashBox.Repository.AssemblyInfo.cs
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\CashBox.Repository.csproj.CoreCompileInputs.cache
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\CashBox.Repository.dll
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\refint\CashBox.Repository.dll
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\CashBox.Repository.pdb
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\ref\CashBox.Repository.dll
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\bin\Debug\net8.0\CashBox.Repository.runtimeconfig.json
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\CashBox.Repository.csproj.AssemblyReference.cache
+D:\C# Projects\CashBox.WebApi\CashBox.Repository\obj\Debug\net8.0\CashBox.Repository.genruntimeconfig.cache
