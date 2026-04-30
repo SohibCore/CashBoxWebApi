@@ -13,6 +13,7 @@ namespace CashBox.WebApi.Controllers
         {
             _userService = userService;
         }
+
         [HttpPost]
         public async Task<IActionResult> GetList([FromBody] UserFilterDto userFilterDto)
         {

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CashBox.WebApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8f62259c250cd3f99d2f0da880ac7d04d15e87e5")]
 [assembly: System.Reflection.AssemblyProductAttribute("CashBox.WebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CashBox.WebApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
