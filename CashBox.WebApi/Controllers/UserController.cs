@@ -13,8 +13,8 @@ namespace CashBox.WebApi.Controllers
         {
             _userService = userService;
         }
-        [HttpPost]
-        public async Task<IActionResult> GetList([FromBody] UserFilterDto userFilterDto)
+        [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] UserFilterDto userFilterDto)
         {
             var result = await _userService.GetListAsync(userFilterDto);
             return Ok(result);

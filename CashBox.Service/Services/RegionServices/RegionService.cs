@@ -1,4 +1,5 @@
 ﻿using CashBox.Repository.Dtos.RegionDtos;
+using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using RepositoryLayer.Entity;
 
@@ -64,6 +65,27 @@ namespace CashBox.Service.Services.RegionServices
 
             _context.Regions.Remove(region);
             await _context.SaveChangesAsync();
+        }
+        public async Task<List<RegionDto>> GetListAsync(RegionFilterDto regionFilterDto)
+        {
+            var region = _context.Regions.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(regionFilterDto.FullName))
+                region = region.Where(x => x.FullName.Contains(regionFilterDto.FullName));
+            if (!string.IsNullOrWhiteSpace(regionFilterDto.ShortName))
+                region = region.Where(x => x.ShortName.Contains(regionFilterDto.ShortName));
+            if (!string.IsNullOrWhiteSpace(regionFilterDto.Code))
+                region = region.Where(x => x.Code.Contains(regionFilterDto.Code));
+            if (regionFilterDto.Id != 0 && regionFilterDto.Id != null)
+                region = region.Where(x => x.Id == regionFilterDto.Id);
+
+            return await region.Select(u => new RegionDto
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                ShortName = u.ShortName,
+                Code = u.Code
+            }).ToListAsync();
         }
     }
 }
