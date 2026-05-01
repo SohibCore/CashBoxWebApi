@@ -1,4 +1,5 @@
 ﻿using CashBox.Repository.Dtos.ContractorDtos;
+using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using RepositoryLayer.Entity;
 
@@ -52,6 +53,34 @@ namespace CashBox.Service.Services.ContractorService
                     DistrictId = contractor.DistrictId
                 }
             };
+        }
+
+        public async Task<List<ContractorDto>> GetListAsync(ContractorFilterDto contractorFilterDto)
+        {
+            var contractor = _context.Contractors.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(contractorFilterDto.Pinfl))
+                contractor = contractor.Where(x => x.Pinfl.ToLower().Contains(contractorFilterDto.Pinfl));
+            if (!string.IsNullOrWhiteSpace(contractorFilterDto.ShortName))
+                contractor = contractor.Where(x => x.ShortName.ToLower().Contains(contractorFilterDto.ShortName));
+            if (!string.IsNullOrWhiteSpace(contractorFilterDto.FullName))
+                contractor = contractor.Where(x => x.FullName.ToLower().Contains(contractorFilterDto.FullName));
+            if (contractorFilterDto.Id != 0 && contractorFilterDto.Id != null)
+                contractor = contractor.Where(x => x.Id == contractorFilterDto.Id);
+            if (contractorFilterDto.RegionId != 0 && contractorFilterDto.RegionId != null)
+                contractor = contractor.Where(x => x.RegionId == contractorFilterDto.RegionId);
+            if (contractorFilterDto.DistrictId != 0 && contractorFilterDto.DistrictId != null)
+                contractor = contractor.Where(x => x.DistrictId == contractorFilterDto.DistrictId);
+
+            return await contractor.Select(u => new ContractorDto
+            {
+                Id = u.Id,
+                Pinfl = u.Pinfl,
+                ShortName = u.ShortName,
+                FullName = u.FullName,
+                RegionId = u.RegionId,
+                DistrictId = u.DistrictId
+            }).ToListAsync();
         }
 
         public async Task UpdateAsync(int id, UpdateContractorDto updateContractorDto)

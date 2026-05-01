@@ -1,4 +1,5 @@
 ﻿using CashBox.Repository.Dtos.CorrencyRateDtos;
+using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using Repository.Entity;
 
@@ -17,7 +18,7 @@ namespace CashBox.Service.Services.CorrencyRateServices
             {
                 CurrencyId = createCorrencyRateDto.CurrencyId,
                 Rate = createCorrencyRateDto.Rate,
-                Date = DateTime.UtcNow
+                Date = DateTime.Now
             };
             await _context.CorrencyRates.AddAsync(correncyRate);
             await _context.SaveChangesAsync();
@@ -47,6 +48,28 @@ namespace CashBox.Service.Services.CorrencyRateServices
                 Date = correncyRate.Date
             };
         }
+
+        public async Task<List<CurrencyRateDto>> GetListAsync(CurrencyRateFilterDto currencyRateFilterDto)
+        {
+            var currencyRate = _context.CorrencyRates.AsQueryable();
+
+            if (currencyRateFilterDto.Id != 0 && currencyRateFilterDto != null)
+                currencyRate = currencyRate.Where(x => x.Id == currencyRateFilterDto.Id);
+            if (currencyRateFilterDto.CurrencyId != 0 && currencyRateFilterDto.CurrencyId != null)
+                currencyRate = currencyRate.Where(x => x.CurrencyId == currencyRateFilterDto.CurrencyId);
+            if (currencyRateFilterDto.Date != null)
+                currencyRate = currencyRate.Where(x => x.Date == currencyRateFilterDto.Date);
+
+
+            return await currencyRate.Select(u => new CurrencyRateDto
+            {
+                Id = u.Id,
+                CurrencyId = u.CurrencyId,
+                Rate = u.Rate,
+                Date = u.Date,
+            }).ToListAsync();
+        }
+
         public async Task UpdateAsync(int id, UpdateCurrencyRateDto updateCurrencyRateDto)
         {
             var currencyRate = await _context.CorrencyRates.FindAsync(id);

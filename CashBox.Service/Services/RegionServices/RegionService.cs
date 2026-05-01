@@ -66,18 +66,23 @@ namespace CashBox.Service.Services.RegionServices
             _context.Regions.Remove(region);
             await _context.SaveChangesAsync();
         }
-        public async Task<List<RegionDto>> GetListAsync(RegionFilterDto regionFilterDto)
+        public async Task<List<RegionDto>> GetListAsync(string searchRegion, RegionFilterDto regionFilterDto)
         {
+            //var region = _context.Regions.AsQueryable();
+
+            //if (!string.IsNullOrWhiteSpace(regionFilterDto.FullName))
+            //    region = region.Where(x => x.FullName.Contains(regionFilterDto.FullName));
+            //if (!string.IsNullOrWhiteSpace(regionFilterDto.ShortName))
+            //    region = region.Where(x => x.ShortName.Contains(regionFilterDto.ShortName));
+            //if (!string.IsNullOrWhiteSpace(regionFilterDto.Code))
+            //    region = region.Where(x => x.Code.Contains(regionFilterDto.Code));
+            //if (regionFilterDto.Id != 0 && regionFilterDto.Id != null)
+            //    region = region.Where(x => x.Id == regionFilterDto.Id);
+
             var region = _context.Regions.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(regionFilterDto.FullName))
-                region = region.Where(x => x.FullName.Contains(regionFilterDto.FullName));
-            if (!string.IsNullOrWhiteSpace(regionFilterDto.ShortName))
-                region = region.Where(x => x.ShortName.Contains(regionFilterDto.ShortName));
-            if (!string.IsNullOrWhiteSpace(regionFilterDto.Code))
-                region = region.Where(x => x.Code.Contains(regionFilterDto.Code));
-            if (regionFilterDto.Id != 0 && regionFilterDto.Id != null)
-                region = region.Where(x => x.Id == regionFilterDto.Id);
+            if(!string.IsNullOrWhiteSpace(searchRegion))
+                region = region.Where(x => x.FullName.ToLower().Contains(searchRegion.ToLower()));
 
             return await region.Select(u => new RegionDto
             {

@@ -23,7 +23,7 @@ builder.Services.AddScoped<IRegionService, RegionService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IDistrictService, DistrictService>();
 builder.Services.AddScoped<ICurrencyRateService, CurrencyRateService>();
-builder.Services.AddScoped<ICorrencyService, CorrencyService>();
+builder.Services.AddScoped<ICurrencyService, CorrencyService>();
 builder.Services.AddScoped<IContractorService, ContractorService>();
 builder.Services.AddScoped<IContratorAccountService, ContratorAccountService>();
 

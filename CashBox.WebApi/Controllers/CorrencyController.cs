@@ -8,12 +8,19 @@ namespace CashBox.WebApi.Controllers
     [Route("api/[controller]/[action]")]
     public class CorrencyController : ControllerBase
     {
-        private readonly ICorrencyService _currencyService;
-        public CorrencyController(ICorrencyService correncyService)
+        private readonly ICurrencyService _currencyService;
+        public CorrencyController(ICurrencyService correncyService)
         {
             _currencyService = correncyService;
         }
         [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] CurrencyFilterDto currencyFilterDto)
+        {
+            var currency = await _currencyService.GetListAsync(currencyFilterDto);
+
+            return Ok(currency);
+        }
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var corrency = await _currencyService.GetAsync(id);
@@ -25,13 +32,13 @@ namespace CashBox.WebApi.Controllers
             await _currencyService.CreateAsync(createCorrencyDto);
             return Ok();
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateCorrencyDto updateCorrencyDto)
         {
             await _currencyService.UpdateAsync(id, updateCorrencyDto);
             return Ok();
         }
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _currencyService.DeleteAsync(id);

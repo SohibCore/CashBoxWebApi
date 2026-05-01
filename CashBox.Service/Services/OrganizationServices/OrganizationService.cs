@@ -1,4 +1,5 @@
 ﻿using CashBox.Repository.Dtos.OrganizationDtos;
+using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using RepositoryLayer.Entity;
 
@@ -66,6 +67,34 @@ namespace CashBox.Service.Services.OrganizationServices
 
             _context.Organizations.Remove(organization);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<OrganizationDto>> GetListAsync(OrganizationFilterDto organizationFilterDto)
+        {
+            var organization = _context.Organizations.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(organizationFilterDto.FullName))
+                organization = organization.Where(x => x.FullName.ToLower().Contains(organizationFilterDto.FullName.ToLower()));
+            if (!string.IsNullOrWhiteSpace(organizationFilterDto.Inn))
+                organization = organization.Where(x => x.Inn.ToLower().Contains(organizationFilterDto.Inn.ToLower()));
+            if (!string.IsNullOrWhiteSpace(organizationFilterDto.ShortName))
+                organization = organization.Where(x => x.ShortName.ToLower().Contains(organizationFilterDto.ShortName.ToLower()));
+            if (!string.IsNullOrWhiteSpace(organizationFilterDto.District))
+                organization = organization.Where(x => x.District.ToLower().Contains(organizationFilterDto.District.ToLower()));
+            if (organizationFilterDto.Id != 0 && organizationFilterDto.Id != null)
+                organization = organization.Where(x => x.Id == organizationFilterDto.Id);
+            if (organizationFilterDto.RegionId != 0 && organizationFilterDto.RegionId != null)
+                organization = organization.Where(x => x.RegionId == organizationFilterDto.RegionId);
+
+            return await organization.Select(u => new OrganizationDto
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                ShortName = u.ShortName,
+                Inn = u.Inn,
+                RegionId = u.RegionId,
+                District = u.District
+            }).ToListAsync();
         }
     }
 }

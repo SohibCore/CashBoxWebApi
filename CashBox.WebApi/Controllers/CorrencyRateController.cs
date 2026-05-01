@@ -14,6 +14,13 @@ namespace CashBox.WebApi.Controllers
             _correncyRateService = correncyRateService;
         }
         [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] CurrencyRateFilterDto currencyRateFilterDto)
+        {
+            var currencyRate = await _correncyRateService.GetListAsync(currencyRateFilterDto);
+
+            return Ok(currencyRate);
+        }
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var correncyRate = await _correncyRateService.GetAsync(id);
@@ -25,13 +32,13 @@ namespace CashBox.WebApi.Controllers
             await _correncyRateService.CreateAsync(createCorrencyRateDto);
             return Ok();
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateCurrencyRateDto updateCorrencyRateDto)
         {
             await _correncyRateService.UpdateAsync(id, updateCorrencyRateDto);
             return Ok();
         }
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _correncyRateService.DeleteAsync(id);

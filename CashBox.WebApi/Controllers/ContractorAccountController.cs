@@ -1,4 +1,5 @@
 ﻿using CashBox.Repository.Dtos.ContractorAccount;
+using CashBox.Repository.Dtos.ContractorAccountDtos;
 using CashBox.Service.Services.ConractorAccountServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,13 @@ namespace CashBox.WebApi.Controllers
             _contratorAccountService = contratorAccountService;
         }
         [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] ContractorAccountFilterDto contractorAccountFilterDto)
+        {
+            var contractor = await _contratorAccountService.GetListAsync(contractorAccountFilterDto);
+
+            return Ok(contractor);
+        }
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var contractor = await _contratorAccountService.GetAsync(id);
@@ -25,13 +33,13 @@ namespace CashBox.WebApi.Controllers
             await _contratorAccountService.CreateAsync(createContractorAccountDto);
             return Ok();
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateContractorAccountDto updateContractorAccountDto)
         {
             await _contratorAccountService.UpdateAsync(id, updateContractorAccountDto);
             return Ok();
         }
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _contratorAccountService.DeleteAsync(id);

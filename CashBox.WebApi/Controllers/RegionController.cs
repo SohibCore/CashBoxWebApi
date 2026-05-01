@@ -13,7 +13,13 @@ namespace CashBox.WebApi.Controllers
         {
             _regionService = regionService;
         }
-        [HttpGet]
+        [HttpPost]
+        public async Task<IActionResult> GetList(string searchRegion, RegionFilterDto regionFilterDto)
+        {
+            var regions = await _regionService.GetListAsync(searchRegion, regionFilterDto);
+            return Ok(regions);
+        }
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var region = await _regionService.GetAsync(id);
@@ -25,13 +31,13 @@ namespace CashBox.WebApi.Controllers
             await _regionService.CreateAsync(createRegionDto);
             return Ok();
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateRegionDto updateRegionDto)
         {
             await _regionService.UpdateAsync(id, updateRegionDto);
             return Ok();
         }
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _regionService.DeleteAsync(id);

@@ -1,4 +1,5 @@
 ﻿using CashBox.Repository.Dtos.DistrictDtos;
+using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using RepositoryLayer.Entity;
 
@@ -45,9 +46,31 @@ namespace CashBox.Service.Services.DistrictServices
                 FullName = district.FullName,
                 Code = district.Code,
                 Region = district.Region,
-                CreateUserId = district.CreateUserId
             };
         }
+
+        public async Task<List<DistrictDto>> GetListAsync(DistrictFilterDto districtFilterDto)
+        {
+            var district = _context.Districts.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(districtFilterDto.FullName))
+                district = district.Where(x => x.FullName.ToLower().Contains(districtFilterDto.FullName.ToLower()));
+            if (!string.IsNullOrWhiteSpace(districtFilterDto.Code))
+                district = district.Where(x => x.Code.ToLower().Contains(districtFilterDto.Code.ToLower()));
+            if (!string.IsNullOrWhiteSpace(districtFilterDto.Region))
+                district = district.Where(x => x.Region.ToLower().Contains(districtFilterDto.Region.ToLower()));
+            if (districtFilterDto.Id != 0 && districtFilterDto.Id != null)
+                district = district.Where(x => x.Id == districtFilterDto.Id);
+
+            return await district.Select(u => new DistrictDto
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                Code = u.Code,
+                Region = u.Region
+            }).ToListAsync();
+        }
+
         public async Task UpdateAsync(int id, UpdateDistrictDto updateDistrictDto)
         {
             var district = await _context.Districts.FindAsync(id);

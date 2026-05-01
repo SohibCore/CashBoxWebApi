@@ -9,12 +9,18 @@ namespace CashBox.WebApi.Controllers
     public class DistrictController : ControllerBase
     {
         private readonly IDistrictService _districtService;
-
         public DistrictController(IDistrictService districtService)
         {
             _districtService = districtService;
         }
         [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] DistrictFilterDto districtFilterDto)
+        {
+            var district = await _districtService.GetListAsync(districtFilterDto);
+
+            return Ok(district);
+        }
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var district = await _districtService.GetAsync(id);
@@ -26,13 +32,13 @@ namespace CashBox.WebApi.Controllers
             await _districtService.CreateAsync(createDistrictDto);
             return Ok();
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateDistrictDto updateDistrictDto)
         {
             await _districtService.UpdateAsync(id, updateDistrictDto);
             return Ok();
         }
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _districtService.DeleteAsync(id);

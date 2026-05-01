@@ -14,6 +14,13 @@ namespace CashBox.WebApi.Controllers
             _organizationService = organizationService;
         }
         [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] OrganizationFilterDto organizationFilterDto)
+        {
+            var organization = await _organizationService.GetListAsync(organizationFilterDto);
+
+            return Ok(organization);
+        }
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var organization = await _organizationService.GetAsync(id); //Service chaqirish
@@ -25,13 +32,13 @@ namespace CashBox.WebApi.Controllers
             await _organizationService.CreateAsync(createOrganizationDto);
             return Ok();
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateOrganizationDto updateOrganizationDto)
         {
             await _organizationService.UpdateAsync(id, updateOrganizationDto);
             return Ok();
         }
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _organizationService.DeleteAsync(id);

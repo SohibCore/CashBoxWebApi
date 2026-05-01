@@ -1,4 +1,6 @@
 ﻿using CashBox.Repository.Dtos.ContractorAccount;
+using CashBox.Repository.Dtos.ContractorAccountDtos;
+using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using RepositoryLayer.Entity;
 
@@ -26,39 +28,52 @@ namespace CashBox.Service.Services.ConractorAccountServices
         public async Task DeleteAsync(int id)
         {
             var contractor = await _context.ContractorAccounts.FindAsync(id);
-            if (contractor != null)
-            {
-                _context.ContractorAccounts.Remove(contractor);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                throw new Exception("O'chirib bo'lmadi");
-            }
+            if (contractor == null)
+                throw new KeyNotFoundException($"{id} topilmadi");
+
+            _context.ContractorAccounts.Remove(contractor);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ContractorAccountDto>> GetAsync(int id)
+        public async Task<ContractorAccountDto> GetAsync(int id)
         {
             var contractor = await _context.ContractorAccounts.FindAsync(id);
-            if (contractor == null)
-                throw new Exception("Error");
 
-            return new List<ContractorAccountDto>
+            if (contractor == null)
+                throw new KeyNotFoundException($"{id} topilmadi");
+
+            return new ContractorAccountDto
             {
-                new ContractorAccountDto
-                {
-                    Id = contractor.Id,
-                    Code = contractor.Code,
-                    FullName = contractor.FullName
-                }
+                Id = contractor.Id,
+                Code = contractor.Code,
+                FullName = contractor.FullName
             };
+        }
+
+        public async Task<List<ContractorAccountDto>> GetListAsync(ContractorAccountFilterDto contractorAccountFilterDto)
+        {
+            var contractorAccount = _context.ContractorAccounts.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(contractorAccountFilterDto.FullName))
+                contractorAccount = contractorAccount.Where(x => x.FullName.ToLower().Contains(contractorAccountFilterDto.FullName.ToLower()));
+            if (!string.IsNullOrWhiteSpace(contractorAccountFilterDto.Code))
+                contractorAccount = contractorAccount.Where(x => x.Code.ToLower().Contains(contractorAccountFilterDto.Code.ToLower()));
+            if (contractorAccountFilterDto.Id != 0 && contractorAccountFilterDto.Id != null)
+                contractorAccount = contractorAccount.Where(x => x.Id == contractorAccountFilterDto.Id);
+
+            return await contractorAccount.Select(u => new ContractorAccountDto
+            {
+                Id = u.Id,
+                Code = u.Code,
+                FullName = u.FullName
+            }).ToListAsync();
         }
 
         public async Task UpdateAsync(int id, UpdateContractorAccountDto updateContractorAccountDto)
         {
             var contractor = _context.ContractorAccounts.Find(id);
             if (contractor == null)
-                throw new Exception($"{id} topilmadi");
+                throw new KeyNotFoundException($"{id} topilmadi");
 
 #pragma warning disable CS8601 // Possible null reference assignment.
             contractor.Code = updateContractorAccountDto.Code;
