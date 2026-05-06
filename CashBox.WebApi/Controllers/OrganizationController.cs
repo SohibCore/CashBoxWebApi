@@ -21,13 +21,13 @@ namespace CashBox.WebApi.Controllers
             return Ok(organization);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
             var organization = await _organizationService.GetAsync(id); //Service chaqirish
             return Ok(organization);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(CreateOrganizationDto createOrganizationDto)
+        public async Task<IActionResult> Create([FromBody] CreateOrganizationDto createOrganizationDto)
         {
             await _organizationService.CreateAsync(createOrganizationDto);
             return Ok();
@@ -39,7 +39,7 @@ namespace CashBox.WebApi.Controllers
             return Ok();
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             await _organizationService.DeleteAsync(id);
             return Ok();

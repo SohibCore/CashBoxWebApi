@@ -14,19 +14,19 @@ namespace CashBox.WebApi.Controllers
             _regionService = regionService;
         }
         [HttpPost]
-        public async Task<IActionResult> GetList(string searchRegion, RegionFilterDto regionFilterDto)
+        public async Task<IActionResult> GetList(RegionFilterDto regionFilterDto)
         {
-            var regions = await _regionService.GetListAsync(searchRegion, regionFilterDto);
+            var regions = await _regionService.GetListAsync(regionFilterDto);
             return Ok(regions);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
             var region = await _regionService.GetAsync(id);
             return Ok(region);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(CreateRegionDto createRegionDto)
+        public async Task<IActionResult> Create([FromBody] CreateRegionDto createRegionDto)
         {
             await _regionService.CreateAsync(createRegionDto);
             return Ok();
@@ -38,7 +38,7 @@ namespace CashBox.WebApi.Controllers
             return Ok();
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             await _regionService.DeleteAsync(id);
             return Ok();

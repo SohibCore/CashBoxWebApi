@@ -20,7 +20,7 @@ namespace CashBox.WebApi.Controllers
             return Ok(result);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get([FromRoute] int id)    
         {
             var users = await _userService.GetAsync(id);
 
@@ -30,7 +30,7 @@ namespace CashBox.WebApi.Controllers
             return Ok(users);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(CreateUserDto createUserDto)
+        public async Task<IActionResult> Create([FromBody] CreateUserDto createUserDto)
         {
             await _userService.CreateAsync(createUserDto);
             return Ok();
@@ -38,13 +38,13 @@ namespace CashBox.WebApi.Controllers
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateUserDto updateUserDto)
-        {   
+        {
             await _userService.UpdateAsync(id, updateUserDto);
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             await _userService.DeleteAsync(id);
             return Ok();

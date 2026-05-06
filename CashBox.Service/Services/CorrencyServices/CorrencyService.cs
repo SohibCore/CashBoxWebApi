@@ -5,14 +5,13 @@ using Repository.Entity;
 
 namespace CashBox.Service.Services.CorrencyServices
 {
-    public class CorrencyService : ICurrencyService
+    public class CurrencyService : ICurrencyService
     {
         private readonly AppDbContext _context;
-        public CorrencyService(AppDbContext context)
+        public CurrencyService(AppDbContext context)
         {
             _context = context;
         }
-
         public async Task CreateAsync(CreateCorrencyDto createCorrencyDto)
         {
             var corrency = new Currency
@@ -80,12 +79,14 @@ namespace CashBox.Service.Services.CorrencyServices
             if (corrency == null)
                 throw new KeyNotFoundException($"{id} topilmadi");
 
-            if (updateCorrencyDto is not null)
-            {
+            if(updateCorrencyDto.FullName != null)
                 corrency.FullName = updateCorrencyDto.FullName;
-                corrency.ShortName = updateCorrencyDto.ShortName;
+
+            if(updateCorrencyDto.ShortName != null)
+                corrency.ShortName= updateCorrencyDto.ShortName;
+
+            if(updateCorrencyDto.Code != null)
                 corrency.Code = updateCorrencyDto.Code;
-            }
 
             await _context.SaveChangesAsync();
         }

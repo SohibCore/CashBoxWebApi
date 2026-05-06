@@ -26,18 +26,16 @@ namespace CashBox.Service.Services.ContractorService
             await _context.Contractors.AddAsync(contractor);
             await _context.SaveChangesAsync();
         }
-
         public async Task DeleteAsync(int id)
         {
             var contractor = await _context.Contractors.FindAsync(id);
 
             if (contractor == null)
-                throw new Exception($"{id} - foydalanuvchi yo'q");
+                throw new Exception($"{id} topilmadi");
 
             _context.Contractors.Remove(contractor);
             await _context.SaveChangesAsync();
         }
-
         public async Task<List<ContractorDto>> GetAsync(int id)
         {
             var contractor = await _context.Contractors.FindAsync(id);
@@ -82,7 +80,6 @@ namespace CashBox.Service.Services.ContractorService
                 DistrictId = u.DistrictId
             }).ToListAsync();
         }
-
         public async Task UpdateAsync(int id, UpdateContractorDto updateContractorDto)
         {
             var contractor = await _context.Contractors.FindAsync(id);

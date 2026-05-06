@@ -21,13 +21,13 @@ namespace CashBox.WebApi.Controllers
             return Ok(currencyRate);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
             var correncyRate = await _correncyRateService.GetAsync(id);
             return Ok(correncyRate);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(CreateCurrencyRateDto createCorrencyRateDto)
+        public async Task<IActionResult> Create([FromBody] CreateCurrencyRateDto createCorrencyRateDto)
         {
             await _correncyRateService.CreateAsync(createCorrencyRateDto);
             return Ok();
@@ -39,7 +39,7 @@ namespace CashBox.WebApi.Controllers
             return Ok();
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             await _correncyRateService.DeleteAsync(id);
             return Ok();

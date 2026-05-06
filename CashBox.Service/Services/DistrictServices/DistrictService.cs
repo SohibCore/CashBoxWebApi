@@ -78,9 +78,14 @@ namespace CashBox.Service.Services.DistrictServices
             if (district == null)
                 throw new KeyNotFoundException($"{id} topilmadi");
 
-            district.FullName = updateDistrictDto.FullName;
-            district.Code = updateDistrictDto.Code;
-            district.Region = updateDistrictDto.Region;
+            if (updateDistrictDto.FullName != null)
+                district.FullName = updateDistrictDto.FullName;
+
+            if (updateDistrictDto.Code != null)
+                district.Code = updateDistrictDto.Code;
+
+            if (updateDistrictDto.Region != null)
+                district.Region = updateDistrictDto.Region;
 
             await _context.SaveChangesAsync();
         }

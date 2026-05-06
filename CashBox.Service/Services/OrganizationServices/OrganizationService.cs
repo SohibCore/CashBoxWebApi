@@ -50,11 +50,20 @@ namespace CashBox.Service.Services.OrganizationServices
             if (organization == null)
                 throw new KeyNotFoundException($"{id} li foydalanuvchi topilmadi");
 
-            organization.Inn = updateOrganizationDto.Inn;
-            organization.FullName = updateOrganizationDto.FullName;
-            organization.ShortName = updateOrganizationDto.ShortName;
-            organization.RegionId = updateOrganizationDto.RegionId;
-            organization.District = updateOrganizationDto.District;
+            if (updateOrganizationDto.Inn != null)
+                organization.Inn = updateOrganizationDto.Inn;
+
+            if (updateOrganizationDto.FullName != null)
+                organization.FullName = updateOrganizationDto.FullName;
+
+            if (updateOrganizationDto.ShortName != null)
+                organization.ShortName = updateOrganizationDto.ShortName;
+
+            if (updateOrganizationDto.RegionId != null && updateOrganizationDto.RegionId != 0)
+                organization.RegionId = updateOrganizationDto.RegionId;
+
+            if (updateOrganizationDto.District != null)
+                organization.District = updateOrganizationDto.District;
 
             await _context.SaveChangesAsync();
         }
@@ -63,7 +72,7 @@ namespace CashBox.Service.Services.OrganizationServices
             var organization = await _context.Organizations.FindAsync(id);
 
             if (organization == null)
-                throw new KeyNotFoundException($"{id} li foydalanuvchi topilmadi");
+                throw new KeyNotFoundException($"{id} topilmadi");
 
             _context.Organizations.Remove(organization);
             await _context.SaveChangesAsync();

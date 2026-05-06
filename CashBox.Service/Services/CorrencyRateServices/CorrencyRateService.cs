@@ -18,7 +18,7 @@ namespace CashBox.Service.Services.CorrencyRateServices
             {
                 CurrencyId = createCorrencyRateDto.CurrencyId,
                 Rate = createCorrencyRateDto.Rate,
-                Date = DateTime.Now
+                Date = DateTime.UtcNow
             };
             await _context.CorrencyRates.AddAsync(correncyRate);
             await _context.SaveChangesAsync();
@@ -38,7 +38,7 @@ namespace CashBox.Service.Services.CorrencyRateServices
         {
             var correncyRate = await _context.CorrencyRates.FindAsync(id);
             if (correncyRate == null)
-                throw new KeyNotFoundException($"{correncyRate} topilmadi");
+                throw new KeyNotFoundException($"{id} topilmadi");
 
             return new CurrencyRateDto
             {
@@ -53,13 +53,12 @@ namespace CashBox.Service.Services.CorrencyRateServices
         {
             var currencyRate = _context.CorrencyRates.AsQueryable();
 
-            if (currencyRateFilterDto.Id != 0 && currencyRateFilterDto != null)
+            if (currencyRateFilterDto != null)
                 currencyRate = currencyRate.Where(x => x.Id == currencyRateFilterDto.Id);
             if (currencyRateFilterDto.CurrencyId != 0 && currencyRateFilterDto.CurrencyId != null)
                 currencyRate = currencyRate.Where(x => x.CurrencyId == currencyRateFilterDto.CurrencyId);
             if (currencyRateFilterDto.Date != null)
                 currencyRate = currencyRate.Where(x => x.Date == currencyRateFilterDto.Date);
-
 
             return await currencyRate.Select(u => new CurrencyRateDto
             {
@@ -77,9 +76,14 @@ namespace CashBox.Service.Services.CorrencyRateServices
             if (currencyRate == null)
                 throw new KeyNotFoundException($"{id} topilmadi");
 
-            currencyRate.CurrencyId = (int)updateCurrencyRateDto.CurrencyId;
-            currencyRate.Rate = (decimal)updateCurrencyRateDto.Rate;
-            currencyRate.Date = (DateTime)updateCurrencyRateDto.Date;
+            if (updateCurrencyRateDto.CurrencyId.HasValue)
+                currencyRate.CurrencyId = updateCurrencyRateDto.CurrencyId.Value;
+
+            if (updateCurrencyRateDto.Rate.HasValue)
+                currencyRate.Rate = updateCurrencyRateDto.Rate.Value;
+
+            if (updateCurrencyRateDto.Date.HasValue)
+                currencyRate.Date = updateCurrencyRateDto.Date.Value;
 
             await _context.SaveChangesAsync();
         }

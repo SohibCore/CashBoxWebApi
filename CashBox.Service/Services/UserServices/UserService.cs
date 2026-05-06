@@ -1,4 +1,5 @@
-﻿using CashBox.Repository.Dtos.UserDtos;
+﻿using CashBox.Repository.Dtos.CorrencyRateDtos;
+using CashBox.Repository.Dtos.UserDtos;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 
@@ -58,16 +59,35 @@ namespace CashBox.Service.Services.UserServices
             if (user == null)
                 throw new KeyNotFoundException($"{id} topilmadi");
 
-            user.UserName = updateUserDto.UserName; //Bazadagi UserNameni frontdan kelgan yangi dataga o'zgartirish
-            user.FullName = updateUserDto.FullName;
-            user.Password = updateUserDto.Password;
-            user.ShortName = updateUserDto.ShortName;
-            user.Pinfl = updateUserDto.Pinfl;
-            user.PhoneNumber = updateUserDto.PhoneNumber;
-            user.Address = updateUserDto.Address;
-            user.OrganizationId = updateUserDto.OrganizationId;
-            user.DateOfBirth = updateUserDto.DateOfBirth;
-            user.PassportSeries = updateUserDto.PassportSeries;
+            if (updateUserDto.UserName != null)
+                user.UserName = updateUserDto.UserName; //Bazadagi UserNameni frontdan kelgan yangi dataga o'zgartirish
+
+            if (updateUserDto.FullName != null)
+                user.FullName = updateUserDto.FullName;
+
+            if (updateUserDto.Password != null)
+                user.Password = updateUserDto.Password;
+
+            if (updateUserDto.ShortName != null)
+                user.ShortName = updateUserDto.ShortName;
+
+            if (updateUserDto.Pinfl != null)
+                user.Pinfl = updateUserDto.Pinfl;
+
+            if (updateUserDto.PhoneNumber != null)
+                user.PhoneNumber = updateUserDto.PhoneNumber;
+
+            if (updateUserDto.Address != null)
+                user.Address = updateUserDto.Address;
+
+            if (updateUserDto.OrganizationId != 0)
+                user.OrganizationId = updateUserDto.OrganizationId;
+
+            if (updateUserDto.DateOfBirth != null)
+                user.DateOfBirth = updateUserDto.DateOfBirth;
+
+            if (updateUserDto.PassportSeries != null) 
+                user.PassportSeries = updateUserDto.PassportSeries;
 
             await _context.SaveChangesAsync();
         }

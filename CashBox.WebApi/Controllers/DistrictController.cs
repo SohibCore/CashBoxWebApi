@@ -21,13 +21,13 @@ namespace CashBox.WebApi.Controllers
             return Ok(district);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
             var district = await _districtService.GetAsync(id);
             return Ok(district);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(CreateDistrictDto createDistrictDto)
+        public async Task<IActionResult> Create([FromBody] CreateDistrictDto createDistrictDto)
         {
             await _districtService.CreateAsync(createDistrictDto);
             return Ok();
@@ -39,7 +39,7 @@ namespace CashBox.WebApi.Controllers
             return Ok();
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             await _districtService.DeleteAsync(id);
             return Ok();
