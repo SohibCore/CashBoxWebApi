@@ -1,9 +1,11 @@
 ﻿using CashBox.Repository.Dtos.CorrencyDtos;
 using CashBox.Service.Services.CorrencyServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class CorrencyController : ControllerBase

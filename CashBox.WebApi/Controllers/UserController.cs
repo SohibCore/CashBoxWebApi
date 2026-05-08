@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CashBox.Repository.Dtos.UserDtos;
 using CashBox.Service.Services.UserServices;
-using CashBox.Repository.Dtos.UserDtos;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class UserController : ControllerBase
@@ -20,7 +22,7 @@ namespace CashBox.WebApi.Controllers
             return Ok(result);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromRoute] int id)    
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
             var users = await _userService.GetAsync(id);
 

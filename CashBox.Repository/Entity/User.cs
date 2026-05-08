@@ -16,8 +16,12 @@ namespace RepositoryLayer.Entity
         public string UserName { get; set; } = null!;
 
         [Column("PASSWORD")]
-        [StringLength(100)]
+        [StringLength(300)]
         public string Password { get; set; } = null!;
+
+        [Column("ROLE")]
+        [StringLength(50)]
+        public string Role { get; set; } = null!;
 
         [Column("FULL_NAME")]
         [StringLength(500)]
@@ -51,9 +55,14 @@ namespace RepositoryLayer.Entity
         [Column("PASSPORT_SERIES")]
         [StringLength(9)]
         public string PassportSeries { get; set; } = null!;
+
+        [Column("EMAIL")]
+        [StringLength(300)]
+        public string Email { get; set; } = null!;
+
         [Column("CREATE_USER_ID")]
         public int? CreateUserId { get; set; }
-        [Column("CREATED_AT")]     
+        [Column("CREATED_AT")]
         public DateTime? CreatedAt { get; set; }
         [Column("MODIFIED_USER_ID")]
         public int? ModifiedUserId { get; set; }

@@ -1,9 +1,11 @@
 ﻿using CashBox.Repository.Dtos.OrganizationDtos;
 using CashBox.Service.Services.OrganizationServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class OrganizationController : ControllerBase

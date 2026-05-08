@@ -1,5 +1,4 @@
-﻿using CashBox.Repository.Dtos.CorrencyRateDtos;
-using CashBox.Repository.Dtos.UserDtos;
+﻿using CashBox.Repository.Dtos.UserDtos;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 
@@ -86,7 +85,7 @@ namespace CashBox.Service.Services.UserServices
             if (updateUserDto.DateOfBirth != null)
                 user.DateOfBirth = updateUserDto.DateOfBirth;
 
-            if (updateUserDto.PassportSeries != null) 
+            if (updateUserDto.PassportSeries != null)
                 user.PassportSeries = updateUserDto.PassportSeries;
 
             await _context.SaveChangesAsync();
@@ -136,5 +135,6 @@ namespace CashBox.Service.Services.UserServices
                 PassportSeries = u.PassportSeries
             }).ToListAsync();
         }
+
     }
 }

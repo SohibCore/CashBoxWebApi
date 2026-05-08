@@ -2,9 +2,11 @@
 using CashBox.Service.Services.ContractorService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CashBox.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class ContractorController : ControllerBase
@@ -14,10 +16,11 @@ namespace CashBox.WebApi.Controllers
         {
             _contratorService = contratorService;
         }
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] ContractorFilterDto contractorFilterDto)
         {
+            var userId = User.FindFirst(ClaimTypes.Name)?.Value;
+
             var contractor = await _contratorService.GetListAsync(contractorFilterDto);
 
             return Ok(contractor);

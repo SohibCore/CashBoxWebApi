@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CashBox.Repository.Entity;
+using CashBox.Repository.Enums;
+using Microsoft.EntityFrameworkCore;
 using Repository.Entity;
 using RepositoryLayer.Entity;
 
@@ -16,5 +18,8 @@ namespace Repository.Data
         public DbSet<Organization> Organizations { get; set; } //DB da Organization class orqali Organizations table hosil qiladi
         public DbSet<Region> Regions { get; set; } //DB da Region class orqali Regions table hosil qiladi
         public DbSet<User> Users { get; set; } //DB da User class orqali Users table hosil qiladi
+        public DbSet<UserRole> UserRoles { get; set; } //DB da UserRole class orqali UserRoles table hosil qiladi
+        public DbSet<Role> Roles { get; set; } //DB da Role class orqali Roles table hosil qiladi
+         public DbSet<State> States { get; set; } //DB da State class orqali States table hosil qiladi
     }
 }

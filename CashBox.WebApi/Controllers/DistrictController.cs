@@ -1,9 +1,11 @@
 ﻿using CashBox.Repository.Dtos.DistrictDtos;
 using CashBox.Service.Services.DistrictServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class DistrictController : ControllerBase
