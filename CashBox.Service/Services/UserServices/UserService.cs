@@ -119,8 +119,8 @@ namespace CashBox.Service.Services.UserServices
                 user = user.Where(x => x.PassportSeries.Contains(userFilterDto.PassportSeries));
             if (userFilterDto.OrganizationId != 0 && userFilterDto.OrganizationId != null)
                 user = user.Where(x => x.OrganizationId == userFilterDto.OrganizationId);
-            if (userFilterDto.DateOfBirth != DateTime.MinValue && userFilterDto.DateOfBirth != null)
-                user = user.Where(x => x.DateOfBirth == userFilterDto.DateOfBirth);
+            //if (userFilterDto.DateOfBirth != DateTime.MinValue && userFilterDto.DateOfBirth != null)
+            //    user = user.Where(x => x.DateOfBirth == userFilterDto.DateOfBirth);
 
             return await user.Select(u => new UserDto
             {

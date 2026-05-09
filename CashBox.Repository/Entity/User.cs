@@ -19,9 +19,9 @@ namespace RepositoryLayer.Entity
         [StringLength(300)]
         public string Password { get; set; } = null!;
 
-        [Column("ROLE")]
-        [StringLength(50)]
-        public string Role { get; set; } = null!;
+        //[Column("ROLE")]
+        //[StringLength(50)]
+        //public string Role { get; set; } = null!;
 
         [Column("FULL_NAME")]
         [StringLength(500)]
@@ -50,15 +50,15 @@ namespace RepositoryLayer.Entity
         public Organization Organization { get; set; } = null!;
 
         [Column("DATE_OF_BIRTH")]
-        public DateTime DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
 
         [Column("PASSPORT_SERIES")]
         [StringLength(9)]
         public string PassportSeries { get; set; } = null!;
 
         [Column("EMAIL")]
-        [StringLength(300)]
-        public string Email { get; set; } = null!;
+        [StringLength(150)]
+        public string? Email { get; set; }
 
         [Column("CREATE_USER_ID")]
         public int? CreateUserId { get; set; }

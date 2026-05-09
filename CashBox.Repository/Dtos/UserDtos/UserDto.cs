@@ -10,7 +10,7 @@
         public string PhoneNumber { get; set; } = null!;
         public string Address { get; set; } = null!;
         public int OrganizationId { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         public string PassportSeries { get; set; } = null!;
     }
 }

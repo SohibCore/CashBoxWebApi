@@ -9,7 +9,7 @@
         public string? Pinfl { get; set; } 
         public string? PhoneNumber { get; set; } 
         public int? OrganizationId { get; set; }
-        public DateTime? DateOfBirth { get; set; }
+        public string? DateOfBirth { get; set; }
         public string? PassportSeries { get; set; } 
     }
 }

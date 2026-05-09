@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using CashBox.Core;
 
 namespace CashBox.Repository.Dtos.UserDtos
 {
@@ -32,7 +34,8 @@ namespace CashBox.Repository.Dtos.UserDtos
         public int OrganizationId { get; set; }
 
         [Required]
-        public DateTime DateOfBirth { get; set; }
+        [StringLength(8)]
+        public string DateOfBirth { get; set; }
 
         [Required]
         [StringLength(9)]

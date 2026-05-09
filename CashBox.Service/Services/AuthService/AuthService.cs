@@ -24,7 +24,7 @@ namespace CashBox.Service.Services.AuthService
             var user = new User
             {
                 UserName = registerDto.UserName,
-                Email = registerDto.Email,
+                //Email = registerDto.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
             };
 
@@ -64,7 +64,7 @@ namespace CashBox.Service.Services.AuthService
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(3),
+                expires: DateTime.UtcNow.AddHours(3),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
