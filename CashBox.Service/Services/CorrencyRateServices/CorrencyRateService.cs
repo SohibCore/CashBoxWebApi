@@ -37,6 +37,7 @@ namespace CashBox.Service.Services.CorrencyRateServices
         public async Task<CurrencyRateDto> GetAsync(int id)
         {
             var correncyRate = await _context.CorrencyRates.FindAsync(id);
+
             if (correncyRate == null)
                 throw new KeyNotFoundException($"{id} topilmadi");
 
@@ -53,9 +54,9 @@ namespace CashBox.Service.Services.CorrencyRateServices
         {
             var currencyRate = _context.CorrencyRates.AsQueryable();
 
-            if (currencyRateFilterDto != null)
+            if (currencyRateFilterDto.Id != 0)
                 currencyRate = currencyRate.Where(x => x.Id == currencyRateFilterDto.Id);
-            if (currencyRateFilterDto.CurrencyId != 0 && currencyRateFilterDto.CurrencyId != null)
+            if (currencyRateFilterDto.CurrencyId != 0)
                 currencyRate = currencyRate.Where(x => x.CurrencyId == currencyRateFilterDto.CurrencyId);
             if (currencyRateFilterDto.Date != null)
                 currencyRate = currencyRate.Where(x => x.Date == currencyRateFilterDto.Date);

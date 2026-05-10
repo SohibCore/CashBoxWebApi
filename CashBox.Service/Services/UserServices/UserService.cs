@@ -28,9 +28,10 @@ namespace CashBox.Service.Services.UserServices
                 Pinfl = user.Pinfl,
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
-                OrganizationId = user.OrganizationId,
+                //OrganizationId = user.OrganizationId,
                 DateOfBirth = user.DateOfBirth,
-                PassportSeries = user.PassportSeries
+                PassportSeries = user.PassportSeries,
+                Email = user.Email
             };
         }
         public async Task CreateAsync(CreateUserDto createUserDto)
@@ -44,9 +45,10 @@ namespace CashBox.Service.Services.UserServices
                 Pinfl = createUserDto.Pinfl,
                 PhoneNumber = createUserDto.PhoneNumber,
                 Address = createUserDto.Address,
-                OrganizationId = createUserDto.OrganizationId,
+                //OrganizationId = createUserDto.OrganizationId,
                 DateOfBirth = createUserDto.DateOfBirth,
                 PassportSeries = createUserDto.PassportSeries,
+                Email = createUserDto.Email
             };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -79,14 +81,17 @@ namespace CashBox.Service.Services.UserServices
             if (updateUserDto.Address != null)
                 user.Address = updateUserDto.Address;
 
-            if (updateUserDto.OrganizationId != 0)
-                user.OrganizationId = updateUserDto.OrganizationId;
+            //if (updateUserDto.OrganizationId != 0)
+            //    user.OrganizationId = updateUserDto.OrganizationId;
 
             if (updateUserDto.DateOfBirth != null)
                 user.DateOfBirth = updateUserDto.DateOfBirth;
 
             if (updateUserDto.PassportSeries != null)
                 user.PassportSeries = updateUserDto.PassportSeries;
+
+            if(updateUserDto.Email != null)
+                user.Email = updateUserDto.Email;
 
             await _context.SaveChangesAsync();
         }
@@ -113,14 +118,8 @@ namespace CashBox.Service.Services.UserServices
                 user = user.Where(x => x.ShortName.Contains(userFilterDto.ShortName));
             if (!string.IsNullOrWhiteSpace(userFilterDto.Pinfl))
                 user = user.Where(x => x.Pinfl.Contains(userFilterDto.Pinfl));
-            if (!string.IsNullOrWhiteSpace(userFilterDto.PhoneNumber))
-                user = user.Where(x => x.PhoneNumber.Contains(userFilterDto.PhoneNumber));
             if (!string.IsNullOrWhiteSpace(userFilterDto.PassportSeries))
                 user = user.Where(x => x.PassportSeries.Contains(userFilterDto.PassportSeries));
-            if (userFilterDto.OrganizationId != 0 && userFilterDto.OrganizationId != null)
-                user = user.Where(x => x.OrganizationId == userFilterDto.OrganizationId);
-            //if (userFilterDto.DateOfBirth != DateTime.MinValue && userFilterDto.DateOfBirth != null)
-            //    user = user.Where(x => x.DateOfBirth == userFilterDto.DateOfBirth);
 
             return await user.Select(u => new UserDto
             {
@@ -129,9 +128,9 @@ namespace CashBox.Service.Services.UserServices
                 FullName = u.FullName,
                 ShortName = u.ShortName,
                 Pinfl = u.Pinfl,
-                PhoneNumber = u.PhoneNumber,
-                OrganizationId = u.OrganizationId,
-                DateOfBirth = u.DateOfBirth,
+                //PhoneNumber = u.PhoneNumber,
+                //OrganizationId = u.OrganizationId,
+                //DateOfBirth = u.DateOfBirth,
                 PassportSeries = u.PassportSeries
             }).ToListAsync();
         }

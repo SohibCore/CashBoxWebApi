@@ -26,7 +26,7 @@ namespace RepositoryLayer.Entity
         [Column("REGION_ID")]
         public int RegionId { get; set; } 
         [ForeignKey(nameof(RegionId))]
-        public Region Region { get; set; }
+        public Region? Region { get; set; }
 
         [Column("DISTRICT")]
         [StringLength(300)]

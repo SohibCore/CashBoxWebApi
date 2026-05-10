@@ -11,9 +11,6 @@ namespace Repository.Entity
         [Column("ID")]
         public int Id { get; set; }
 
-        [Column("CURRENCY_ID")]
-        public int CurrencyId { get; set; }
-
         [Column("RATE")]
         public decimal Rate { get; set; } 
 
@@ -29,7 +26,10 @@ namespace Repository.Entity
         [Column("MODIFIED_AT")]
         public DateTime? ModifiedAt { get; set; }
 
+        [Column("CURRENCY_ID")]
+        public int CurrencyId { get; set; }
+
         [ForeignKey(nameof(CurrencyId))]
-        public Currency Currency { get; set; }
+        public Currency? Currency { get; set; }
     }
 }

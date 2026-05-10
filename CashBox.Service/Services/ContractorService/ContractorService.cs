@@ -36,20 +36,21 @@ namespace CashBox.Service.Services.ContractorService
             _context.Contractors.Remove(contractor);
             await _context.SaveChangesAsync();
         }
-        public async Task<List<ContractorDto>> GetAsync(int id)
+        public async Task<ContractorDto> GetAsync(int id)
         {
             var contractor = await _context.Contractors.FindAsync(id);
-            return new List<ContractorDto>()
+
+            if (contractor == null)
+                throw new KeyNotFoundException($"{id} topilmadi");
+
+            return new ContractorDto()
             {
-                new ContractorDto()
-                {
-                    Id = contractor.Id,
-                    Pinfl = contractor.Pinfl,
-                    ShortName = contractor.ShortName,
-                    FullName = contractor.FullName,
-                    RegionId = contractor.RegionId,
-                    DistrictId = contractor.DistrictId
-                }
+                Id = contractor.Id,
+                Pinfl = contractor.Pinfl,
+                ShortName = contractor.ShortName,
+                FullName = contractor.FullName,
+                RegionId = contractor.RegionId,
+                DistrictId = contractor.DistrictId
             };
         }
 

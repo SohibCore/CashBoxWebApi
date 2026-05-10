@@ -59,7 +59,7 @@ namespace CashBox.Service.Services.OrganizationServices
             if (updateOrganizationDto.ShortName != null)
                 organization.ShortName = updateOrganizationDto.ShortName;
 
-            if (updateOrganizationDto.RegionId != null && updateOrganizationDto.RegionId != 0)
+            if (updateOrganizationDto.RegionId != 0)
                 organization.RegionId = updateOrganizationDto.RegionId;
 
             if (updateOrganizationDto.District != null)

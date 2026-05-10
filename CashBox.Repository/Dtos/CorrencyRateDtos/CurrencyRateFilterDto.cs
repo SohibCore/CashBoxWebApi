@@ -2,9 +2,9 @@
 {
     public class CurrencyRateFilterDto
     {
-        public int? Id { get; set; }
-        public int? CurrencyId { get; set; }
-        public decimal? Rate { get; set; }
+        public int Id { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal Rate { get; set; }
         public DateTime? Date { get; set; }
     }
 }
