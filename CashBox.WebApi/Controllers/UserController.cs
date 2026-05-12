@@ -30,7 +30,8 @@ namespace CashBox.WebApi.Controllers
                 return NotFound();
 
             return Ok(users);
-        }
+        }        
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateUserDto createUserDto)
         {

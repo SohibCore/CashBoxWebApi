@@ -1,6 +1,8 @@
 ﻿using CashBox.Repository.Dtos.UserDtos;
+using CashBox.Service.Services.AuthService;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
+using RepositoryLayer.Entity;
 
 namespace CashBox.Service.Services.UserServices
 {
@@ -36,10 +38,10 @@ namespace CashBox.Service.Services.UserServices
         }
         public async Task CreateAsync(CreateUserDto createUserDto)
         {
-            var user = new RepositoryLayer.Entity.User
+            var user = new User
             {
                 UserName = createUserDto.UserName,
-                Password = createUserDto.Password,
+                Password = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password),
                 FullName = createUserDto.FullName,
                 ShortName = createUserDto.ShortName,
                 Pinfl = createUserDto.Pinfl,
@@ -90,7 +92,7 @@ namespace CashBox.Service.Services.UserServices
             if (updateUserDto.PassportSeries != null)
                 user.PassportSeries = updateUserDto.PassportSeries;
 
-            if(updateUserDto.Email != null)
+            if (updateUserDto.Email != null)
                 user.Email = updateUserDto.Email;
 
             await _context.SaveChangesAsync();
@@ -106,10 +108,17 @@ namespace CashBox.Service.Services.UserServices
             await _context.SaveChangesAsync();
         }
 
+        public async Task<UserDto> GetMe(int id)
+        {
+            return await GetAsync(id);
+        }
+
         public async Task<List<UserDto>> GetListAsync(UserFilterDto userFilterDto)
         {
             var user = _context.Users.AsQueryable();
 
+            if (userFilterDto.Id != 0)
+                user = user.Where(x => x.Id == userFilterDto.Id);
             if (!string.IsNullOrWhiteSpace(userFilterDto.UserName))
                 user = user.Where(x => x.UserName.Contains(userFilterDto.UserName));
             if (!string.IsNullOrWhiteSpace(userFilterDto.FullName))

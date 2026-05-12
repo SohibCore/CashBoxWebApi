@@ -24,7 +24,7 @@ namespace CashBox.Service.Services.AuthService
             var user = new User
             {
                 UserName = registerDto.UserName,
-                //Email = registerDto.Email,
+                Email = registerDto.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
             };
 

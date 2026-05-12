@@ -3,11 +3,11 @@
     public class UserFilterDto
     {
         public int Id { get; set; }
-        public string UserName { get; set; } = null!;
-        public string FullName { get; set; } = null!;
-        public string ShortName { get; set; } = null!;
-        public string Pinfl { get; set; } = null!;
+        public string? UserName { get; set; } 
+        public string? FullName { get; set; }
+        public string? ShortName { get; set; }
+        public string? Pinfl { get; set; } 
         public int OrganizationId { get; set; } 
-        public string PassportSeries { get; set; } = null!;
+        public string? PassportSeries { get; set; }
     }
 }

@@ -9,5 +9,6 @@ namespace CashBox.Service.Services.UserServices
         Task CreateAsync(CreateUserDto createUserDto);
         Task UpdateAsync(int id, UpdateUserDto updateUserDto);
         Task DeleteAsync(int id);
+        Task<UserDto> GetMe(int id);
     }
 }

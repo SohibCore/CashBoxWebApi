@@ -29,19 +29,19 @@ namespace RepositoryLayer.Entity
 
         [Column("SHORT_NAME")]
         [StringLength(300)]
-        public string? ShortName { get; set; } = null!;
+        public string? ShortName { get; set; }
 
         [Column("PINFL")]
         [StringLength(14)]
-        public string? Pinfl { get; set; } = null!;
+        public string? Pinfl { get; set; } 
 
         [Column("PHONE_NUMBER")]
         [StringLength(30)]
-        public string? PhoneNumber { get; set; } = null!;
+        public string? PhoneNumber { get; set; } 
 
-        [Column("ADRESS")]
+        [Column("ADDRESS")]
         [StringLength(300)]
-        public string? Address { get; set; } = null!;
+        public string? Address { get; set; } 
 
         //[Column("ORGANIZATION_ID")]
         //public int OrganizationId { get; set; }
@@ -55,7 +55,7 @@ namespace RepositoryLayer.Entity
 
         [Column("PASSPORT_SERIES")]
         [StringLength(9)]
-        public string? PassportSeries { get; set; } = null!;
+        public string? PassportSeries { get; set; } 
 
         [Column("EMAIL")]
         [StringLength(150)]
