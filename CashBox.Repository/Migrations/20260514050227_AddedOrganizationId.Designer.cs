@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace CashBox.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260514050227_AddedOrganizationId")]
+    partial class AddedOrganizationId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,13 +69,12 @@ namespace CashBox.Repository.Migrations
 
             modelBuilder.Entity("CashBox.Repository.Entity.UserRole", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("USER_ID");
+                        .HasColumnName("ID");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer")
-                        .HasColumnName("ROLE_ID");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CreateUserId")
                         .HasColumnType("integer")
@@ -82,13 +84,6 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("CREATED_AT");
 
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("ID");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("MODIFIED_AT");
@@ -97,9 +92,25 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("MODIFIED_USER_ID");
 
-                    b.HasKey("UserId", "RoleId");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ROLE_ID");
+
+                    b.Property<int>("StateId")
+                        .HasColumnType("integer")
+                        .HasColumnName("STATE_ID");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("USER_ID");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("StateId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("SYS_USER_ROLE");
                 });
@@ -559,7 +570,7 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("MODIFIED_USER_ID");
 
-                    b.Property<int?>("OrganizationId")
+                    b.Property<int>("OrganizationId")
                         .HasColumnType("integer")
                         .HasColumnName("ORGANIZATION_ID");
 
@@ -605,18 +616,26 @@ namespace CashBox.Repository.Migrations
             modelBuilder.Entity("CashBox.Repository.Entity.UserRole", b =>
                 {
                     b.HasOne("CashBox.Repository.Entity.Role", "Role")
-                        .WithMany("UserRoles")
+                        .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CashBox.Repository.Enums.State", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RepositoryLayer.Entity.User", "User")
-                        .WithMany("UserRoles")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Role");
+
+                    b.Navigation("State");
 
                     b.Navigation("User");
                 });
@@ -677,19 +696,11 @@ namespace CashBox.Repository.Migrations
                 {
                     b.HasOne("RepositoryLayer.Entity.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("OrganizationId");
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Organization");
-                });
-
-            modelBuilder.Entity("CashBox.Repository.Entity.Role", b =>
-                {
-                    b.Navigation("UserRoles");
-                });
-
-            modelBuilder.Entity("RepositoryLayer.Entity.User", b =>
-                {
-                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

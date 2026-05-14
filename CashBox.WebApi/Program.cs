@@ -4,8 +4,11 @@ using CashBox.Service.Services.ContractorService;
 using CashBox.Service.Services.CorrencyRateServices;
 using CashBox.Service.Services.CorrencyServices;
 using CashBox.Service.Services.DistrictServices;
+using CashBox.Service.Services.NewFolder;
 using CashBox.Service.Services.OrganizationServices;
 using CashBox.Service.Services.RegionServices;
+using CashBox.Service.Services.RoleServices;
+using CashBox.Service.Services.UserRoleService;
 using CashBox.Service.Services.UserServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +63,8 @@ builder.Services.AddScoped<ICurrencyRateService, CurrencyRateService>();
 builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<IContractorService, ContractorService>();
 builder.Services.AddScoped<IContratorAccountService, ContratorAccountService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 
 builder.Services.AddSwaggerGen(options =>
 {

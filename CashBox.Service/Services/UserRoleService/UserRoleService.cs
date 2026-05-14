@@ -1,4 +1,5 @@
-﻿using CashBox.Repository.Dtos.UserRoleDtos;
+﻿using CashBox.Core.Roles;
+using CashBox.Repository.Dtos.UserRoleDtos;
 using CashBox.Repository.Entity;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
@@ -12,67 +13,58 @@ namespace CashBox.Service.Services.UserRoleService
         {
             _context = context;
         }
-        public async Task CreateAsync(UserRole userRole)
+
+        public async Task AssignAsync(int userId, int roleId)
         {
-            var role = _context.UserRoles.AnyAsync(x => x.UserId == userRole.UserId && x.RoleId == userRole.RoleId);
+            var role = await _context.UserRoles
+           .AnyAsync(x => x.UserId == userId && x.RoleId == roleId);
 
-            if (role != null)
-                throw new Exception("Bu role allaqachon biriktirilgan");
+            if (role)
+                throw new KeyNotFoundException("Role allaqachon yuklangan");
 
-            var roles = new UserRole
+            var userRole = new UserRole
             {
-                UserId = userRole.UserId,
-                RoleId = userRole.RoleId,
-                StateId = userRole.StateId,
+                UserId = userId,
+                RoleId = roleId
             };
-            await _context.UserRoles.AddAsync(roles);
+
+            await _context.UserRoles.AddAsync(userRole);
             await _context.SaveChangesAsync();
         }
-        public async Task DeleteAsync(int id)
+
+        public async Task<List<UserRoleDto>> GetListAsync(UserRoleFilter userRoleFilter)
         {
-            var userRole = await _context.UserRoles.FindAsync(id);
+            //return await _context.UserRoles
+            //.Where(x => x.UserId == userId)
+            //.Select(x => x.Role.Name)
+            //.ToListAsync();
 
-            if (userRole == null)
-                throw new Exception("Bu id li userRole mavjud emas");
+            var userRole = _context.UserRoles.AsQueryable();
 
-            _context.UserRoles.Remove(userRole);
-            await _context.SaveChangesAsync();
-        }
-        public async Task<UserRole> GetAsync(int id)
-        {
-            var userRole = await _context.UserRoles.FindAsync(id);
+            if (userRoleFilter.UserId != 0)
+                userRole = userRole.Where(x => x.UserId == userRoleFilter.UserId);
 
-            if (userRole == null)
-                throw new Exception("Bu id li userRole mavjud emas");
+            if (userRoleFilter.RoleId != 0)
+                userRole = userRole.Where(x => x.RoleId == userRoleFilter.RoleId);
 
-            return new UserRole
-            {
-                Id = userRole.Id,
-                UserId = userRole.UserId,
-                RoleId = userRole.RoleId,
-                StateId = userRole.StateId,
-            };
-        }
-        public async Task<List<UserRole>> GetListAsync(UserRoleFilter userRoleFilter)
-        {
-            var roles = _context.UserRoles.AsQueryable();
-
-            if (userRoleFilter.Id != 0 || userRoleFilter.Id == null)
-                roles = roles.Where(x => x.Id == userRoleFilter.Id);
-
-            if (userRoleFilter.UserId != 0 || userRoleFilter.UserId == null)
-                roles = roles.Where(x => x.UserId == userRoleFilter.UserId);
-
-            if (userRoleFilter.RoleId != 0 || userRoleFilter.RoleId == null)
-                roles = roles.Where(x => x.RoleId == userRoleFilter.RoleId);
-
-            return await roles.Select(u => new UserRole
+            return await userRole.Select(u => new UserRoleDto
             {
                 Id = u.Id,
                 UserId = u.UserId,
                 RoleId = u.RoleId,
-                StateId = u.StateId,
             }).ToListAsync();
+        }
+
+        public async Task RemoveAsync(int userId, int roleId)
+        {
+            var userRole = await _context.UserRoles
+           .FirstOrDefaultAsync(x => x.UserId == userId && x.RoleId == roleId);
+
+            if (userRole == null)
+                throw new Exception("UserRole not found");
+
+            _context.UserRoles.Remove(userRole);
+            await _context.SaveChangesAsync();
         }
     }
 }

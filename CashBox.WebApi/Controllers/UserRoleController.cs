@@ -1,46 +1,37 @@
 ﻿using CashBox.Repository.Dtos.UserRoleDtos;
-using CashBox.Repository.Entity;
 using CashBox.Service.Services.UserRoleService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class UserRoleController : ControllerBase
     {
-        private readonly IUserRoleService _userRoleService;
-        public UserRoleController(IUserRoleService userRoleService)
-        {
-            _userRoleService = userRoleService;
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] UserRoleFilter userRoleFilter)
-        {
-            var result = await _userRoleService.GetListAsync(userRoleFilter);
-            return Ok(result);
-        }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromRoute] int id)
-        {
-            var userRole = await _userRoleService.GetAsync(id);
+        private readonly IUserRoleService _service;
 
-            if(userRole == null)
-                return NotFound();
+        public UserRoleController(IUserRoleService service)
+        {
+            _service = service;
+        }
 
-            return Ok(userRole);
-        }
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] UserRole userRole)
+        [HttpPost("assign")]
+        public async Task<IActionResult> Assign(int userId, int roleId)
         {
-            await _userRoleService.CreateAsync(userRole);
-            return Ok();
+            await _service.AssignAsync(userId, roleId);
+            return Ok("Role assigned");
         }
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("remove")]
+        public async Task<IActionResult> Remove(int userId, int roleId)
         {
-            await _userRoleService.DeleteAsync(id);
-            return Ok();
+            await _service.RemoveAsync(userId, roleId);
+            return Ok("Role removed");
+        }
+        [HttpGet("list")]
+        public async Task<IActionResult> GetList(UserRoleFilter userRoleFilter)
+        {
+            var roles = await _service.GetListAsync(userRoleFilter);
+            return Ok(roles);
         }
     }
 }

@@ -26,6 +26,14 @@ namespace CashBox.Service.Services.AuthService
                 UserName = registerDto.UserName,
                 Email = registerDto.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
+                FullName = registerDto.FullName,
+                ShortName = registerDto.ShortName,
+                Pinfl = registerDto.Pinfl,
+                PhoneNumber = registerDto.PhoneNumber,
+                Address = registerDto.Address,
+                OrganizationId = registerDto.OrganizationId,
+                DateOfBirth = registerDto.DateOfBirth,
+                PassportSeries = registerDto.PassportSeries,
             };
 
             await _context.Users.AddAsync(user);
@@ -53,14 +61,17 @@ namespace CashBox.Service.Services.AuthService
         }
         private string GenerateJwt(User user)
         {
-            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+            //var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
 
             var claims = new[]
             {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName),
-        };
-            var creds = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+            new Claim(ClaimTypes.Email, user.Email),
+             };
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 claims: claims,

@@ -23,11 +23,6 @@ namespace CashBox.Repository.Entity
         [ForeignKey(nameof(RoleId))]
         public Role Role { get; set; } = null!;
 
-        [Column("STATE_ID")]
-        public int StateId { get; set; }
-        [ForeignKey(nameof(StateId))]
-        public State State { get; set; } = null!;
-
         [Column("CREATE_USER_ID")]
         public int? CreateUserId { get; set; }
         [Column("CREATED_AT")]

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CashBox.Repository.Entity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RepositoryLayer.Entity
@@ -25,7 +26,7 @@ namespace RepositoryLayer.Entity
 
         [Column("FULL_NAME")]
         [StringLength(500)]
-        public string? FullName { get; set; } 
+        public string? FullName { get; set; }
 
         [Column("SHORT_NAME")]
         [StringLength(300)]
@@ -33,21 +34,21 @@ namespace RepositoryLayer.Entity
 
         [Column("PINFL")]
         [StringLength(14)]
-        public string? Pinfl { get; set; } 
+        public string? Pinfl { get; set; }
 
         [Column("PHONE_NUMBER")]
         [StringLength(30)]
-        public string? PhoneNumber { get; set; } 
+        public string? PhoneNumber { get; set; }
 
         [Column("ADDRESS")]
         [StringLength(300)]
-        public string? Address { get; set; } 
+        public string? Address { get; set; }
 
-        //[Column("ORGANIZATION_ID")]
-        //public int OrganizationId { get; set; }
+        [Column("ORGANIZATION_ID")]
+        public int? OrganizationId { get; set; }
 
-        //[ForeignKey(nameof(OrganizationId))]
-        //public Organization Organization { get; set; } = null!;
+        [ForeignKey(nameof(OrganizationId))]
+        public Organization? Organization { get; set; }
 
         [Column("DATE_OF_BIRTH")]
         [StringLength(10)]
@@ -55,7 +56,7 @@ namespace RepositoryLayer.Entity
 
         [Column("PASSPORT_SERIES")]
         [StringLength(9)]
-        public string? PassportSeries { get; set; } 
+        public string? PassportSeries { get; set; }
 
         [Column("EMAIL")]
         [StringLength(150)]
@@ -69,5 +70,8 @@ namespace RepositoryLayer.Entity
         public int? ModifiedUserId { get; set; }
         [Column("MODIFIED_AT")]
         public DateTime? ModifiedAt { get; set; }
+
+        public ICollection<UserRole> UserRoles { get; set; }
+    = new List<UserRole>();
     }
 }

@@ -1,5 +1,4 @@
 ﻿using CashBox.Repository.Dtos.UserDtos;
-using CashBox.Service.Services.AuthService;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using RepositoryLayer.Entity;
@@ -30,7 +29,7 @@ namespace CashBox.Service.Services.UserServices
                 Pinfl = user.Pinfl,
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
-                //OrganizationId = user.OrganizationId,
+                OrganizationId = user.OrganizationId,
                 DateOfBirth = user.DateOfBirth,
                 PassportSeries = user.PassportSeries,
                 Email = user.Email
@@ -47,7 +46,7 @@ namespace CashBox.Service.Services.UserServices
                 Pinfl = createUserDto.Pinfl,
                 PhoneNumber = createUserDto.PhoneNumber,
                 Address = createUserDto.Address,
-                //OrganizationId = createUserDto.OrganizationId,
+                OrganizationId = createUserDto.OrganizationId,
                 DateOfBirth = createUserDto.DateOfBirth,
                 PassportSeries = createUserDto.PassportSeries,
                 Email = createUserDto.Email
@@ -119,6 +118,8 @@ namespace CashBox.Service.Services.UserServices
 
             if (userFilterDto.Id != 0)
                 user = user.Where(x => x.Id == userFilterDto.Id);
+            if(userFilterDto.OrganizationId != 0)
+                user = user.Where(x => x.OrganizationId == userFilterDto.OrganizationId);
             if (!string.IsNullOrWhiteSpace(userFilterDto.UserName))
                 user = user.Where(x => x.UserName.Contains(userFilterDto.UserName));
             if (!string.IsNullOrWhiteSpace(userFilterDto.FullName))
@@ -129,6 +130,13 @@ namespace CashBox.Service.Services.UserServices
                 user = user.Where(x => x.Pinfl.Contains(userFilterDto.Pinfl));
             if (!string.IsNullOrWhiteSpace(userFilterDto.PassportSeries))
                 user = user.Where(x => x.PassportSeries.Contains(userFilterDto.PassportSeries));
+            if (!string.IsNullOrWhiteSpace(userFilterDto.PhoneNumber))
+                user = user.Where(x => x.PhoneNumber.Contains(userFilterDto.PhoneNumber));
+            if (!string.IsNullOrWhiteSpace(userFilterDto.DateOfBirth))
+                user = user.Where(x => x.UserName.Contains(userFilterDto.DateOfBirth));
+            if (!string.IsNullOrWhiteSpace(userFilterDto.Address))
+                user = user.Where(x => x.Address.Contains(userFilterDto.Address));
+
 
             return await user.Select(u => new UserDto
             {
@@ -137,9 +145,10 @@ namespace CashBox.Service.Services.UserServices
                 FullName = u.FullName,
                 ShortName = u.ShortName,
                 Pinfl = u.Pinfl,
-                //PhoneNumber = u.PhoneNumber,
-                //OrganizationId = u.OrganizationId,
-                //DateOfBirth = u.DateOfBirth,
+                PhoneNumber = u.PhoneNumber,
+                Address = u.Address,
+                OrganizationId = u.OrganizationId,
+                DateOfBirth = u.DateOfBirth,
                 PassportSeries = u.PassportSeries
             }).ToListAsync();
         }

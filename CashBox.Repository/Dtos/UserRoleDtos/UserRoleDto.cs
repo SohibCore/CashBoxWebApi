@@ -1,6 +1,6 @@
 ﻿namespace CashBox.Repository.Dtos.UserRoleDtos
 {
-    public class UserRoleFilter
+    public class UserRoleDto
     {
         public int Id { get; set; }
         public int? UserId { get; set; }

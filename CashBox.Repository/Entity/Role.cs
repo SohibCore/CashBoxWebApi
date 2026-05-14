@@ -27,5 +27,8 @@ namespace CashBox.Repository.Entity
         public int? ModifiedUserId { get; set; }
         [Column("MODIFIED_AT")]
         public DateTime? ModifiedAt { get; set; }
+
+        public ICollection<UserRole> UserRoles { get; set; }
+    = new List<UserRole>();
     }
 }
