@@ -12,8 +12,8 @@ using Repository.Data;
 namespace CashBox.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260509130728_SyncState")]
-    partial class SyncState
+    [Migration("20260514193800_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -96,10 +96,6 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("ROLE_ID");
 
-                    b.Property<int>("StateId")
-                        .HasColumnType("integer")
-                        .HasColumnName("STATE_ID");
-
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
                         .HasColumnName("USER_ID");
@@ -107,8 +103,6 @@ namespace CashBox.Repository.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
-
-                    b.HasIndex("StateId");
 
                     b.HasIndex("UserId");
 
@@ -535,10 +529,9 @@ namespace CashBox.Repository.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)")
-                        .HasColumnName("ADRESS");
+                        .HasColumnName("ADDRESS");
 
                     b.Property<int?>("CreateUserId")
                         .HasColumnType("integer")
@@ -549,8 +542,8 @@ namespace CashBox.Repository.Migrations
                         .HasColumnName("CREATED_AT");
 
                     b.Property<string>("DateOfBirth")
-                        .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("DATE_OF_BIRTH");
 
                     b.Property<string>("Email")
@@ -559,7 +552,6 @@ namespace CashBox.Repository.Migrations
                         .HasColumnName("EMAIL");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("FULL_NAME");
@@ -572,12 +564,11 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("MODIFIED_USER_ID");
 
-                    b.Property<int>("OrganizationId")
+                    b.Property<int?>("OrganizationId")
                         .HasColumnType("integer")
                         .HasColumnName("ORGANIZATION_ID");
 
                     b.Property<string>("PassportSeries")
-                        .IsRequired()
                         .HasMaxLength(9)
                         .HasColumnType("character varying(9)")
                         .HasColumnName("PASSPORT_SERIES");
@@ -589,19 +580,16 @@ namespace CashBox.Repository.Migrations
                         .HasColumnName("PASSWORD");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)")
                         .HasColumnName("PHONE_NUMBER");
 
                     b.Property<string>("Pinfl")
-                        .IsRequired()
                         .HasMaxLength(14)
                         .HasColumnType("character varying(14)")
                         .HasColumnName("PINFL");
 
                     b.Property<string>("ShortName")
-                        .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)")
                         .HasColumnName("SHORT_NAME");
@@ -622,26 +610,18 @@ namespace CashBox.Repository.Migrations
             modelBuilder.Entity("CashBox.Repository.Entity.UserRole", b =>
                 {
                     b.HasOne("CashBox.Repository.Entity.Role", "Role")
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CashBox.Repository.Enums.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("RepositoryLayer.Entity.User", "User")
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Role");
-
-                    b.Navigation("State");
 
                     b.Navigation("User");
                 });
@@ -702,11 +682,19 @@ namespace CashBox.Repository.Migrations
                 {
                     b.HasOne("RepositoryLayer.Entity.Organization", "Organization")
                         .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OrganizationId");
 
                     b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("CashBox.Repository.Entity.Role", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("RepositoryLayer.Entity.User", b =>
+                {
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

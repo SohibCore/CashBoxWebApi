@@ -1,9 +1,11 @@
 ﻿using CashBox.Repository.Dtos.UserRoleDtos;
 using CashBox.Service.Services.UserRoleService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class UserRoleController : ControllerBase
@@ -15,19 +17,19 @@ namespace CashBox.WebApi.Controllers
             _service = service;
         }
 
-        [HttpPost("assign")]
+        [HttpPost]
         public async Task<IActionResult> Assign(int userId, int roleId)
         {
             await _service.AssignAsync(userId, roleId);
             return Ok("Role assigned");
         }
-        [HttpDelete("remove")]
+        [HttpDelete]
         public async Task<IActionResult> Remove(int userId, int roleId)
         {
             await _service.RemoveAsync(userId, roleId);
             return Ok("Role removed");
         }
-        [HttpGet("list")]
+        [HttpGet]
         public async Task<IActionResult> GetList(UserRoleFilter userRoleFilter)
         {
             var roles = await _service.GetListAsync(userRoleFilter);

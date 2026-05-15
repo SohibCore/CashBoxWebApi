@@ -41,7 +41,7 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import { getUsers, getRoles, createUserRole, getMe } from '../api';
+import { getUsers, getRoles, assignUserRole as assignUserRoleAPI, getMe } from '../api';
 
 export default {
   setup() {
@@ -143,7 +143,7 @@ export default {
         return;
       }
       try {
-        await createUserRole({
+        await assignUserRoleAPI({
           userId: roleAssignment.value.userId,
           roleId: roleAssignment.value.roleId
         });

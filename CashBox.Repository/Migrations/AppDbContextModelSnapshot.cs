@@ -66,13 +66,12 @@ namespace CashBox.Repository.Migrations
 
             modelBuilder.Entity("CashBox.Repository.Entity.UserRole", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("USER_ID");
+                        .HasColumnName("ID");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer")
-                        .HasColumnName("ROLE_ID");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CreateUserId")
                         .HasColumnType("integer")
@@ -82,13 +81,6 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("CREATED_AT");
 
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("ID");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("MODIFIED_AT");
@@ -97,9 +89,19 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("MODIFIED_USER_ID");
 
-                    b.HasKey("UserId", "RoleId");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ROLE_ID");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("USER_ID");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("SYS_USER_ROLE");
                 });

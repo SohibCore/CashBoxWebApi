@@ -77,6 +77,27 @@ export async function createUserRole(data) {
   return api.post('/api/userrole/create', mapped);
 }
 
+export async function assignUserRole(data) {
+  const mapped = mapUserRolePayload(data);
+  return await api.post('/api/userrole/assign', null, {
+    params: {
+      userId: mapped.UserId,
+      roleId: mapped.RoleId
+    }
+  });
+}
+
+export async function removeUserRole(userId, roleId) {
+  return api.post('/api/userrole/remove', {
+    UserId: userId,
+    RoleId: roleId
+  });
+}
+
+export async function getUserRoles(userId) {
+  return api.get(`/api/userrole/getlist?userId=${userId}`);
+}
+
 export const extractApiData = (response) => {
   if (!response || typeof response !== 'object') return response;
   return response.data?.data ?? response.data ?? response;

@@ -15,6 +15,11 @@ namespace CashBox.Service.Services.RoleServices
         }
         public async Task CreateAsync(CreateRoleDto createRoleDto)
         {
+            var roleUser = await _context.Roles.AnyAsync(x => x.Name == createRoleDto.Name);
+
+            if(roleUser)
+                throw new InvalidOperationException($"'{createRoleDto.Name}' roli allaqachon mavjud");
+
             var role = new Role()
             {
                 Name = createRoleDto.Name,
@@ -35,14 +40,14 @@ namespace CashBox.Service.Services.RoleServices
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Role> GetAsync(int id)
+        public async Task<RoleDto> GetAsync(int id)
         {
             var role = await _context.Roles.FindAsync(id);
 
             if (role == null)
                 throw new KeyNotFoundException($"{id} topilmadi");
 
-            return new Role
+            return new RoleDto
             {
                 Id = role.Id,
                 Name = role.Name,
@@ -54,7 +59,7 @@ namespace CashBox.Service.Services.RoleServices
         {
             var role = _context.Roles.AsQueryable();
 
-            if (roleFilterDto.Id != 0)
+            if (roleFilterDto.Id != 0 && roleFilterDto.Id != null)
                 role = role.Where(r => r.Id == roleFilterDto.Id);
 
             if (!string.IsNullOrEmpty(roleFilterDto.Name))

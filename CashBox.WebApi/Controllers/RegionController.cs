@@ -15,8 +15,8 @@ namespace CashBox.WebApi.Controllers
         {
             _regionService = regionService;
         }
-        [HttpPost]
-        public async Task<IActionResult> GetList(RegionFilterDto regionFilterDto)
+        [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] RegionFilterDto regionFilterDto)
         {
             var regions = await _regionService.GetListAsync(regionFilterDto);
             return Ok(regions);

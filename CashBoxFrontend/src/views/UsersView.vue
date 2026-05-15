@@ -7,7 +7,14 @@
       </div>
     </div>
 
-    <form class="entity-form" @submit.prevent="createNewUser">
+    <div class="section-actions">
+      <button type="button" class="toggle-create" @click="toggleCreateForm">
+        <span>+</span> Yangi foydalanuvchi
+      </button>
+      <span class="user-count">{{ users.length }} ta foydalanuvchi</span>
+    </div>
+
+    <form v-if="showCreateForm" class="entity-form" @submit.prevent="createNewUser">
       <h3>Yangi foydalanuvchi</h3>
       <div class="form-grid">
         <label>Login nomi<input v-model="newUser.userName" required /></label>
@@ -48,34 +55,47 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td>{{ user.id || '-' }}</td>
-            <td>{{ user.userName || '-' }}</td>
-            <td>{{ user.fullName || '-' }}</td>
-            <td>{{ user.shortName || '-' }}</td>
-            <td>{{ user.pinfl || '-' }}</td>
-            <td>{{ user.phoneNumber || '-' }}</td>
-            <td>{{ user.address || '-' }}</td>
-            <td>{{ formatDate(user.dateOfBirth) || '-' }}</td>
-            <td>{{ user.passportSeries || '-' }}</td>
-            <td>{{ organizationName(user.organizationId) }}</td>
-            <td class="actions">
-              <button @click="startEdit(user)" class="icon-btn" title="Tahrirlash">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-              </button>
-              <button @click="deleteRow(user.id)" class="icon-btn danger" title="O'chirish">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  <line x1="10" y1="11" x2="10" y2="17"></line>
-                  <line x1="14" y1="11" x2="14" y2="17"></line>
-                </svg>
-              </button>
-            </td>
-          </tr>
+          <template v-for="user in users" :key="user.id">
+            <tr>
+              <td>{{ user.id || '-' }}</td>
+              <td>{{ user.userName || '-' }}</td>
+              <td>{{ user.fullName || '-' }}</td>
+              <td>{{ user.shortName || '-' }}</td>
+              <td>{{ user.pinfl || '-' }}</td>
+              <td>{{ user.phoneNumber || '-' }}</td>
+              <td>{{ user.address || '-' }}</td>
+              <td>{{ formatDate(user.dateOfBirth) || '-' }}</td>
+              <td>{{ user.passportSeries || '-' }}</td>
+              <td>{{ organizationName(user.organizationId) }}</td>
+              <td class="actions">
+                <div class="action-dropdown-wrapper">
+                  <button @click="toggleRow(user.id)" :class="['icon-btn', { expanded: expandedUserId === user.id }]" title="Amallarni ko'rsatish">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </button>
+                  <div v-if="expandedUserId === user.id" class="action-dropdown">
+                    <button @click="startEdit(user)" class="dropdown-btn">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                      Tahrirlash
+                    </button>
+                    <button @click="deleteRow(user.id)" class="dropdown-btn danger">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                      </svg>
+                      O'chirish
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -94,6 +114,8 @@ export default {
     const users = ref([]);
     const organizations = ref([]);
     const createError = ref('');
+    const showCreateForm = ref(false);
+    const expandedUserId = ref(null);
     const newUser = ref({
       userName: '',
       email: '',
@@ -107,6 +129,14 @@ export default {
       dateOfBirth: '',
       passportSeries: ''
     });
+
+    const toggleCreateForm = () => {
+      showCreateForm.value = !showCreateForm.value;
+    };
+
+    const toggleRow = (id) => {
+      expandedUserId.value = expandedUserId.value === id ? null : id;
+    };
 
     const loadUsers = async () => {
       try {
@@ -254,9 +284,13 @@ export default {
       organizations,
       newUser,
       createError,
+      showCreateForm,
+      expandedUserId,
       createNewUser,
       startEdit,
       deleteRow,
+      toggleCreateForm,
+      toggleRow,
       organizationName,
       formatDate
     };
@@ -283,6 +317,147 @@ export default {
 
 .entity-form {
   margin-bottom: 1.5rem;
+}
+
+.section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.toggle-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2563eb;
+  color: white;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+}
+
+.user-count {
+  color: #475569;
+  font-weight: 600;
+}
+
+.action-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.action-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.3rem;
+  display: flex;
+  gap: 0.4rem;
+  background: white;
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid transparent;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.dropdown-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.dropdown-btn:hover {
+  background: #eff6ff;
+  border-color: #cbd5e1;
+}
+
+.dropdown-btn.danger {
+  color: white;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.dropdown-btn.danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.icon-btn.expanded svg {
+  transform: rotate(180deg);
+}
+
+.expanded-row td {
+  background: #eff6ff;
+}
+
+.expanded-actions {
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+  background: #f8fafc;
+}
+
+.action-card {
+  display: inline-flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  background: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
+}
+
+.small-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid transparent;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.82rem;
+  border-radius: 0.55rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.small-action svg {
+  width: 14px;
+  height: 14px;
+}
+
+.small-action:hover {
+  background: #eff6ff;
+  border-color: #cbd5e1;
+}
+
+.small-action.danger {
+  color: #dc2626;
+}
+
+.small-action.danger:hover {
+  background: #fee2e2;
 }
 
 .section-card {

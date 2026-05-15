@@ -1,5 +1,4 @@
-﻿using CashBox.Repository.Enums;
-using RepositoryLayer.Entity;
+﻿using RepositoryLayer.Entity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

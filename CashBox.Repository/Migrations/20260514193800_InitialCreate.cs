@@ -13,6 +13,25 @@ namespace CashBox.Repository.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "ENUM_STATE",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FULL_NAME = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    SHORT_NAME = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    CODE = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: false),
+                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    MODIFIED_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ENUM_STATE", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "INFO_CURRENCY",
                 columns: table => new
                 {
@@ -21,8 +40,8 @@ namespace CashBox.Repository.Migrations
                     CODE = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     FULL_NAME = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     SHORT_NAME = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
-                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: false),
-                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     MODIFIED_USER_ID = table.Column<int>(type: "integer", nullable: true),
                     MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -59,8 +78,8 @@ namespace CashBox.Repository.Migrations
                     FULL_NAME = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     SHORT_NAME = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
                     CODE = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: false),
-                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     MODIFIED_USER_ID = table.Column<int>(type: "integer", nullable: true),
                     MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -70,18 +89,36 @@ namespace CashBox.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SYS_ROLE",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    NAME = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    DESCRIPTION = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    MODIFIED_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SYS_ROLE", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "INFO_CURRENCY_RATE",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CURRENCY_ID = table.Column<int>(type: "integer", nullable: false),
                     RATE = table.Column<decimal>(type: "numeric", nullable: false),
                     DATE = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: false),
-                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     MODIFIED_USER_ID = table.Column<int>(type: "integer", nullable: true),
-                    MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CURRENCY_ID = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,8 +176,8 @@ namespace CashBox.Repository.Migrations
                     SHORT_NAME = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
                     REGION_ID = table.Column<int>(type: "integer", nullable: false),
                     DISTRICT = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
-                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: false),
-                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     MODIFIED_USER_ID = table.Column<int>(type: "integer", nullable: true),
                     MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -164,8 +201,8 @@ namespace CashBox.Repository.Migrations
                     CODE = table.Column<string>(type: "character varying(27)", maxLength: 27, nullable: false),
                     CONTRACTOR_ID = table.Column<int>(type: "integer", nullable: false),
                     FULL_NAME = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: false),
-                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     MODIFIED_USER_ID = table.Column<int>(type: "integer", nullable: true),
                     MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -187,17 +224,18 @@ namespace CashBox.Repository.Migrations
                     ID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     USER_NAME = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    PASSWORD = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    FULL_NAME = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    SHORT_NAME = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
-                    PINFL = table.Column<string>(type: "character varying(14)", maxLength: 14, nullable: false),
-                    PHONE_NUMBER = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
-                    ADRESS = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
-                    ORGANIZATION_ID = table.Column<int>(type: "integer", nullable: false),
-                    DATE_OF_BIRTH = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PASSPORT_SERIES = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: false),
-                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: false),
-                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PASSWORD = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    FULL_NAME = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    SHORT_NAME = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
+                    PINFL = table.Column<string>(type: "character varying(14)", maxLength: 14, nullable: true),
+                    PHONE_NUMBER = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
+                    ADDRESS = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
+                    ORGANIZATION_ID = table.Column<int>(type: "integer", nullable: true),
+                    DATE_OF_BIRTH = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
+                    PASSPORT_SERIES = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: true),
+                    EMAIL = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
+                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     MODIFIED_USER_ID = table.Column<int>(type: "integer", nullable: true),
                     MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -208,6 +246,35 @@ namespace CashBox.Repository.Migrations
                         name: "FK_SYS_USER_INFO_ORGANIZATION_ORGANIZATION_ID",
                         column: x => x.ORGANIZATION_ID,
                         principalTable: "INFO_ORGANIZATION",
+                        principalColumn: "ID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SYS_USER_ROLE",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    USER_ID = table.Column<int>(type: "integer", nullable: false),
+                    ROLE_ID = table.Column<int>(type: "integer", nullable: false),
+                    CREATE_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    MODIFIED_USER_ID = table.Column<int>(type: "integer", nullable: true),
+                    MODIFIED_AT = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SYS_USER_ROLE", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_SYS_USER_ROLE_SYS_ROLE_ROLE_ID",
+                        column: x => x.ROLE_ID,
+                        principalTable: "SYS_ROLE",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SYS_USER_ROLE_SYS_USER_USER_ID",
+                        column: x => x.USER_ID,
+                        principalTable: "SYS_USER",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -241,11 +308,24 @@ namespace CashBox.Repository.Migrations
                 name: "IX_SYS_USER_ORGANIZATION_ID",
                 table: "SYS_USER",
                 column: "ORGANIZATION_ID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SYS_USER_ROLE_ROLE_ID",
+                table: "SYS_USER_ROLE",
+                column: "ROLE_ID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SYS_USER_ROLE_USER_ID",
+                table: "SYS_USER_ROLE",
+                column: "USER_ID");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "ENUM_STATE");
+
             migrationBuilder.DropTable(
                 name: "HL_CONTRACTOR_ACCOUNT");
 
@@ -253,7 +333,7 @@ namespace CashBox.Repository.Migrations
                 name: "INFO_CURRENCY_RATE");
 
             migrationBuilder.DropTable(
-                name: "SYS_USER");
+                name: "SYS_USER_ROLE");
 
             migrationBuilder.DropTable(
                 name: "HL_CONTRACTOR");
@@ -262,10 +342,16 @@ namespace CashBox.Repository.Migrations
                 name: "INFO_CURRENCY");
 
             migrationBuilder.DropTable(
-                name: "INFO_ORGANIZATION");
+                name: "SYS_ROLE");
+
+            migrationBuilder.DropTable(
+                name: "SYS_USER");
 
             migrationBuilder.DropTable(
                 name: "INFO_DISTRICT");
+
+            migrationBuilder.DropTable(
+                name: "INFO_ORGANIZATION");
 
             migrationBuilder.DropTable(
                 name: "INFO_REGION");

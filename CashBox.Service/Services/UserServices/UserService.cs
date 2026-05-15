@@ -116,9 +116,9 @@ namespace CashBox.Service.Services.UserServices
         {
             var user = _context.Users.AsQueryable();
 
-            if (userFilterDto.Id != 0)
+            if (userFilterDto.Id.HasValue)
                 user = user.Where(x => x.Id == userFilterDto.Id);
-            if(userFilterDto.OrganizationId != 0)
+            if(userFilterDto.OrganizationId.HasValue)
                 user = user.Where(x => x.OrganizationId == userFilterDto.OrganizationId);
             if (!string.IsNullOrWhiteSpace(userFilterDto.UserName))
                 user = user.Where(x => x.UserName.Contains(userFilterDto.UserName));
@@ -133,10 +133,9 @@ namespace CashBox.Service.Services.UserServices
             if (!string.IsNullOrWhiteSpace(userFilterDto.PhoneNumber))
                 user = user.Where(x => x.PhoneNumber.Contains(userFilterDto.PhoneNumber));
             if (!string.IsNullOrWhiteSpace(userFilterDto.DateOfBirth))
-                user = user.Where(x => x.UserName.Contains(userFilterDto.DateOfBirth));
+                user = user.Where(x => x.DateOfBirth.Contains(userFilterDto.DateOfBirth));
             if (!string.IsNullOrWhiteSpace(userFilterDto.Address))
                 user = user.Where(x => x.Address.Contains(userFilterDto.Address));
-
 
             return await user.Select(u => new UserDto
             {

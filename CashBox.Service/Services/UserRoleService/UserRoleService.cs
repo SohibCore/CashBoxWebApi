@@ -20,7 +20,7 @@ namespace CashBox.Service.Services.UserRoleService
            .AnyAsync(x => x.UserId == userId && x.RoleId == roleId);
 
             if (role)
-                throw new KeyNotFoundException("Role allaqachon yuklangan");
+                throw new InvalidOperationException("Role allaqachon yuklangan");
 
             var userRole = new UserRole
             {
@@ -39,7 +39,8 @@ namespace CashBox.Service.Services.UserRoleService
             //.Select(x => x.Role.Name)
             //.ToListAsync();
 
-            var userRole = _context.UserRoles.AsQueryable();
+            var userRole = _context.UserRoles
+                .AsQueryable();
 
             if (userRoleFilter.UserId != 0)
                 userRole = userRole.Where(x => x.UserId == userRoleFilter.UserId);
