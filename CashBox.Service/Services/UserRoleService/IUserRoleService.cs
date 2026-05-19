@@ -4,7 +4,7 @@ namespace CashBox.Service.Services.UserRoleService
 {
     public interface IUserRoleService
     {
-        Task AssignAsync(int userId, int roleId);
+        Task AssignAsync(int userId, List<int> roleIds);
         Task RemoveAsync(int userId, int roleId);
         Task<List<UserRoleDto>> GetListAsync(UserRoleFilter userRoleFilter);
     }

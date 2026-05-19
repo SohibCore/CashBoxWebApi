@@ -8,10 +8,10 @@ namespace CashBox.WebApi.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class CorrencyController : ControllerBase
+    public class CurrencyController : ControllerBase
     {
         private readonly ICurrencyService _currencyService;
-        public CorrencyController(ICurrencyService correncyService)
+        public CurrencyController(ICurrencyService correncyService)
         {
             _currencyService = correncyService;
         }

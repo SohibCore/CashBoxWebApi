@@ -77,25 +77,22 @@ export async function createUserRole(data) {
   return api.post('/api/userrole/create', mapped);
 }
 
-export async function assignUserRole(data) {
-  const mapped = mapUserRolePayload(data);
-  return await api.post('/api/userrole/assign', null, {
-    params: {
-      userId: mapped.UserId,
-      roleId: mapped.RoleId
-    }
+export async function assignUserRoles(userId, roleIds) {
+  return api.post('/api/userrole/AssignRole', roleIds, {
+    params: { userId }
   });
 }
 
 export async function removeUserRole(userId, roleId) {
-  return api.post('/api/userrole/remove', {
-    UserId: userId,
-    RoleId: roleId
+  return api.delete('/api/userrole/Remove', {
+    params: { userId, roleId }
   });
 }
 
 export async function getUserRoles(userId) {
-  return api.get(`/api/userrole/getlist?userId=${userId}`);
+  return api.get('/api/userrole/GetList', {
+    params: { userId }
+  });
 }
 
 export const extractApiData = (response) => {
@@ -229,6 +226,10 @@ export async function getCurrencies() {
   return api.get('/api/currency/getlist');
 }
 
+export async function getCurrencyById(id) {
+  return api.get(`/api/currency/getbyid/${id}`);
+}
+
 const mapCurrencyPayload = (data) => {
   if (!data || typeof data !== 'object') return data;
   const mapping = {
@@ -266,7 +267,9 @@ export async function getRegions() {
 const mapRegionPayload = (data) => {
   if (!data || typeof data !== 'object') return data;
   const mapping = {
-    name: 'Name',
+    fullName: 'FullName',
+    shortName: 'ShortName',
+    code: 'Code',
     id: 'Id'
   };
   return Object.entries(data).reduce((result, [key, value]) => {
@@ -296,8 +299,9 @@ export async function getDistricts() {
 const mapDistrictPayload = (data) => {
   if (!data || typeof data !== 'object') return data;
   const mapping = {
-    name: 'Name',
-    regionId: 'RegionId',
+    fullName: 'FullName',
+    code: 'Code',
+    region: 'Region',
     id: 'Id'
   };
   return Object.entries(data).reduce((result, [key, value]) => {

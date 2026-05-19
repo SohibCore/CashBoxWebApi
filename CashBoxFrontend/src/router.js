@@ -5,6 +5,7 @@ import RegisterView from './views/RegisterView.vue';
 import UsersView from './views/UsersView.vue';
 import OrganizationsView from './views/OrganizationsView.vue';
 import EditUserView from './views/EditUserView.vue';
+import CreateUserView from './views/CreateUserView.vue';
 import ProfileView from './views/ProfileView.vue';
 import CompleteProfileView from './views/CompleteProfileView.vue';
 import RoleAssignmentView from './views/RoleAssignmentView.vue';
@@ -31,6 +32,7 @@ const routes = [
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
   { path: '/profile/fill', component: CompleteProfileView, meta: { requiresAuth: true } },
   { path: '/users', component: UsersView, meta: { requiresAuth: true } },
+  { path: '/users/new', component: CreateUserView, meta: { requiresAuth: true } },
   { path: '/users/edit/:id', component: EditUserView, meta: { requiresAuth: true } },
   { path: '/user-role', component: RoleAssignmentView, meta: { requiresAuth: true } },
   { path: '/organizations', component: OrganizationsView, meta: { requiresAuth: true } },

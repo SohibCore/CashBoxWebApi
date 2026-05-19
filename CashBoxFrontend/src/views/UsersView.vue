@@ -1,5 +1,5 @@
 <template>
-  <div class="page-card wide-card">
+  <div class="page-card wide-card users-page">
     <div class="section-header">
       <div>
         <h2>Foydalanuvchilar</h2>
@@ -8,33 +8,11 @@
     </div>
 
     <div class="section-actions">
-      <button type="button" class="toggle-create" @click="toggleCreateForm">
+      <router-link to="/users/new" class="toggle-create">
         <span>+</span> Yangi foydalanuvchi
-      </button>
+      </router-link>
       <span class="user-count">{{ users.length }} ta foydalanuvchi</span>
     </div>
-
-    <form v-if="showCreateForm" class="entity-form" @submit.prevent="createNewUser">
-      <h3>Yangi foydalanuvchi</h3>
-      <div class="form-grid">
-        <label>Login nomi<input v-model="newUser.userName" required /></label>
-        <label>Email<input type="email" v-model="newUser.email" required /></label>
-        <label>Parol<input type="password" v-model="newUser.password" required /></label>
-        <label>To‘liq ism<input v-model="newUser.fullName" required /></label>
-        <label>Qisqa nom<input v-model="newUser.shortName" required /></label>
-        <label>PINFL<input v-model="newUser.pinfl" required maxlength="14" /></label>
-        <label>Telefon<input v-model="newUser.phoneNumber" required maxlength="9" /></label>
-        <label>Manzil<input v-model="newUser.address" required /></label>
-        <label>Tashkilot<select v-model.number="newUser.organizationId" required>
-            <option value="0" disabled>Tanlang</option>
-            <option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.shortName }}</option>
-          </select></label>
-        <label>Tug‘ilgan sana<input type="text" v-model="newUser.dateOfBirth" placeholder="dd.MM.yyyy" required /></label>
-        <label>Passport seriya<input v-model="newUser.passportSeries" required maxlength="9" /></label>
-      </div>
-      <button type="submit">Saqlash</button>
-      <p v-if="createError" class="error">{{ createError }}</p>
-    </form>
 
     <div class="data-panel">
       <h3>Foydalanuvchi ro‘yxati</h3>
@@ -106,33 +84,14 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { getUsers, createUser, updateUser, deleteUser, getOrganizations } from '../api';
+import { getUsers, deleteUser, getOrganizations } from '../api';
 
 export default {
   setup() {
     const router = useRouter();
     const users = ref([]);
     const organizations = ref([]);
-    const createError = ref('');
-    const showCreateForm = ref(false);
     const expandedUserId = ref(null);
-    const newUser = ref({
-      userName: '',
-      email: '',
-      password: '',
-      fullName: '',
-      shortName: '',
-      pinfl: '',
-      phoneNumber: '',
-      address: '',
-      organizationId: 0,
-      dateOfBirth: '',
-      passportSeries: ''
-    });
-
-    const toggleCreateForm = () => {
-      showCreateForm.value = !showCreateForm.value;
-    };
 
     const toggleRow = (id) => {
       expandedUserId.value = expandedUserId.value === id ? null : id;
@@ -183,7 +142,6 @@ export default {
     const loadOrganizations = async () => {
       try {
         const response = await getOrganizations();
-        console.log('Organizations response:', response.data);
         const result = response.data;
         const rawOrgs = Array.isArray(result)
           ? result
@@ -202,39 +160,8 @@ export default {
           regionId: getField(org, ['regionId', 'RegionId']) || 0,
           district: getField(org, ['district', 'District']) || ''
         }));
-        console.log('Loaded organizations:', organizations.value);
       } catch (error) {
         console.error('Load organizations error:', error);
-      }
-    };
-
-
-    const createNewUser = async () => {
-      createError.value = '';
-      const payload = { ...newUser.value };
-      console.log('Payload being sent:', payload);
-      if (payload.organizationId === 0) {
-        createError.value = 'Tashkilot tanlang.';
-        return;
-      }
-      if (!payload.dateOfBirth || payload.dateOfBirth.length !== 10 || !payload.dateOfBirth.includes('.')) {
-        createError.value = 'Tug‘ilgan sanani dd.MM.yyyy formatida kiriting.';
-        return;
-      }
-      try {
-        await createUser(payload);
-        loadUsers();
-        Object.assign(newUser.value, {
-          userName: '', email: '', password: '', fullName: '', shortName: '', pinfl: '', phoneNumber: '', address: '', organizationId: 0, dateOfBirth: '', passportSeries: ''
-        });
-      } catch (error) {
-        console.error('Create user error:', error.response?.data || error.message);
-        if (error.response?.data?.errors) {
-          const messages = Object.values(error.response.data.errors).flat().join(' ');
-          createError.value = messages;
-        } else {
-          createError.value = error.response?.data?.message || error.response?.statusText || 'Foydalanuvchini yaratishda xatolik yuz berdi.';
-        }
       }
     };
 
@@ -282,14 +209,9 @@ export default {
     return {
       users,
       organizations,
-      newUser,
-      createError,
-      showCreateForm,
       expandedUserId,
-      createNewUser,
       startEdit,
       deleteRow,
-      toggleCreateForm,
       toggleRow,
       organizationName,
       formatDate
@@ -298,17 +220,19 @@ export default {
 };
 </script>
 
-<style>
-.page-card {
+<style scoped>
+.users-page.page-card {
   background: white;
   padding: 1.5rem;
   border-radius: 1rem;
   box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
 }
 
-.wide-card {
-  max-width: 1200px;
-  margin: 0 auto;
+.users-page.wide-card {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .section-header {
@@ -338,6 +262,14 @@ export default {
   border-radius: 0.75rem;
   border: none;
   cursor: pointer;
+  text-decoration: none;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.toggle-create:hover {
+  background: #1d4ed8;
+  color: white;
 }
 
 .user-count {
@@ -505,37 +437,48 @@ button {
 }
 
 .data-panel {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-x: visible;
   background: #f8fafc;
   padding: 1.5rem;
   border-radius: 0.5rem;
 }
 
+.data-panel h3 {
+  margin-top: 0;
+}
+
 table {
   width: 100%;
-  min-width: 1200px;
+  min-width: 0;
   border-collapse: collapse;
+  table-layout: auto;
 }
 
 thead th {
   text-align: left;
-  padding: 0.8rem;
+  padding: 0.65rem 0.5rem;
   border-bottom: 1px solid #e2e8f0;
   background: #f9fafb;
   font-weight: 600;
-  white-space: nowrap;
+  font-size: 0.82rem;
+  line-height: 1.3;
+  white-space: normal;
 }
 
 tbody td {
-  padding: 0.9rem 0.8rem;
+  padding: 0.75rem 0.5rem;
   border-bottom: 1px solid #f1f5f9;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  vertical-align: top;
+  word-break: break-word;
 }
 
 .actions {
   display: flex;
   gap: 0.5rem;
   white-space: nowrap;
+  word-break: normal;
 }
 
 .icon-btn {

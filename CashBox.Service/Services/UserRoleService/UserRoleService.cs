@@ -14,26 +14,46 @@ namespace CashBox.Service.Services.UserRoleService
             _context = context;
         }
 
-        public async Task AssignAsync(int userId, int roleId)
+        //public async Task AssignAsync(int userId, int roleId)
+        //{
+        //    var role = await _context.UserRoles
+        //   .AnyAsync(x => x.UserId == userId && x.RoleId == roleId);
+
+        //    if (role)
+        //        throw new InvalidOperationException("Role allaqachon yuklangan");
+
+        //    var userRole = new UserRole
+        //    {
+        //        UserId = userId,
+        //        RoleId = roleId
+        //    };
+
+        //    await _context.UserRoles.AddAsync(userRole);
+        //    await _context.SaveChangesAsync();
+        //}
+        public async Task AssignAsync(int userId, List<int> roleIds)
         {
-            var role = await _context.UserRoles
-           .AnyAsync(x => x.UserId == userId && x.RoleId == roleId);
-
-            if (role)
-                throw new InvalidOperationException("Role allaqachon yuklangan");
-
-            var userRole = new UserRole
+            foreach (var roleId in roleIds)
             {
-                UserId = userId,
-                RoleId = roleId
-            };
+                var exists = await _context.UserRoles
+                    .AnyAsync(x => x.UserId == userId && x.RoleId == roleId);
 
-            await _context.UserRoles.AddAsync(userRole);
-            await _context.SaveChangesAsync();
+                if (exists) continue;  // bor bo'lsa o'tkazib yuboramiz
+
+                var userRole = new UserRole
+                {
+                    UserId = userId,
+                    RoleId = roleId
+                };
+                await _context.UserRoles.AddAsync(userRole);
+            }
+
+            await _context.SaveChangesAsync();  // loopdan tashqarida — bir marta saqlaymiz
         }
 
         public async Task<List<UserRoleDto>> GetListAsync(UserRoleFilter userRoleFilter)
         {
+
             //return await _context.UserRoles
             //.Where(x => x.UserId == userId)
             //.Select(x => x.Role.Name)

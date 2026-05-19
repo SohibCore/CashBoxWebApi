@@ -1,55 +1,61 @@
 <template>
-  <div class="currencies-view">
-    <h2>Currencies</h2>
-    <div class="form-section">
-      <form @submit.prevent="createNewCurrency" class="currency-form">
-        <div class="form-group">
-          <label for="name">Name:</label>
-          <input v-model="newCurrency.name" type="text" id="name" required>
-        </div>
-        <div class="form-group">
-          <label for="code">Code (numeric):</label>
-          <input v-model.number="newCurrency.code" type="number" id="code" required>
-        </div>
-        <div class="form-group">
-          <label for="symbol">Symbol:</label>
-          <input v-model="newCurrency.symbol" type="text" id="symbol" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Create Currency</button>
-      </form>
+  <div class="page-card wide-card">
+    <div class="section-header">
+      <div>
+        <h2>Valyutalar</h2>
+        <p>Mavjud valyutalarni boshqarish va yangilarini qo'shish.</p>
+      </div>
     </div>
-    <div class="table-section">
-      <table class="data-table">
+
+    <div class="section-actions">
+      <router-link to="/currencies/new" class="toggle-create">
+        <span>+</span> Yangi valyuta yaratish
+      </router-link>
+      <span class="user-count">{{ currencies.length }} ta valyuta</span>
+    </div>
+
+    <div class="data-panel">
+      <h3>Valyutalar ro'yxati</h3>
+      <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Code</th>
-            <th>Symbol</th>
-            <th>Actions</th>
+            <th>Kodi</th>
+            <th>To'liq nomi</th>
+            <th>Qisqa nomi</th>
+            <th class="actions-head">Amallar</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="currency in currencies" :key="currency.id">
-            <td>{{ currency.id }}</td>
-            <td>{{ currency.name }}</td>
             <td>{{ currency.code }}</td>
+            <td>{{ currency.name }}</td>
             <td>{{ currency.symbol }}</td>
-            <td>
-              <button @click="editCurrency(currency)" class="btn btn-edit">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-              </button>
-              <button @click="deleteCurrency(currency.id)" class="btn btn-delete">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M3 6h18"></path>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  <line x1="10" y1="11" x2="10" y2="17"></line>
-                  <line x1="14" y1="11" x2="14" y2="17"></line>
-                </svg>
-              </button>
+            <td class="actions">
+              <div class="action-dropdown-wrapper">
+                <button @click="toggleRow(currency.id)" :class="['icon-btn', { expanded: expandedCurrencyId === currency.id }]" title="Amallarni ko'rsatish">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div v-if="expandedCurrencyId === currency.id" class="action-dropdown">
+                  <button @click="startEdit(currency.id)" class="dropdown-btn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Tahrirlash
+                  </button>
+                  <button @click="deleteCurrencyRow(currency.id)" class="dropdown-btn danger">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      <line x1="10" y1="11" x2="10" y2="17"></line>
+                      <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                    O'chirish
+                  </button>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -60,165 +66,167 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import { getCurrencies, createCurrency, updateCurrency, deleteCurrency } from '../api.js';
+import { useRouter } from 'vue-router';
+import { getCurrencies, deleteCurrency } from '../api';
 
 export default {
   name: 'CurrenciesView',
   setup() {
+    const router = useRouter();
     const currencies = ref([]);
-    const newCurrency = ref({ name: '', code: '', symbol: '' });
-    const editingCurrency = ref(null);
+    const expandedCurrencyId = ref(null);
 
     const loadCurrencies = async () => {
       try {
         const response = await getCurrencies();
-        const data = response.data;
-        if (Array.isArray(data)) {
-          currencies.value = data;
-        } else if (data && Array.isArray(data.data)) {
-          currencies.value = data.data;
-        } else {
-          currencies.value = [];
-        }
+        currencies.value = response.data?.data || response.data || [];
       } catch (error) {
         console.error('Error loading currencies:', error);
-        currencies.value = [];
       }
     };
 
-    const createNewCurrency = async () => {
-      // Validation
-      if (!newCurrency.value.name?.trim()) {
-        alert('Name is required');
-        return;
-      }
-      if (!newCurrency.value.code?.trim()) {
-        alert('Code is required');
-        return;
-      }
-      if (!newCurrency.value.symbol?.trim()) {
-        alert('Symbol is required');
-        return;
-      }
+    const startEdit = (id) => {
+      router.push(`/currencies/edit/${id}`);
+      expandedCurrencyId.value = null;
+    };
 
-      try {
-        const data = {
-          name: newCurrency.value.name.trim(),
-          code: newCurrency.value.code.trim(),
-          symbol: newCurrency.value.symbol.trim()
-        };
-        console.log('Creating currency with data:', data);
-        const response = await createCurrency(data);
-        console.log('Create response:', response);
-        newCurrency.value = { name: '', code: '', symbol: '' };
-        await loadCurrencies();
-        alert('Currency created successfully!');
-      } catch (error) {
-        console.error('Error creating currency:', error);
-        console.error('Error response:', error.response?.data);
-        console.error('Full error:', error);
-        const errorMsg = error.response?.data?.message || 
-                        error.response?.data?.error ||
-                        error.message || 
-                        'Failed to create currency';
-        alert(`Error: ${errorMsg}`);
+    const deleteCurrencyRow = async (id) => {
+      if (confirm('Rostdan ham ushbu valyutani o\'chirmoqchimisiz?')) {
+        try {
+          await deleteCurrency(id);
+          await loadCurrencies();
+        } catch (error) {
+          console.error('Error deleting currency:', error);
+        }
       }
     };
 
-    const editCurrency = (currency) => {
-      editingCurrency.value = { ...currency };
-      // For simplicity, populate the form
-      newCurrency.value = { name: currency.name, code: currency.code, symbol: currency.symbol };
-    };
-
-    const deleteCurrencyItem = async (id) => {
-      try {
-        await deleteCurrency(id);
-        await loadCurrencies();
-      } catch (error) {
-        console.error('Error deleting currency:', error);
-        alert('Failed to delete currency');
-      }
+    const toggleRow = (id) => {
+      expandedCurrencyId.value = expandedCurrencyId.value === id ? null : id;
     };
 
     onMounted(loadCurrencies);
 
     return {
       currencies,
-      newCurrency,
-      createNewCurrency,
-      editCurrency,
-      deleteCurrency: deleteCurrencyItem
+      expandedCurrencyId,
+      startEdit,
+      deleteCurrencyRow,
+      toggleRow
     };
   }
 };
 </script>
 
 <style scoped>
-.currencies-view {
-  padding: 20px;
+.page-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
-.form-section {
-  margin-bottom: 20px;
+.wide-card {
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.currency-form {
-  display: flex;
-  gap: 10px;
-  align-items: end;
+.section-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 1rem;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
+.entity-form {
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
 }
 
-label {
-  margin-bottom: 5px;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
 }
 
-input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.data-panel {
+  overflow-x: visible; /* Dropdown ko'rinishi uchun muhim */
 }
 
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-edit {
-  background-color: #ffc107;
-  color: black;
-  margin-right: 5px;
-}
-
-.btn-delete {
-  background-color: #dc3545;
-  color: white;
-}
-
-.data-table {
+table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.data-table th, .data-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+th {
   text-align: left;
+  padding: 0.75rem;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.875rem;
 }
 
-.data-table th {
-  background-color: #f2f2f2;
+td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.actions {
+  position: relative;
+  width: 50px;
+}
+
+.action-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.action-dropdown {
+  position: absolute;
+  top: 0;
+  right: 110%; /* Tugmaning chap tomonida chiqadi */
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  white-space: nowrap;
+}
+
+.dropdown-btn {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 0.35rem;
+}
+
+.icon-btn {
+  border: none;
+  background: #2563eb; /* Ko'k rang */
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.icon-btn.expanded {
+  background: #1d4ed8; /* Kengaytirilganda biroz to'qroq ko'k */
+  color: white;
+}
+
+.icon-btn:hover {
+  background: #1d4ed8; /* Hover holatida to'qroq ko'k */
 }
 </style>

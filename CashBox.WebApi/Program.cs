@@ -21,11 +21,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddCors(options =>
+builder.Services.AddCors(options =>  // UIning ishlashi uchun http
 {
     options.AddPolicy("AllowLocalhostFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174")
+        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "http://localhost:5175", "http://127.0.0.1:5175")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

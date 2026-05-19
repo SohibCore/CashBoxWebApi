@@ -8,7 +8,23 @@
       </label>
       <label>
         Parol
-        <input v-model="password" type="password" autocomplete="current-password" required />
+        <div class="password-wrap">
+          <input
+            v-model="password"
+            :type="showPassword ? 'text' : 'password'"
+            autocomplete="current-password"
+            required
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            :aria-pressed="showPassword"
+            :aria-label="showPassword ? 'Parolni yashirish' : 'Parolni ko‘rsatish'"
+            @click.prevent="showPassword = !showPassword"
+          >
+            {{ showPassword ? 'Yashirish' : 'Ko‘rsatish' }}
+          </button>
+        </div>
       </label>
       <button type="submit">Kirish</button>
       <p v-if="error" class="error">{{ error }}</p>
@@ -27,6 +43,7 @@ export default {
     const router = useRouter();
     const userName = ref('');
     const password = ref('');
+    const showPassword = ref(false);
     const error = ref('');
 
     const submit = async () => {
@@ -73,6 +90,7 @@ export default {
     return {
       userName,
       password,
+      showPassword,
       error,
       submit
     };
@@ -103,6 +121,22 @@ label {
   color: #0f172a;
 }
 
+.password-wrap {
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.password-wrap input {
+  width: 100%;
+  padding: 0.85rem 6.5rem 0.85rem 0.85rem;
+  margin-top: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background: #f8fafc;
+}
+
 input {
   width: 100%;
   padding: 0.85rem;
@@ -120,7 +154,32 @@ input:focus {
   background: white;
 }
 
-button {
+.password-wrap input:focus {
+  background: white;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  margin: 0;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: #e2e8f0;
+  color: #0f172a;
+  border: none;
+  border-radius: 0.45rem;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  background: #cbd5e1;
+}
+
+form > button[type='submit'] {
   width: 100%;
   padding: 0.95rem;
   border: none;
@@ -134,7 +193,7 @@ button {
   transition: background 0.3s ease;
 }
 
-button:hover {
+form > button[type='submit']:hover {
   background: #1d4ed8;
 }
 
