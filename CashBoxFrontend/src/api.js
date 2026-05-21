@@ -188,8 +188,8 @@ export async function deleteUser(id) {
   return api.delete(`/api/user/delete/${id}`);
 }
 
-export async function getOrganizations() {
-  return api.get('/api/organization/getlist');
+export async function getOrganizations(params = {}) {
+  return api.get('/api/organization/getlist', { params });
 }
 
 export async function getOrganizationById(id) {

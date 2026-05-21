@@ -9,7 +9,7 @@
 
       <div class="sidebar-brand">
         <h2>CashBox</h2>
-        <p>Admin panel</p>
+        <p>{{ role === 'Admin' ? 'Admin panel' : 'User panel' }}</p>
       </div>
 
       <div class="profile-card">
@@ -19,14 +19,16 @@
 
       <nav class="sidebar-nav">
         <router-link to="/profile" class="nav-link">Profil</router-link>
-        <router-link to="/users" class="nav-link">Foydalanuvchilar</router-link>
-        <router-link to="/user-role" class="nav-link">Foydalanuvchiga rol biriktirish</router-link>
-        <router-link to="/organizations" class="nav-link">Tashkilotlar</router-link>
-        <router-link to="/currencies" class="nav-link">Valyutalar</router-link>
-        <router-link to="/regions" class="nav-link">Viloyatlar</router-link>
-        <router-link to="/districts" class="nav-link">Tumanlar</router-link>
+        <!-- ✅ Faqat Admin ko'radi -->
+        <template v-if="role === 'Admin'">
+          <router-link to="/users" class="nav-link">Foydalanuvchilar</router-link>
+          <router-link to="/user-role" class="nav-link">Foydalanuvchiga rol biriktirish</router-link>
+          <router-link to="/organizations" class="nav-link">Tashkilotlar</router-link>
+          <router-link to="/currencies" class="nav-link">Valyutalar</router-link>
+          <router-link to="/regions" class="nav-link">Viloyatlar</router-link>
+          <router-link to="/districts" class="nav-link">Tumanlar</router-link>
+        </template>
       </nav>
-
       <button class="logout-btn" @click="logout">Chiqish</button>
     </aside>
 
@@ -49,8 +51,9 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { jwtDecode } from 'jwt-decode';
 
 export default {
   setup() {
@@ -60,10 +63,27 @@ export default {
     const email = ref(localStorage.getItem('email') || '');
     const collapsed = ref(false);
 
+    // ✅ Token dan rol olish
+    const getUserRole = () => {
+      const t = localStorage.getItem('token');
+      if (!t) return null;
+      try {
+        const decoded = jwtDecode(t);
+        // Adjust this claim name if your JWT uses a different one for roles
+        return decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      } catch (e) {
+        console.error("Error decoding token:", e);
+        return null;
+      }
+    };
+
+    const role = ref(getUserRole());
+
     router.afterEach(() => {
       token.value = localStorage.getItem('token');
       userName.value = localStorage.getItem('userName') || '';
       email.value = localStorage.getItem('email') || '';
+      role.value = getUserRole(); // ✅ rol ham yangilansin
     });
 
     const logout = () => {
@@ -79,7 +99,8 @@ export default {
       userName,
       email,
       collapsed,
-      logout
+      role, // Return the role
+      logout,
     };
   }
 };

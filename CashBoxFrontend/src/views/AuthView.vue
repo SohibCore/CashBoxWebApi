@@ -10,6 +10,19 @@
         <div class="auth-panel">
           <router-view />
         </div>
+        <div class="auth-footer">
+          <span class="footer-label">Aloqa uchun:</span>
+          <div class="footer-links">
+            <a href="https://t.me/bekmurodv_s" target="_blank" class="footer-link">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              Telegram
+            </a>
+            <a href="https://instagram.com/sohibjon_bekmurodov" target="_blank" class="footer-link">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+              Instagram
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -129,5 +142,41 @@ html::-webkit-scrollbar {
 
 .auth-panel::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.auth-footer {
+  border-top: 1px solid #0f172a;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  background: #ffffff;
+}
+
+.footer-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #0f172a;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: #2563eb;
 }
 </style>
