@@ -124,8 +124,12 @@ html {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: 260px;
+  margin-left: 0;
   min-height: 100vh;
+}
+
+.content-area.with-sidebar {
+  margin-left: 260px;
 }
 
 .content-area.collapsed-sidebar {
@@ -300,7 +304,7 @@ main {
     width: 200px;
   }
   
-  .content-area {
+  .content-area.with-sidebar {
     margin-left: 200px;
   }
   

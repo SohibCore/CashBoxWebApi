@@ -42,10 +42,13 @@ namespace CashBox.Service.Services.AuthService
         }
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.UserName);
+            var user = await _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(x => x.UserName == loginDto.UserName);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
-                throw new Exception("Invalid credentials");
+                throw new Exception("Mavjud bo'lmagan foydalanuvchi");
 
             return GenerateJwt(user);
         }
@@ -66,12 +69,18 @@ namespace CashBox.Service.Services.AuthService
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
 
-            var claims = new[]
+            var claims = new List<Claim>()
             {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Email, user.Email),
              };
+
+            foreach (var userRole in user.UserRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
+            }
+
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(

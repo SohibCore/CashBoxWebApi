@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class DistrictController : ControllerBase
@@ -15,6 +14,7 @@ namespace CashBox.WebApi.Controllers
         {
             _districtService = districtService;
         }
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] DistrictFilterDto districtFilterDto)
         {
@@ -22,24 +22,28 @@ namespace CashBox.WebApi.Controllers
 
             return Ok(district);
         }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             var district = await _districtService.GetAsync(id);
             return Ok(district);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateDistrictDto createDistrictDto)
         {
             await _districtService.CreateAsync(createDistrictDto);
             return Ok();
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateDistrictDto updateDistrictDto)
         {
             await _districtService.UpdateAsync(id, updateDistrictDto);
             return Ok();
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {

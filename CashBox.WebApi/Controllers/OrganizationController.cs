@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
-    [Authorize]
+    
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class OrganizationController : ControllerBase
@@ -15,6 +15,7 @@ namespace CashBox.WebApi.Controllers
         {
             _organizationService = organizationService;
         }
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] OrganizationFilterDto organizationFilterDto)
         {
@@ -22,24 +23,28 @@ namespace CashBox.WebApi.Controllers
 
             return Ok(organization);
         }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             var organization = await _organizationService.GetAsync(id); //Service chaqirish
             return Ok(organization);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateOrganizationDto createOrganizationDto)
         {
             await _organizationService.CreateAsync(createOrganizationDto);
             return Ok();
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateOrganizationDto updateOrganizationDto)
         {
             await _organizationService.UpdateAsync(id, updateOrganizationDto);
             return Ok();
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {

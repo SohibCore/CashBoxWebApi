@@ -19,9 +19,11 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 401) {
+    const isAuthPage = window.location.pathname.startsWith('/auth/');
+    
+    if (error.response?.status === 401 && !isAuthPage) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      window.location.href = '/auth/login';
     }
     return Promise.reject(error);
   }
