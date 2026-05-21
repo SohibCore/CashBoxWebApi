@@ -29,6 +29,24 @@
         </label>
 
         <label class="form-field">
+          <span class="field-label">Email</span>
+          <div class="field-with-icon">
+            <span class="field-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </span>
+            <input 
+              type="email" 
+              :value="userEmail" 
+              disabled 
+              style="background: #f1f5f9; cursor: not-allowed;" 
+            />
+          </div>
+        </label>
+
+        <label class="form-field">
           <span class="field-label"><span class="required-star">*</span> Rol</span>
           <div class="role-picker" ref="rolePickerRef">
             <button
@@ -94,13 +112,16 @@
 
 <script>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useRoute } from 'vue-router';
 import { getUsers, getRoles, assignUserRoles, removeUserRole, getUserRoles, getMe, extractApiData } from '../api';
 
 export default {
   setup() {
+    const route = useRoute();
     const users = ref([]);
     const roles = ref([]);
-    const selectedUserId = ref(0);
+    const selectedUserId = ref(Number(route.query.userId) || 0);
+    const userEmail = ref(route.query.email || '');
     const selectedRoleIds = ref([]);
     const roleDropdownOpen = ref(false);
     const rolePickerRef = ref(null);
@@ -145,7 +166,8 @@ export default {
         users.value = rawUsers.map((user) => ({
           id: getField(user, ['id', 'Id', 'userId', 'userID']),
           userName: getField(user, ['userName', 'UserName', 'username', 'Username']),
-          fullName: getField(user, ['fullName', 'FullName'])
+          fullName: getField(user, ['fullName', 'FullName']),
+          email: getField(user, ['email', 'Email'])
         }));
 
         try {
@@ -154,7 +176,8 @@ export default {
           const currentUserMapped = {
             id: getField(currentUser, ['id', 'Id', 'userId', 'userID']),
             userName: getField(currentUser, ['userName', 'UserName', 'username', 'Username']),
-            fullName: getField(currentUser, ['fullName', 'FullName'])
+            fullName: getField(currentUser, ['fullName', 'FullName']),
+            email: getField(currentUser, ['email', 'Email'])
           };
           const exists = users.value.some((u) => u.id === currentUserMapped.id);
           if (!exists && currentUserMapped.id) {
@@ -218,6 +241,8 @@ export default {
       assignSuccess.value = '';
       assignError.value = '';
       roleDropdownOpen.value = false;
+      const found = users.value.find(u => u.id === selectedUserId.value);
+      if (found) userEmail.value = found.email || '';
       await loadUserRoles(selectedUserId.value);
     };
 
@@ -278,6 +303,13 @@ export default {
       document.addEventListener('click', handleClickOutside);
       await loadUsers();
       await loadRoles();
+      if (selectedUserId.value) {
+        await loadUserRoles(selectedUserId.value);
+        if (!userEmail.value) {
+          const found = users.value.find(u => u.id === selectedUserId.value);
+          if (found) userEmail.value = found.email || '';
+        }
+      }
     });
 
     onBeforeUnmount(() => {
@@ -288,6 +320,7 @@ export default {
       users,
       roles,
       selectedUserId,
+      userEmail,
       selectedRoleIds,
       selectedRoles,
       availableRoles,
@@ -397,7 +430,7 @@ export default {
   pointer-events: none;
 }
 
-.field-with-icon select {
+.field-with-icon select, .field-with-icon input {
   width: 100%;
   min-height: 3rem;
   padding: 0.75rem 2.25rem 0.75rem 3.15rem;

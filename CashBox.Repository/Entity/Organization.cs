@@ -9,11 +9,11 @@ namespace RepositoryLayer.Entity
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID")]
-        public int Id { get; set; } 
+        public int Id { get; set; }
 
         [Column("INN")]
         [StringLength(10)]
-        public string Inn { get; set; } = null!;    
+        public string Inn { get; set; } = null!;
 
         [Column("FULL_NAME")]
         [StringLength(500)]
@@ -24,7 +24,7 @@ namespace RepositoryLayer.Entity
         public string ShortName { get; set; } = null!;
 
         [Column("REGION_ID")]
-        public int RegionId { get; set; } 
+        public int RegionId { get; set; }
         [ForeignKey(nameof(RegionId))]
         public Region? Region { get; set; }
 

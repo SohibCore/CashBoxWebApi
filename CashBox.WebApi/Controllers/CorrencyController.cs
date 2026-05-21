@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class CurrencyController : ControllerBase
@@ -15,6 +15,7 @@ namespace CashBox.WebApi.Controllers
         {
             _currencyService = correncyService;
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] CurrencyFilterDto currencyFilterDto)
         {
@@ -22,24 +23,28 @@ namespace CashBox.WebApi.Controllers
 
             return Ok(currency);
         }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             var corrency = await _currencyService.GetAsync(id);
             return Ok(corrency);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateCorrencyDto createCorrencyDto)
         {
             await _currencyService.CreateAsync(createCorrencyDto);
             return Ok();
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateCorrencyDto updateCorrencyDto)
         {
             await _currencyService.UpdateAsync(id, updateCorrencyDto);
             return Ok();
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {

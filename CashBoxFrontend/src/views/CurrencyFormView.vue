@@ -10,16 +10,16 @@
     <form class="entity-form" @submit.prevent="saveCurrency">
       <div class="form-grid">
         <label>
-          Valyuta kodi
-          <input v-model="form.code" type="text" placeholder="Masalan: 001" required />
+          Valyuta kodi (Code)
+          <input v-model="form.code" type="text" placeholder="Masalan: USD" required />
         </label>
         <label>
-          Valyuta nomi (To'liq)
-          <input v-model="form.name" type="text" placeholder="Masalan: O'zbek so'mi" required />
+          Valyuta nomi (To'liq nomi)
+          <input v-model="form.fullName" type="text" placeholder="Masalan: Amerika Qo'shma Shtatlari Dollari" required />
         </label>
         <label>
-          Qisqa nomi / Simvoli
-          <input v-model="form.symbol" type="text" placeholder="Masalan: SUM" required />
+          Qisqa nomi / Simvoli (ShortName)
+          <input v-model="form.shortName" type="text" placeholder="Masalan: $" required />
         </label>
       </div>
       <div class="button-row">
@@ -47,9 +47,9 @@ export default {
 
     const form = ref({
       id: null,
-      name: '',
       code: '',
-      symbol: ''
+      fullName: '',
+      shortName: ''
     });
 
     const isEdit = computed(() => !!route.params.id);
@@ -58,15 +58,14 @@ export default {
     const loadCurrency = async () => {
       if (!isEdit.value) return;
       try {
-        const response = await getCurrencyById(route.params.id); // getCurrencyById orqali ma'lumotni yuklash
+        const response = await getCurrencyById(route.params.id);
         const item = response.data?.data || response.data;
         if (item) {
-          // API dan kelgan maydonlarni bizning formaga xaritlaymiz
           form.value = { 
-            id: item.id || item.Id,
-            name: item.name || item.Name,
+            id: item.id || item.Id, // ID ni saqlab qolish muhim
             code: item.code || item.Code,
-            symbol: item.symbol || item.Symbol
+            fullName: item.fullName || item.FullName,
+            shortName: item.shortName || item.ShortName
           };
         } else {
           error.value = 'Valyuta topilmadi.';
@@ -78,27 +77,25 @@ export default {
     };
 
     const saveCurrency = async () => {
-      error.value = '';
+      error.value = '';qa
       successMessage.value = '';
-      isSaving.value = true; // Saqlash holatini yoqish
+      isSaving.value = true;
       try {
-        console.log('Saving currency with payload:', form.value); // Yuborilayotgan ma'lumotni log qilish
         if (isEdit.value) {
-          // Tahrirlash (PUT request)
-          await updateCurrency(form.value.id, form.value);
+          await updateCurrency(route.params.id, form.value);
           successMessage.value = 'Valyuta muvaffaqiyatli yangilandi!';
         } else {
-          // Yangi yaratish (POST request)
+          // Yangi yaratish - POST API bilan bog'lanish
           await createCurrency(form.value);
           successMessage.value = 'Valyuta muvaffaqiyatli yaratildi!';
-          form.value = { id: null, name: '', code: '', symbol: '' }; // Yaratilgandan so'ng formani tozalash
+          form.value = { id: null, code: '', fullName: '', shortName: '' }; // Formani tozalash
         }
-        // Muvaffaqiyatli saqlangach, qisqa muddatdan so'ng ro'yxat sahifasiga qaytish
+        
         setTimeout(() => {
           router.push('/currencies');
         }, 1500);
       } catch (err) {
-        console.error('Error saving currency:', err); // To'liq xatolikni konsolga chiqarish
+        console.error('Error saving currency:', err);
         error.value = err.response?.data?.message || err.response?.data?.title || err.message || 'Saqlashda xatolik yuz berdi.';
       } finally {
         isSaving.value = false; // Saqlash holatini o'chirish

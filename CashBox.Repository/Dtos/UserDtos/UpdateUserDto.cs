@@ -12,6 +12,6 @@
         public int OrganizationId { get; set; }
         public string? DateOfBirth { get; set; }
         public string? PassportSeries { get; set; } 
-        public string? Password { get; set; } 
+        public string? Password { get; set; }
     }
 }

@@ -7,25 +7,12 @@
       </div>
     </div>
 
-    <form class="entity-form" @submit.prevent="createNewDistrict">
-      <h3>Yangi tuman</h3>
-      <div class="form-grid">
-        <label>
-          To‘liq nom
-          <input v-model="newDistrict.fullName" required maxlength="500" />
-        </label>
-        <label>
-          Kod
-          <input v-model="newDistrict.code" required maxlength="9" />
-        </label>
-        <label>
-          Viloyat
-          <input v-model="newDistrict.region" required />
-        </label>
-      </div>
-      <button type="submit">Saqlash</button>
-      <p v-if="createError" class="error">{{ createError }}</p>
-    </form>
+    <div class="section-actions">
+      <router-link to="/districts/new" class="toggle-create">
+        <span>+</span> Yangi tuman qo'shish
+      </router-link>
+      <span class="user-count">{{ districts.length }} ta tuman</span>
+    </div>
 
     <div class="data-panel">
       <h3>Tumanlar ro‘yxati</h3>
@@ -41,7 +28,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="district in districts" :key="district.id">
+          <tr v-for="district in districts" :key="district.id" @dblclick="startEdit(district)" style="cursor: pointer;">
             <td>{{ district.id || '-' }}</td>
             <td>{{ district.fullName || '-' }}</td>
             <td>{{ district.code || '-' }}</td>
@@ -83,43 +70,20 @@
       </table>
     </div>
 
-    <div v-if="editDistrict" class="entity-form">
-      <h3>Tumanni yangilash</h3>
-      <div class="form-grid">
-        <label>
-          To‘liq nom
-          <input v-model="editDistrict.fullName" required maxlength="500" />
-        </label>
-        <label>
-          Kod
-          <input v-model="editDistrict.code" required maxlength="9" />
-        </label>
-        <label>
-          Viloyat
-          <input v-model="editDistrict.region" required />
-        </label>
-      </div>
-      <div class="button-row">
-        <button type="button" @click="saveEdit">Yangilash</button>
-        <button type="button" class="btn-secondary" @click="cancelEdit">Bekor qilish</button>
-      </div>
-      <p v-if="updateError" class="error">{{ updateError }}</p>
-    </div>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue';
-import { getDistricts, createDistrict, updateDistrict, deleteDistrict, extractApiData } from '../api';
+import { useRouter } from 'vue-router';
+import { getDistricts, deleteDistrict, extractApiData, getRegions } from '../api';
 
 export default {
   setup() {
+    const router = useRouter();
     const districts = ref([]);
+    const regionsMap = ref({});
     const expandedDistrictId = ref(null);
-    const newDistrict = ref({ fullName: '', code: '', region: '' });
-    const editDistrict = ref(null);
-    const createError = ref('');
-    const updateError = ref('');
 
     const getField = (obj, keys) => {
       if (!obj) return null;
@@ -131,12 +95,32 @@ export default {
       return null;
     };
 
-    const mapDistrict = (item) => ({
-      id: getField(item, ['id', 'Id']),
-      fullName: getField(item, ['fullName', 'FullName', 'name', 'Name']) || '',
-      code: getField(item, ['code', 'Code']) || '',
-      region: getField(item, ['region', 'Region', 'regionName', 'RegionName']) || ''
-    });
+    const loadRegionsMap = async () => {
+      try {
+        const response = await getRegions();
+        const data = extractApiData(response);
+        const rawList = Array.isArray(data) ? data : (data?.items || data?.value || []);
+        const map = {};
+        rawList.forEach(item => {
+          const id = getField(item, ['id', 'Id']);
+          const name = getField(item, ['fullName', 'FullName', 'name', 'Name']);
+          if (id) map[id] = name;
+        });
+        regionsMap.value = map;
+      } catch (error) {
+        console.error('Error loading regions for map:', error);
+      }
+    };
+
+    const mapDistrict = (item) => {
+      const regionId = getField(item, ['regionId', 'RegionId']);
+      return {
+        id: getField(item, ['id', 'Id']),
+        fullName: getField(item, ['fullName', 'FullName', 'name', 'Name']) || '',
+        code: getField(item, ['code', 'Code']) || '',
+        region: regionsMap.value[regionId] || getField(item, ['region', 'Region', 'regionName', 'RegionName']) || regionId || '-'
+      };
+    };
 
     const loadDistricts = async () => {
       try {
@@ -160,80 +144,33 @@ export default {
       expandedDistrictId.value = expandedDistrictId.value === id ? null : id;
     };
 
-    const createNewDistrict = async () => {
-      createError.value = '';
-      try {
-        await createDistrict(newDistrict.value);
-        newDistrict.value = { fullName: '', code: '', region: '' };
-        await loadDistricts();
-      } catch (error) {
-        console.error('Error creating district:', error);
-        createError.value =
-          error.response?.data?.message ||
-          error.response?.data?.title ||
-          'Tuman yaratishda xatolik yuz berdi.';
-      }
-    };
-
     const startEdit = (district) => {
       expandedDistrictId.value = null;
-      editDistrict.value = { ...district };
-    };
-
-    const saveEdit = async () => {
-      updateError.value = '';
-      if (!editDistrict.value?.id) return;
-      const payload = {
-        fullName: editDistrict.value.fullName,
-        code: editDistrict.value.code,
-        region: editDistrict.value.region
-      };
-      try {
-        await updateDistrict(editDistrict.value.id, payload);
-        editDistrict.value = null;
-        await loadDistricts();
-      } catch (error) {
-        console.error('Error updating district:', error);
-        updateError.value =
-          error.response?.data?.message ||
-          error.response?.data?.title ||
-          'Tumanni yangilashda xatolik yuz berdi.';
-      }
+      router.push(`/districts/edit/${district.id}`);
     };
 
     const deleteRow = async (id) => {
       expandedDistrictId.value = null;
       try {
         await deleteDistrict(id);
-        if (editDistrict.value?.id === id) {
-          editDistrict.value = null;
-        }
         await loadDistricts();
       } catch (error) {
         console.error('Error deleting district:', error);
       }
     };
 
-    const cancelEdit = () => {
-      editDistrict.value = null;
-      updateError.value = '';
-    };
-
-    onMounted(loadDistricts);
+    onMounted(async () => {
+      await loadRegionsMap();
+      await loadDistricts();
+    });
 
     return {
       districts,
       expandedDistrictId,
-      newDistrict,
-      editDistrict,
-      createError,
-      updateError,
       toggleRow,
-      createNewDistrict,
       startEdit,
-      saveEdit,
       deleteRow,
-      cancelEdit
+      regionsMap
     };
   }
 };
@@ -256,6 +193,35 @@ export default {
 
 .section-header {
   margin-bottom: 1.5rem;
+}
+
+.section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.toggle-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2563eb;
+  color: white;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.user-count {
+  color: #475569;
+  font-weight: 600;
 }
 
 .entity-form {

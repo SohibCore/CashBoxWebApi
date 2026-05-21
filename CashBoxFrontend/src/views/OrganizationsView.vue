@@ -7,18 +7,12 @@
       </div>
     </div>
 
-    <form class="entity-form" @submit.prevent="createNewOrganization">
-      <h3>Yangi tashkilot</h3>
-      <div class="form-grid">
-        <label>INN<input v-model="newOrganization.inn" required maxlength="9" /></label>
-        <label>To‘liq nom<input v-model="newOrganization.fullName" required /></label>
-        <label>Qisqa nom<input v-model="newOrganization.shortName" required /></label>
-        <label>Region ID<input type="number" v-model.number="newOrganization.regionId" required min="1" /></label>
-        <label>Hudud<input v-model="newOrganization.district" required /></label>
-      </div>
-      <button type="submit">Saqlash</button>
-      <p v-if="createError" class="error">{{ createError }}</p>
-    </form>
+    <div class="section-actions">
+      <router-link to="/organizations/new" class="toggle-create">
+        <span>+</span> Yangi tashkilot qo'shish
+      </router-link>
+      <span class="user-count">{{ organizations.length }} ta tashkilot</span>
+    </div>
 
     <div class="data-panel">
       <h3>Tashkilotlar ro‘yxati</h3>
@@ -29,18 +23,18 @@
             <th>INN</th>
             <th>To‘liq nom</th>
             <th>Qisqa nom</th>
-            <th>Region ID</th>
+            <th>Viloyat</th>
             <th>Hudud</th>
             <th>Amallar</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="org in organizations" :key="org.id">
+          <tr v-for="org in organizations" :key="org.id" @dblclick="startEdit(org)" style="cursor: pointer;">
             <td>{{ org.id || '-' }}</td>
             <td>{{ org.inn || '-' }}</td>
             <td>{{ org.fullName || '-' }}</td>
             <td>{{ org.shortName || '-' }}</td>
-            <td>{{ org.regionId || '-' }}</td>
+            <td>{{ org.regionName || '-' }}</td>
             <td>{{ org.district || '-' }}</td>
             <td class="actions">
               <div class="action-dropdown-wrapper">
@@ -79,36 +73,19 @@
       </table>
     </div>
 
-    <div v-if="editOrganization" class="entity-form">
-      <h3>Mavjud tashkilotni yangilash</h3>
-      <div class="form-grid">
-        <label>INN<input v-model="editOrganization.inn" maxlength="9" /></label>
-        <label>To‘liq nom<input v-model="editOrganization.fullName" /></label>
-        <label>Qisqa nom<input v-model="editOrganization.shortName" /></label>
-        <label>Region ID<input type="number" v-model.number="editOrganization.regionId" min="1" /></label>
-        <label>Hudud<input v-model="editOrganization.district" /></label>
-      </div>
-      <div class="button-row">
-        <button type="button" @click="saveEdit">Yangilash</button>
-        <button type="button" class="danger" @click="cancelEdit">Bekor qilish</button>
-      </div>
-      <p v-if="updateError" class="error">{{ updateError }}</p>
-    </div>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue';
-import { getOrganizations, createOrganization, updateOrganization, deleteOrganization } from '../api';
+import { useRouter } from 'vue-router';
+import { getOrganizations, deleteOrganization } from '../api';
 
 export default {
   setup() {
+    const router = useRouter();
     const organizations = ref([]);
     const expandedOrgId = ref(null);
-    const newOrganization = ref({ inn: '', fullName: '', shortName: '', regionId: 0, district: '' });
-    const editOrganization = ref(null);
-    const createError = ref('');
-    const updateError = ref('');
 
     const toggleRow = (id) => {
       expandedOrgId.value = expandedOrgId.value === id ? null : id;
@@ -143,6 +120,8 @@ export default {
           fullName: getField(org, ['fullName', 'FullName']) || '',
           shortName: getField(org, ['shortName', 'ShortName']) || getField(org, ['fullName', 'FullName']) || '',
           regionId: getField(org, ['regionId', 'RegionId']) || 0,
+          // Backenddan kelayotgan RegionName ni map qilish
+          regionName: getField(org, ['regionName', 'RegionName', 'region', 'Region']) || '',
           district: getField(org, ['district', 'District']) || ''
         }));
       } catch (error) {
@@ -150,44 +129,9 @@ export default {
       }
     };
 
-    const createNewOrganization = async () => {
-      createError.value = '';
-      try {
-        await createOrganization(newOrganization.value);
-        await loadOrganizations();
-        Object.assign(newOrganization.value, { inn: '', fullName: '', shortName: '', regionId: 0, district: '' });
-      } catch (error) {
-        console.error('Create organization error:', error.response?.data || error.message);
-        if (error.response?.data?.errors) {
-          createError.value = Object.values(error.response.data.errors).flat().join(' ');
-        } else {
-          createError.value = error.response?.data?.message || 'Tashkilot yaratishda xatolik yuz berdi.';
-        }
-      }
-    };
-
     const startEdit = (org) => {
       expandedOrgId.value = null;
-      editOrganization.value = { ...org };
-    };
-
-    const saveEdit = async () => {
-      updateError.value = '';
-      if (!editOrganization.value) return;
-      const payload = { ...editOrganization.value };
-      delete payload.id;
-      try {
-        await updateOrganization(editOrganization.value.id, payload);
-        editOrganization.value = null;
-        await loadOrganizations();
-      } catch (error) {
-        console.error('Update organization error:', error.response?.data || error.message);
-        if (error.response?.data?.errors) {
-          updateError.value = Object.values(error.response.data.errors).flat().join(' ');
-        } else {
-          updateError.value = error.response?.data?.message || 'Tashkilotni yangilashda xatolik yuz berdi.';
-        }
-      }
+      router.push(`/organizations/edit/${org.id}`);
     };
 
     const deleteRow = async (id) => {
@@ -200,25 +144,14 @@ export default {
       }
     };
 
-    const cancelEdit = () => {
-      editOrganization.value = null;
-    };
-
     onMounted(loadOrganizations);
 
     return {
       organizations,
       expandedOrgId,
-      newOrganization,
-      editOrganization,
-      createError,
-      updateError,
-      createNewOrganization,
       toggleRow,
       startEdit,
-      saveEdit,
-      deleteRow,
-      cancelEdit
+      deleteRow
     };
   }
 };
@@ -241,6 +174,35 @@ export default {
 
 .section-header {
   margin-bottom: 1.5rem;
+}
+
+.section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.toggle-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2563eb;
+  color: white;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.user-count {
+  color: #475569;
+  font-weight: 600;
 }
 
 .entity-form {

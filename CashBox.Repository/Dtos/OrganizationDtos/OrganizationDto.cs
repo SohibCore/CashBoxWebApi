@@ -7,6 +7,8 @@
         public string FullName { get; set; } = null!;
         public string ShortName { get; set; } = null!;
         public int RegionId { get; set; }
+        public string RegionName { get; set; } = null!;
         public string District { get; set; } = null!;
+        public string Region { get; set; } = null!;
     }
 }

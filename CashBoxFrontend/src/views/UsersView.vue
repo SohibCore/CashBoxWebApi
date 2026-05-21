@@ -1,5 +1,5 @@
 <template>
-  <div class="page-card wide-card users-page">
+  <div class="page-card wide-card">
     <div class="section-header">
       <div>
         <h2>Foydalanuvchilar</h2>
@@ -22,6 +22,7 @@
             <th>ID</th>
             <th>Login</th>
             <th>F.I.O.</th>
+            <th>Email</th>
             <th>Qisqa nom</th>
             <th>PINFL</th>
             <th>Telefon</th>
@@ -34,10 +35,11 @@
         </thead>
         <tbody>
           <template v-for="user in users" :key="user.id">
-            <tr>
+            <tr @dblclick="startEdit(user)" style="cursor: pointer;">
               <td>{{ user.id || '-' }}</td>
               <td>{{ user.userName || '-' }}</td>
               <td>{{ user.fullName || '-' }}</td>
+              <td>{{ user.email || '-' }}</td>
               <td>{{ user.shortName || '-' }}</td>
               <td>{{ user.pinfl || '-' }}</td>
               <td>{{ user.phoneNumber || '-' }}</td>
@@ -60,6 +62,15 @@
                       </svg>
                       Tahrirlash
                     </button>
+                    <button @click="goToRoleAssign(user)" class="dropdown-btn">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      </svg>
+                      Rol biriktirish
+                    </button>
                     <button @click="deleteRow(user.id)" class="dropdown-btn danger">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="3 6 5 6 21 6"></polyline>
@@ -78,13 +89,95 @@
       </table>
     </div>
 
+    <!-- Foydalanuvchi boshqaruv modali -->
+    <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content wide-modal">
+        <div class="modal-header">
+          <h3>{{ modalUser.fullName || modalUser.userName }} - Boshqarish</h3>
+          <button class="close-btn" @click="closeModal">&times;</button>
+        </div>
+        
+        <div class="modal-tabs">
+          <button :class="['tab-item', { active: activeTab === 'edit' }]" @click="activeTab = 'edit'">
+            Tahrirlash
+          </button>
+          <button :class="['tab-item', { active: activeTab === 'roles' }]" @click="activeTab = 'roles'">
+            Rollar
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Tahrirlash tabi -->
+          <div v-if="activeTab === 'edit'" class="tab-pane">
+            <form @submit.prevent="saveUserChanges" class="modal-form">
+              <div class="form-grid">
+                <label>Login nomi <input v-model="modalUser.userName" required /></label>
+                <label>Email <input type="email" v-model="modalUser.email" required /></label>
+                <label>To'liq ism <input v-model="modalUser.fullName" required /></label>
+                <label>PINFL <input v-model="modalUser.pinfl" maxlength="14" /></label>
+                <label>Telefon <input v-model="modalUser.phoneNumber" maxlength="9" /></label>
+                <label>Passport <input v-model="modalUser.passportSeries" maxlength="9" /></label>
+                <label>Tashkilot 
+                  <select v-model.number="modalUser.organizationId">
+                    <option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.shortName }}</option>
+                  </select>
+                </label>
+                <label>Tug'ilgan sana <input v-model="modalUser.dateOfBirth" placeholder="dd.MM.yyyy" /></label>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="save-btn" :disabled="isSaving">Saqlash</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Rollar tabi -->
+          <div v-if="activeTab === 'roles'" class="tab-pane">
+            <div class="role-management">
+              <h4>Biriktirilgan rollar:</h4>
+              <div class="role-chips">
+                <span v-for="roleId in userRoleIds" :key="roleId" class="role-chip">
+                  {{ getRoleName(roleId) }}
+                  <button @click="removeRole(roleId)" class="remove-role">&times;</button>
+                </span>
+                <span v-if="userRoleIds.length === 0" class="empty-text">Rollari yo'q</span>
+              </div>
+              <hr />
+              <h4>Mavjud rollar:</h4>
+              <div class="available-roles">
+                <button 
+                  v-for="role in filteredAvailableRoles" 
+                  :key="role.id" 
+                  @click="addRole(role.id)"
+                  class="add-role-btn"
+                >
+                  + {{ role.name }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div v-if="modalError" class="error-msg">{{ modalError }}</div>
+        <div v-if="modalSuccess" class="success-msg">{{ modalSuccess }}</div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { getUsers, deleteUser, getOrganizations } from '../api';
+import { 
+  getUsers, 
+  deleteUser, 
+  getOrganizations, 
+  updateUser, 
+  getRoles, 
+  getUserRoles, 
+  assignUserRoles, 
+  removeUserRole 
+} from '../api';
 
 export default {
   setup() {
@@ -92,6 +185,16 @@ export default {
     const users = ref([]);
     const organizations = ref([]);
     const expandedUserId = ref(null);
+
+    // Modal holati
+    const isModalOpen = ref(false);
+    const activeTab = ref('edit'); // 'edit' yoki 'roles'
+    const modalUser = ref({});
+    const allRoles = ref([]);
+    const userRoleIds = ref([]);
+    const isSaving = ref(false);
+    const modalError = ref('');
+    const modalSuccess = ref('');
 
     const toggleRow = (id) => {
       expandedUserId.value = expandedUserId.value === id ? null : id;
@@ -165,9 +268,94 @@ export default {
       }
     };
 
-    const startEdit = (user) => {
-      router.push(`/users/edit/${user.id}`);
+    const openModal = async (user, tab = 'edit') => {
+      modalError.value = '';
+      modalSuccess.value = '';
+      activeTab.value = tab;
+      modalUser.value = { ...user, dateOfBirth: formatDate(user.dateOfBirth) };
+      isModalOpen.value = true;
+      expandedUserId.value = null;
+
+      // Rollarni yuklash
+      if (allRoles.value.length === 0) {
+        try {
+          const resp = await getRoles();
+          const data = resp.data?.data || resp.data || [];
+          allRoles.value = data.map(r => ({
+            id: getField(r, ['id', 'Id', 'roleId', 'RoleId']),
+            name: getField(r, ['name', 'Name', 'roleName', 'RoleName', 'title', 'Title'])
+          }));
+        } catch (e) { console.error(e); }
+      }
+
+      // Tanlangan user rollarini yuklash
+      try {
+        const resp = await getUserRoles(user.id);
+        const data = resp.data?.data || resp.data || [];
+        userRoleIds.value = data.map(r => getField(r, ['roleId', 'RoleId'])).filter(id => id != null);
+      } catch (e) { console.error(e); }
     };
+
+    const closeModal = () => {
+      isModalOpen.value = false;
+    };
+
+    const startEdit = (user) => {
+      openModal(user, 'edit');
+    };
+
+    const goToRoleAssign = (user) => {
+      router.push(`/user-role?userId=${user.id}&email=${encodeURIComponent(user.email || '')}`);
+      expandedUserId.value = null;
+    };
+
+    const saveUserChanges = async () => {
+      isSaving.value = true;
+      modalError.value = '';
+      const userId = modalUser.value.id;
+      const payload = { ...modalUser.value };
+      delete payload.id;
+
+      try {
+        await updateUser(userId, payload);
+        modalSuccess.value = 'Muvaffaqiyatli saqlandi';
+        await loadUsers();
+        setTimeout(() => { closeModal(); }, 1000);
+      } catch (e) {
+        modalError.value = e.response?.data?.message || 'Xatolik yuz berdi';
+      } finally {
+        isSaving.value = false;
+      }
+    };
+
+    const addRole = async (roleId) => {
+      try {
+        await assignUserRoles(modalUser.value.id, [roleId]);
+        if (!userRoleIds.value.includes(roleId)) {
+          userRoleIds.value.push(roleId);
+        }
+      } catch (e) {
+        modalError.value = "Rol biriktirishda xatolik";
+      }
+    };
+
+    const removeRole = async (roleId) => {
+      try {
+        await removeUserRole(modalUser.value.id, roleId);
+        userRoleIds.value = userRoleIds.value.filter(id => id !== roleId);
+      } catch (e) {
+        modalError.value = "Rolni o'chirishda xatolik";
+      }
+    };
+
+    const getRoleName = (id) => {
+      const role = allRoles.value.find(r => r.id === id);
+      return role ? role.name : 'Noma\'lum';
+    };
+
+    const filteredAvailableRoles = computed(() => {
+      return allRoles.value.filter(role => !userRoleIds.value.includes(role.id));
+    });
 
     const deleteRow = async (id) => {
       try {
@@ -214,24 +402,38 @@ export default {
       deleteRow,
       toggleRow,
       organizationName,
-      formatDate
+      formatDate,
+      goToRoleAssign,
+      isModalOpen,
+      activeTab,
+      modalUser,
+      closeModal,
+      saveUserChanges,
+      userRoleIds,
+      addRole,
+      removeRole,
+      getRoleName,
+      filteredAvailableRoles,
+      isSaving,
+      modalError,
+      modalSuccess
     };
   }
 };
 </script>
 
-<style scoped>
-.users-page.page-card {
+<style>
+.page-card {
   background: white;
   padding: 1.5rem;
   border-radius: 1rem;
   box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
 }
 
-.users-page.wide-card {
-  max-width: none;
+.wide-card {
+  max-width: 1000000px;
   width: 100%;
-  margin: 0;
+  margin: 1px;
   box-sizing: border-box;
 }
 
@@ -287,10 +489,10 @@ export default {
   top: 100%;
   right: 0;
   margin-top: 0.3rem;
-  display: flex;
-  gap: 0.4rem;
+  display: flex; /* Flexbox xususiyatini saqlab qolamiz */
+  gap: 0.25rem; /* Bo'shliqni kamaytiramiz */
   background: white;
-  padding: 0.4rem;
+  padding: 0.25rem; /* Paddingni kamaytiramiz */
   border-radius: 0.5rem;
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
@@ -305,8 +507,8 @@ export default {
   border: 1px solid transparent;
   background: #ffffff;
   color: #0f172a;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.78rem;
+  padding: 0.3rem 0.5rem; /* Paddingni kamaytiramiz */
+  font-size: 0.72rem; /* Font hajmini kichiklashtiramiz */
   border-radius: 0.4rem;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
@@ -437,48 +639,37 @@ button {
 }
 
 .data-panel {
-  overflow-x: visible;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   background: #f8fafc;
   padding: 1.5rem;
   border-radius: 0.5rem;
 }
 
-.data-panel h3 {
-  margin-top: 0;
-}
-
 table {
   width: 100%;
-  min-width: 0;
+  min-width: 1200px;
   border-collapse: collapse;
-  table-layout: auto;
 }
 
 thead th {
   text-align: left;
-  padding: 0.65rem 0.5rem;
+  padding: 0.8rem;
   border-bottom: 1px solid #e2e8f0;
   background: #f9fafb;
   font-weight: 600;
-  font-size: 0.82rem;
-  line-height: 1.3;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 tbody td {
-  padding: 0.75rem 0.5rem;
+  padding: 0.9rem 0.8rem;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 0.88rem;
-  line-height: 1.35;
-  vertical-align: top;
-  word-break: break-word;
 }
 
 .actions {
   display: flex;
   gap: 0.5rem;
   white-space: nowrap;
-  word-break: normal;
 }
 
 .icon-btn {
@@ -509,4 +700,124 @@ tbody td {
 button.danger {
   background: #dc2626;
 }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+.tab-item {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-item.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.modal-footer {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  background: #2563eb;
+  padding: 0.8rem 2rem;
+  font-weight: 600;
+}
+
+/* Role management inside modal */
+.role-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.role-chip {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 0.4rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.remove-role {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.available-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.add-role-btn {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+}
+
+.error-msg { color: #dc2626; margin-top: 1rem; }
+.success-msg { color: #16a34a; margin-top: 1rem; }
+
 </style>

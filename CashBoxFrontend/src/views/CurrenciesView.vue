@@ -26,10 +26,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="currency in currencies" :key="currency.id">
+          <tr v-for="currency in currencies" :key="currency.id" @dblclick="startEdit(currency.id)" style="cursor: pointer;">
             <td>{{ currency.code }}</td>
-            <td>{{ currency.name }}</td>
-            <td>{{ currency.symbol }}</td>
+            <td>{{ currency.fullName }}</td>
+            <td>{{ currency.shortName }}</td>
             <td class="actions">
               <div class="action-dropdown-wrapper">
                 <button @click="toggleRow(currency.id)" :class="['icon-btn', { expanded: expandedCurrencyId === currency.id }]" title="Amallarni ko'rsatish">
@@ -76,10 +76,24 @@ export default {
     const currencies = ref([]);
     const expandedCurrencyId = ref(null);
 
+    const getField = (obj, keys) => {
+      if (!obj) return null;
+      for (const key of keys) {
+        if (obj[key] !== undefined && obj[key] !== null) return obj[key];
+      }
+      return null;
+    };
+
     const loadCurrencies = async () => {
       try {
         const response = await getCurrencies();
-        currencies.value = response.data?.data || response.data || [];
+        const rawData = response.data?.data || response.data || [];
+        currencies.value = rawData.map(item => ({
+          id: getField(item, ['id', 'Id']),
+          code: getField(item, ['code', 'Code']),
+          fullName: getField(item, ['fullName', 'FullName', 'name', 'Name']),
+          shortName: getField(item, ['shortName', 'ShortName', 'symbol', 'Symbol'])
+        }));
       } catch (error) {
         console.error('Error loading currencies:', error);
       }
@@ -137,27 +151,31 @@ export default {
   padding-bottom: 1rem;
 }
 
-.entity-form {
-  background: #f8fafc;
-  padding: 1.25rem;
+.section-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.toggle-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white; /* Oq fon */
+  color: #2563eb; /* Ko'k matn */
+  border: 1px solid #2563eb; /* Ko'k ramka */
+  padding: 0.75rem 1.25rem;
   border-radius: 0.75rem;
-  margin-bottom: 2rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin: 1rem 0;
-}
-
-.data-panel {
-  overflow-x: visible; /* Dropdown ko'rinishi uchun muhim */
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
+.toggle-create:hover {
+  background: #eff6ff; /* Hoverda ochroq ko'k fon */
+  color: #1d4ed8; /* Hoverda to'qroq ko'k matn */
+  border-color: #1d4ed8; /* Hoverda to'qroq ko'k ramka */
 }
 
 th {
@@ -174,11 +192,6 @@ td {
   vertical-align: middle;
 }
 
-.actions {
-  position: relative;
-  width: 50px;
-}
-
 .action-dropdown-wrapper {
   position: relative;
   display: inline-block;
@@ -186,8 +199,9 @@ td {
 
 .action-dropdown {
   position: absolute;
-  top: 0;
-  right: 110%; /* Tugmaning chap tomonida chiqadi */
+  top: 100%;
+  right: 0;
+  margin-top: 0.3rem;
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 0.5rem;

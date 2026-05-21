@@ -90,7 +90,8 @@ namespace CashBox.Service.Services.RegionServices
                 Id = u.Id,
                 FullName = u.FullName,
                 ShortName = u.ShortName,
-                Code = u.Code
+                Code = u.Code,
+                
             }).ToListAsync();
         }
     }

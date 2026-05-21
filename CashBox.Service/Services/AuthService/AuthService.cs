@@ -34,6 +34,7 @@ namespace CashBox.Service.Services.AuthService
                 OrganizationId = registerDto.OrganizationId,
                 DateOfBirth = registerDto.DateOfBirth,
                 PassportSeries = registerDto.PassportSeries,
+                CreatedAt = DateTime.UtcNow,
             };
 
             await _context.Users.AddAsync(user);

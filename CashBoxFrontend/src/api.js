@@ -190,6 +190,10 @@ export async function getOrganizations() {
   return api.get('/api/organization/getlist');
 }
 
+export async function getOrganizationById(id) {
+  return api.get(`/api/organization/get/${id}`);
+}
+
 const mapOrganizationPayload = (data) => {
   if (!data || typeof data !== 'object') return data;
   const mapping = {
@@ -227,27 +231,20 @@ export async function getCurrencies() {
 }
 
 export async function getCurrencyById(id) {
-  return api.get(`/api/currency/getbyid/${id}`);
+  return api.get(`/api/currency/get/${id}`);
 }
 
-const mapCurrencyPayload = (data) => {
-  if (!data || typeof data !== 'object') return data;
-  const mapping = {
-    name: 'Name',
-    code: 'Code',
-    symbol: 'Symbol',
-    id: 'Id'
+const mapCurrencyPayload = (data) => { // O'zgartirilgan
+  return {
+    FullName: data.name || data.fullName || data.FullName,
+    ShortName: data.symbol || data.shortName || data.ShortName,
+    Code: data.code || data.Code,
   };
-  return Object.entries(data).reduce((result, [key, value]) => {
-    if (value === undefined) return result;
-    const mappedKey = mapping[key] || key;
-    result[mappedKey] = value;
-    return result;
-  }, {});
 };
 
 export async function createCurrency(data) {
-  const mapped = mapCurrencyPayload(data);
+  const { id, Id, ...rest } = data;
+  const mapped = mapCurrencyPayload(rest);
   console.log('Currency create payload:', mapped);
   return api.post('/api/currency/create', mapped);
 }
@@ -262,6 +259,10 @@ export async function deleteCurrency(id) {
 
 export async function getRegions() {
   return api.get('/api/region/getlist');
+}
+
+export async function getRegionById(id) {
+  return api.get(`/api/region/get/${id}`);
 }
 
 const mapRegionPayload = (data) => {
@@ -292,8 +293,14 @@ export async function deleteRegion(id) {
   return api.delete(`/api/region/delete/${id}`);
 }
 
-export async function getDistricts() {
-  return api.get('/api/district/getlist');
+export async function getDistricts(regionId = null) {
+  return api.get('/api/district/getlist', {
+    params: regionId ? { regionId } : {}
+  });
+}
+
+export async function getDistrictById(id) {
+  return api.get(`/api/district/get/${id}`);
 }
 
 const mapDistrictPayload = (data) => {
@@ -301,7 +308,7 @@ const mapDistrictPayload = (data) => {
   const mapping = {
     fullName: 'FullName',
     code: 'Code',
-    region: 'Region',
+    regionId: 'RegionId',
     id: 'Id'
   };
   return Object.entries(data).reduce((result, [key, value]) => {

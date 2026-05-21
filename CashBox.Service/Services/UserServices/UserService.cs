@@ -94,6 +94,8 @@ namespace CashBox.Service.Services.UserServices
             if (updateUserDto.Email != null)
                 user.Email = updateUserDto.Email;
 
+            user.ModifiedAt = DateTime.UtcNow;
+
             await _context.SaveChangesAsync();
         }
         public async Task DeleteAsync(int id)
@@ -148,7 +150,8 @@ namespace CashBox.Service.Services.UserServices
                 Address = u.Address,
                 OrganizationId = u.OrganizationId,
                 DateOfBirth = u.DateOfBirth,
-                PassportSeries = u.PassportSeries
+                PassportSeries = u.PassportSeries,
+                Email = u.Email
             }).ToListAsync();
         }
 

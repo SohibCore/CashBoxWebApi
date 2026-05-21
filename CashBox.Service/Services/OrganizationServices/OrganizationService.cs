@@ -95,15 +95,18 @@ namespace CashBox.Service.Services.OrganizationServices
             if (organizationFilterDto.RegionId != 0 && organizationFilterDto.RegionId != null)
                 organization = organization.Where(x => x.RegionId == organizationFilterDto.RegionId);
 
-            return await organization.Select(u => new OrganizationDto
-            {
-                Id = u.Id,
-                FullName = u.FullName,
-                ShortName = u.ShortName,
-                Inn = u.Inn,
-                RegionId = u.RegionId,
-                District = u.District
-            }).ToListAsync();
+            return await organization
+                .Include(u => u.Region)
+                .Select(u => new OrganizationDto
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    ShortName = u.ShortName,
+                    Inn = u.Inn,
+                    RegionId = u.RegionId,
+                    RegionName = u.Region.FullName,
+                    District = u.District,
+                }).ToListAsync();
         }
     }
 }

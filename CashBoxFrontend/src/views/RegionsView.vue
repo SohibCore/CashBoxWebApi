@@ -7,25 +7,12 @@
       </div>
     </div>
 
-    <form class="entity-form" @submit.prevent="createNewRegion">
-      <h3>Yangi viloyat</h3>
-      <div class="form-grid">
-        <label>
-          To‘liq nom
-          <input v-model="newRegion.fullName" required maxlength="500" />
-        </label>
-        <label>
-          Qisqa nom
-          <input v-model="newRegion.shortName" required maxlength="300" />
-        </label>
-        <label>
-          Kod
-          <input v-model="newRegion.code" required maxlength="9" />
-        </label>
-      </div>
-      <button type="submit">Saqlash</button>
-      <p v-if="createError" class="error">{{ createError }}</p>
-    </form>
+    <div class="section-actions">
+      <router-link to="/regions/new" class="toggle-create">
+        <span>+</span> Yangi viloyat qo'shish
+      </router-link>
+      <span class="user-count">{{ regions.length }} ta viloyat</span>
+    </div>
 
     <div class="data-panel">
       <h3>Viloyatlar ro‘yxati</h3>
@@ -41,7 +28,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="region in regions" :key="region.id">
+          <tr v-for="region in regions" :key="region.id" @dblclick="startEdit(region)" style="cursor: pointer;">
             <td>{{ region.id || '-' }}</td>
             <td>{{ region.fullName || '-' }}</td>
             <td>{{ region.shortName || '-' }}</td>
@@ -82,44 +69,19 @@
         </tbody>
       </table>
     </div>
-
-    <div v-if="editRegion" class="entity-form">
-      <h3>Viloyatni yangilash</h3>
-      <div class="form-grid">
-        <label>
-          To‘liq nom
-          <input v-model="editRegion.fullName" required maxlength="500" />
-        </label>
-        <label>
-          Qisqa nom
-          <input v-model="editRegion.shortName" required maxlength="300" />
-        </label>
-        <label>
-          Kod
-          <input v-model="editRegion.code" required maxlength="9" />
-        </label>
-      </div>
-      <div class="button-row">
-        <button type="button" @click="saveEdit">Yangilash</button>
-        <button type="button" class="btn-secondary" @click="cancelEdit">Bekor qilish</button>
-      </div>
-      <p v-if="updateError" class="error">{{ updateError }}</p>
-    </div>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue';
-import { getRegions, createRegion, updateRegion, deleteRegion, extractApiData } from '../api';
+import { useRouter } from 'vue-router';
+import { getRegions, deleteRegion, extractApiData } from '../api';
 
 export default {
   setup() {
+    const router = useRouter();
     const regions = ref([]);
     const expandedRegionId = ref(null);
-    const newRegion = ref({ fullName: '', shortName: '', code: '' });
-    const editRegion = ref(null);
-    const createError = ref('');
-    const updateError = ref('');
 
     const getField = (obj, keys) => {
       if (!obj) return null;
@@ -160,63 +122,19 @@ export default {
       expandedRegionId.value = expandedRegionId.value === id ? null : id;
     };
 
-    const createNewRegion = async () => {
-      createError.value = '';
-      try {
-        await createRegion(newRegion.value);
-        newRegion.value = { fullName: '', shortName: '', code: '' };
-        await loadRegions();
-      } catch (error) {
-        console.error('Error creating region:', error);
-        createError.value =
-          error.response?.data?.message ||
-          error.response?.data?.title ||
-          'Viloyat yaratishda xatolik yuz berdi.';
-      }
-    };
-
     const startEdit = (region) => {
       expandedRegionId.value = null;
-      editRegion.value = { ...region };
-    };
-
-    const saveEdit = async () => {
-      updateError.value = '';
-      if (!editRegion.value?.id) return;
-      const payload = {
-        fullName: editRegion.value.fullName,
-        shortName: editRegion.value.shortName,
-        code: editRegion.value.code
-      };
-      try {
-        await updateRegion(editRegion.value.id, payload);
-        editRegion.value = null;
-        await loadRegions();
-      } catch (error) {
-        console.error('Error updating region:', error);
-        updateError.value =
-          error.response?.data?.message ||
-          error.response?.data?.title ||
-          'Viloyatni yangilashda xatolik yuz berdi.';
-      }
+      router.push(`/regions/edit/${region.id}`);
     };
 
     const deleteRow = async (id) => {
       expandedRegionId.value = null;
       try {
         await deleteRegion(id);
-        if (editRegion.value?.id === id) {
-          editRegion.value = null;
-        }
         await loadRegions();
       } catch (error) {
         console.error('Error deleting region:', error);
       }
-    };
-
-    const cancelEdit = () => {
-      editRegion.value = null;
-      updateError.value = '';
     };
 
     onMounted(loadRegions);
@@ -224,16 +142,9 @@ export default {
     return {
       regions,
       expandedRegionId,
-      newRegion,
-      editRegion,
-      createError,
-      updateError,
       toggleRow,
-      createNewRegion,
       startEdit,
-      saveEdit,
-      deleteRow,
-      cancelEdit
+      deleteRow
     };
   }
 };
@@ -256,6 +167,35 @@ export default {
 
 .section-header {
   margin-bottom: 1.5rem;
+}
+
+.section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.toggle-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2563eb;
+  color: white;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.user-count {
+  color: #475569;
+  font-weight: 600;
 }
 
 .entity-form {

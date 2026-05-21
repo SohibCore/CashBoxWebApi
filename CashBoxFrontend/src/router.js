@@ -12,6 +12,10 @@ import RoleAssignmentView from './views/RoleAssignmentView.vue';
 import CurrenciesView from './views/CurrenciesView.vue';
 import RegionsView from './views/RegionsView.vue';
 import DistrictsView from './views/DistrictsView.vue';
+import CurrencyFormView from './views/CurrencyFormView.vue';
+import OrganizationFormView from './views/OrganizationFormView.vue';
+import RegionFormView from './views/RegionFormView.vue';
+import DistrictFormView from './views/DistrictFormView.vue';
 
 const routes = [
   {
@@ -36,9 +40,17 @@ const routes = [
   { path: '/users/edit/:id', component: EditUserView, meta: { requiresAuth: true } },
   { path: '/user-role', component: RoleAssignmentView, meta: { requiresAuth: true } },
   { path: '/organizations', component: OrganizationsView, meta: { requiresAuth: true } },
+  { path: '/organizations/new', component: OrganizationFormView, meta: { requiresAuth: true } },
+  { path: '/organizations/edit/:id', component: OrganizationFormView, meta: { requiresAuth: true } },
   { path: '/currencies', component: CurrenciesView, meta: { requiresAuth: true } },
+  { path: '/currencies/new', component: CurrencyFormView, meta: { requiresAuth: true } },
+  { path: '/currencies/edit/:id', component: CurrencyFormView, meta: { requiresAuth: true } },
   { path: '/regions', component: RegionsView, meta: { requiresAuth: true } },
-  { path: '/districts', component: DistrictsView, meta: { requiresAuth: true } }
+  { path: '/regions/new', component: RegionFormView, meta: { requiresAuth: true } },
+  { path: '/regions/edit/:id', component: RegionFormView, meta: { requiresAuth: true } },
+  { path: '/districts', component: DistrictsView, meta: { requiresAuth: true } },
+  { path: '/districts/new', component: DistrictFormView, meta: { requiresAuth: true } },
+  { path: '/districts/edit/:id', component: DistrictFormView, meta: { requiresAuth: true } }
 ];
 
 const router = createRouter({
