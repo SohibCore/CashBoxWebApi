@@ -1,6 +1,6 @@
 <template>
   <div class="app-shell">
-    <aside v-if="token" class="sidebar" :class="{ collapsed: collapsed }">
+    <aside v-if="token" class="sidebar" :class="{ collapsed: collapsed }"> 
       <button class="menu-toggle" @click="collapsed = !collapsed" aria-label="Toggle navigation">
         <span></span>
         <span></span>
@@ -22,17 +22,25 @@
         <!-- ✅ Faqat Admin ko'radi -->
         <template v-if="role === 'Admin'">
           <router-link to="/users" class="nav-link">Foydalanuvchilar</router-link>
-          <router-link to="/user-role" class="nav-link">Foydalanuvchiga rol biriktirish</router-link>
+        </template>
+
+        <router-link to="/income-documents" class="nav-link">📄 Kirim hujjatlari</router-link>
+        <router-link to="/suppliers" class="nav-link">🏭 Ta'minotchilar</router-link>
+        <router-link to="/products" class="nav-link">📦 Mahsulotlar</router-link>
+
+        <template v-if="role === 'Admin'">
           <router-link to="/organizations" class="nav-link">Tashkilotlar</router-link>
           <router-link to="/currencies" class="nav-link">Valyutalar</router-link>
           <router-link to="/regions" class="nav-link">Viloyatlar</router-link>
           <router-link to="/districts" class="nav-link">Tumanlar</router-link>
         </template>
       </nav>
-      <button class="logout-btn" @click="logout">Chiqish</button>
     </aside>
 
-    <div class="content-area" :class="{ 'with-sidebar': token }">
+    <div 
+      class="content-area" 
+      :class="{ 'with-sidebar': token, 'collapsed-sidebar': collapsed && token }"
+    >
       <header class="topbar">
         <div>
           <h1>CashBox</h1>
@@ -51,40 +59,47 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { jwtDecode } from 'jwt-decode';
 
 export default {
   setup() {
     const router = useRouter();
+    const route = useRoute();
+    
     const token = ref(localStorage.getItem('token'));
     const userName = ref(localStorage.getItem('userName') || '');
     const email = ref(localStorage.getItem('email') || '');
     const collapsed = ref(false);
+    const role = ref(null);
 
-    // ✅ Token dan rol olish
     const getUserRole = () => {
-      const t = localStorage.getItem('token');
-      if (!t) return null;
+      if (!token.value) return null;
       try {
-        const decoded = jwtDecode(t);
-        // Adjust this claim name if your JWT uses a different one for roles
-        return decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+        const decoded = jwtDecode(token.value);
+        // Ko'p hollarda 'role' yoki Microsoft sxemasi bo'ladi
+        return decoded['role'] || 
+               decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 
+               null;
       } catch (e) {
         console.error("Error decoding token:", e);
         return null;
       }
     };
 
-    const role = ref(getUserRole());
-
-    router.afterEach(() => {
+    // Ma'lumotlarni yangilash funksiyasi
+    const refreshState = () => {
       token.value = localStorage.getItem('token');
       userName.value = localStorage.getItem('userName') || '';
       email.value = localStorage.getItem('email') || '';
-      role.value = getUserRole(); // ✅ rol ham yangilansin
-    });
+      role.value = getUserRole();
+    };
+
+    // Sahifa yuklanganda va har safar route o'zgarganda tekshirish
+    watch(() => route.path, () => {
+      refreshState();
+    }, { immediate: true });
 
     const logout = () => {
       localStorage.removeItem('token');
@@ -92,6 +107,7 @@ export default {
       localStorage.removeItem('email');
       localStorage.removeItem('userId');
       router.push('/auth/login');
+      refreshState();
     };
 
     return {
@@ -99,7 +115,7 @@ export default {
       userName,
       email,
       collapsed,
-      role, // Return the role
+      role,
       logout,
     };
   }
@@ -129,6 +145,7 @@ html {
   position: fixed;
   height: 100vh;
   overflow-y: auto;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 100;
 }
 
@@ -148,20 +165,18 @@ html {
   margin-left: 0;
   min-height: 100vh;
 }
-
+              
 .content-area.with-sidebar {
   margin-left: 260px;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.content-area.collapsed-sidebar {
-  margin-left: 88px;
+.content-area.with-sidebar.collapsed-sidebar {
+  margin-left: 88px !important;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidebar.collapsed ~ .content-area {
-  margin-left: 88px;
-}
-
-.menu-toggle {
+ .menu-toggle {
   border: none;
   background: transparent;
   cursor: pointer;
@@ -183,6 +198,11 @@ html {
 
 .sidebar-brand {
   overflow: hidden;
+  white-space: nowrap;
+}
+
+.sidebar-brand h2, .sidebar-brand p {
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .sidebar.collapsed .sidebar-brand h2,
@@ -192,11 +212,11 @@ html {
 .sidebar.collapsed .profile-email,
 .sidebar.collapsed .sidebar-nav,
 .sidebar.collapsed .nav-link {
-  overflow: hidden;
-  width: 0;
-  height: 0;
   opacity: 0;
+  pointer-events: none;
+  transform: translateX(-10px);
 }
+
 
 .sidebar.collapsed .logout-btn {
   width: 100%;
@@ -225,12 +245,15 @@ html {
 .profile-card {
   padding: 1rem;
   background: #111827;
+  white-space: nowrap;
+  transition: opacity 0.2s ease, transform 0.2s ease;
   border-radius: 0.75rem;
 }
 
 .profile-name {
   font-weight: 700;
 }
+
 
 .profile-email {
   color: #94a3b8;
@@ -241,12 +264,15 @@ html {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
+  white-space: nowrap;
   gap: 0.75rem;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .nav-link {
   color: #cbd5e1;
   text-decoration: none;
+  display: block;
   padding: 0.85rem 1rem;
   border-radius: 0.75rem;
   transition: background 0.2s ease;
@@ -263,6 +289,7 @@ html {
   background: #2563eb;
   color: white;
   padding: 0.85rem 1rem;
+  transition: all 0.3s ease;
   border-radius: 0.75rem;
   cursor: pointer;
 }

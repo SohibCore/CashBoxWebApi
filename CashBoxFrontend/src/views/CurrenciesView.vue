@@ -1,6 +1,6 @@
 <template>
   <div class="page-card wide-card">
-    <div class="section-header">
+    <div class="section-header"> 
       <div>
         <h2>Valyutalar</h2>
         <p>Mavjud valyutalarni boshqarish va yangilarini qo'shish.</p>
@@ -26,7 +26,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="currency in currencies" :key="currency.id" @dblclick="startEdit(currency.id)" style="cursor: pointer;">
+          <tr v-for="currency in currencies" :key="currency.id" @dblclick="startEdit(currency.id)">
             <td>{{ currency.code }}</td>
             <td>{{ currency.fullName }}</td>
             <td>{{ currency.shortName }}</td>
@@ -65,9 +65,9 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { getCurrencies, deleteCurrency } from '../api';
+import { getCurrencies, deleteCurrency, extractApiData, getField } from '../api';
 
 export default {
   name: 'CurrenciesView',
@@ -76,18 +76,12 @@ export default {
     const currencies = ref([]);
     const expandedCurrencyId = ref(null);
 
-    const getField = (obj, keys) => {
-      if (!obj) return null;
-      for (const key of keys) {
-        if (obj[key] !== undefined && obj[key] !== null) return obj[key];
-      }
-      return null;
-    };
-
     const loadCurrencies = async () => {
       try {
         const response = await getCurrencies();
-        const rawData = response.data?.data || response.data || [];
+        const result = extractApiData(response);
+        const rawData = Array.isArray(result) ? result : [];
+
         currencies.value = rawData.map(item => ({
           id: getField(item, ['id', 'Id']),
           code: getField(item, ['code', 'Code']),
@@ -155,7 +149,22 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-and-count {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
 }
 
 .toggle-create {
@@ -192,6 +201,10 @@ td {
   vertical-align: middle;
 }
 
+tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 .action-dropdown-wrapper {
   position: relative;
   display: inline-block;

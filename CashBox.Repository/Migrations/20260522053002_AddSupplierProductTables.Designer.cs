@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace CashBox.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260522053002_AddSupplierProductTables")]
+    partial class AddSupplierProductTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,48 +24,6 @@ namespace CashBox.Repository.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("CashBox.Repository.Entity.IncomeDocument", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("ID");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("DATE");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric")
-                        .HasColumnName("PRICE");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer")
-                        .HasColumnName("PRODUCT_ID");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric")
-                        .HasColumnName("QUANTITY");
-
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("integer")
-                        .HasColumnName("SUPPLIER_ID");
-
-                    b.Property<decimal>("TotalSum")
-                        .HasColumnType("numeric")
-                        .HasColumnName("TOTAL_SUM");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("SupplierId");
-
-                    b.ToTable("INCOME_DOCUMENT");
-                });
 
             modelBuilder.Entity("CashBox.Repository.Entity.Product", b =>
                 {
@@ -179,7 +140,7 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("CREATED_USER_ID");
 
-                    b.Property<string>("Inn")
+                    b.Property<string>("INN")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
@@ -736,25 +697,6 @@ namespace CashBox.Repository.Migrations
                     b.HasIndex("OrganizationId");
 
                     b.ToTable("SYS_USER");
-                });
-
-            modelBuilder.Entity("CashBox.Repository.Entity.IncomeDocument", b =>
-                {
-                    b.HasOne("CashBox.Repository.Entity.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CashBox.Repository.Entity.Supplier", "Supplier")
-                        .WithMany()
-                        .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("CashBox.Repository.Entity.Product", b =>

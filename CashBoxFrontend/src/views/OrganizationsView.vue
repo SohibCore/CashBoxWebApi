@@ -1,6 +1,6 @@
 <template>
   <div class="page-card wide-card organizations-page">
-    <div class="section-header">
+    <div class="section-header"> 
       <div>
         <h2>Tashkilotlar</h2>
         <p>Tashkilot qo‘shish, ro‘yxatni ko‘rish va yangilash.</p>
@@ -11,7 +11,11 @@
       <router-link to="/organizations/new" class="toggle-create">
         <span>+</span> Yangi tashkilot qo'shish
       </router-link>
-      <span class="user-count">{{ organizations.length }} ta tashkilot</span>
+      <div class="search-and-count">
+        <input type="text" v-model="searchQuery" placeholder="Tashkilot nomini qidirish..." class="search-input" />
+        <span class="user-count">{{ filteredOrganizations.length }} ta tashkilot</span>
+      </div>
+
     </div>
 
     <div class="data-panel">
@@ -29,7 +33,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="org in organizations" :key="org.id" @dblclick="startEdit(org)" style="cursor: pointer;">
+          <tr v-for="org in organizations" :key="org.id" @dblclick="startEdit(org)">
             <td>{{ org.id || '-' }}</td>
             <td>{{ org.inn || '-' }}</td>
             <td>{{ org.fullName || '-' }}</td>
@@ -77,9 +81,9 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { getOrganizations, deleteOrganization } from '../api';
+import { getOrganizations, deleteOrganization, extractApiData, getField } from '../api';
 
 export default {
   setup() {
@@ -91,29 +95,12 @@ export default {
       expandedOrgId.value = expandedOrgId.value === id ? null : id;
     };
 
-    const getField = (obj, keys) => {
-      if (!obj) return null;
-      for (const key of keys) {
-        if (obj[key] !== undefined && obj[key] !== null) {
-          return obj[key];
-        }
-      }
-      return null;
-    };
-
     const loadOrganizations = async () => {
       try {
         const response = await getOrganizations();
-        const result = response.data;
-        const rawOrgs = Array.isArray(result)
-          ? result
-          : Array.isArray(result?.data)
-          ? result.data
-          : Array.isArray(result?.items)
-          ? result.items
-          : Array.isArray(result?.value)
-          ? result.value
-          : [];
+        const result = extractApiData(response);
+        const rawOrgs = Array.isArray(result) ? result : [];
+
         organizations.value = rawOrgs.map((org) => ({
           id: getField(org, ['id', 'Id', 'organizationId', 'OrganizationId']),
           inn: getField(org, ['inn', 'Inn']) || '',
@@ -183,6 +170,19 @@ export default {
   gap: 1rem;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+.search-and-count {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
 }
 
 .toggle-create {
@@ -303,6 +303,10 @@ tbody td {
   word-break: break-word;
 }
 
+tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 .actions {
   display: flex;
   gap: 0.5rem;

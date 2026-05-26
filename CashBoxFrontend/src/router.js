@@ -16,6 +16,12 @@ import CurrencyFormView from './views/CurrencyFormView.vue';
 import OrganizationFormView from './views/OrganizationFormView.vue';
 import RegionFormView from './views/RegionFormView.vue';
 import DistrictFormView from './views/DistrictFormView.vue';
+import IncomeDocumentsView from './views/IncomeDocumentsView.vue';
+import IncomeDocumentFormView from './views/IncomeDocumentFormView.vue';
+import SuppliersView from './views/SuppliersView.vue';
+import ProductsView from './views/ProductsView.vue';
+import SupplierFormView from './views/SupplierFormView.vue';
+import ProductFormView from './views/ProductFormView.vue';
 
 const routes = [
   {
@@ -38,6 +44,15 @@ const routes = [
   { path: '/users', component: UsersView, meta: { requiresAuth: true } },
   { path: '/users/new', component: CreateUserView, meta: { requiresAuth: true } },
   { path: '/users/edit/:id', component: EditUserView, meta: { requiresAuth: true } },
+  { path: '/income-documents', component: IncomeDocumentsView, meta: { requiresAuth: true } },
+  { path: '/income-documents/new', component: IncomeDocumentFormView, meta: { requiresAuth: true } },
+  { path: '/income-documents/edit/:id', component: IncomeDocumentFormView, meta: { requiresAuth: true } },
+  { path: '/suppliers', component: SuppliersView, meta: { requiresAuth: true } },
+  { path: '/suppliers/new', component: SupplierFormView, meta: { requiresAuth: true } },
+  { path: '/suppliers/edit/:id', component: SupplierFormView, meta: { requiresAuth: true } },
+  { path: '/products', component: ProductsView, meta: { requiresAuth: true } },
+  { path: '/products/new', component: ProductFormView, meta: { requiresAuth: true } },
+  { path: '/products/edit/:id', component: ProductFormView, meta: { requiresAuth: true } },
   { path: '/user-role', component: RoleAssignmentView, meta: { requiresAuth: true } },
   { path: '/organizations', component: OrganizationsView, meta: { requiresAuth: true } },
   { path: '/organizations/new', component: OrganizationFormView, meta: { requiresAuth: true } },

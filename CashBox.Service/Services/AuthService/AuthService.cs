@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CashBox.Service.Services.AccountServices;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Repository.Data;
@@ -13,11 +14,13 @@ namespace CashBox.Service.Services.AuthService
     {
         private readonly AppDbContext _context;
         private readonly IConfiguration _config;
+        private readonly AccountService _account;
 
-        public AuthService(AppDbContext context, IConfiguration config)
+        public AuthService(AppDbContext context, IConfiguration config,AccountService account)
         {
             _context = context;
             _config = config;
+            _account = account;
         }
         public async Task RegisterAsync(RegisterDto registerDto)
         {
@@ -50,6 +53,9 @@ namespace CashBox.Service.Services.AuthService
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
                 throw new Exception("Mavjud bo'lmagan foydalanuvchi");
 
+            _account.UserId = user.Id;
+            _account.OrganizationId = user.OrganizationId.Value;
+
             return GenerateJwt(user);
         }
         public async Task RefreshAsync(LoginDto loginDto)
@@ -74,6 +80,7 @@ namespace CashBox.Service.Services.AuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Email, user.Email),
+            new Claim("OrgId", user.OrganizationId.ToString()),
              };
 
             foreach (var userRole in user.UserRoles)

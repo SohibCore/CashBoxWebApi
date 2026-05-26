@@ -16,7 +16,7 @@
         <label>PINFL<input v-model="user.pinfl" required maxlength="14" /></label>
         <label>Telefon<input v-model="user.phoneNumber" required maxlength="9" /></label>
         <label>Manzil<input v-model="user.address" required /></label>
-        <label>Tashkilot<select v-model.number="user.organizationId" required>
+        <label>Tashkilot<select v-model.number="user.organizationId" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="0" disabled>Tanlang</option>
             <option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.shortName }}</option>
           </select></label>

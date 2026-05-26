@@ -1,4 +1,5 @@
 ﻿using CashBox.Repository.Dtos.UserDtos;
+using CashBox.Service.Services.AccountServices;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using RepositoryLayer.Entity;
@@ -9,9 +10,11 @@ namespace CashBox.Service.Services.UserServices
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
-        public UserService(AppDbContext context) // Dependency Injection orqali AppDbContext ni qabul qilamiz
+        private readonly AccountService _account;
+        public UserService(AppDbContext context, AccountService account) // Dependency Injection orqali AppDbContext ni qabul qilamiz
         {
             _context = context;
+            _account = account;
         }
         public async Task<UserDto> GetAsync(int id)
         {

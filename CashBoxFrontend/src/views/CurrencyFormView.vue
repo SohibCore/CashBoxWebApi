@@ -77,7 +77,7 @@ export default {
     };
 
     const saveCurrency = async () => {
-      error.value = '';qa
+      error.value = '';
       successMessage.value = '';
       isSaving.value = true;
       try {

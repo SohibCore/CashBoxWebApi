@@ -1,6 +1,6 @@
 <template>
   <div class="page-card wide-card">
-    <div class="section-header">
+    <div class="section-header"> 
       <div>
         <h2>{{ isEdit ? 'Tashkilotni tahrirlash' : 'Yangi tashkilot yaratish' }}</h2>
         <p>{{ isEdit ? 'Tashkilot ma\'lumotlarini o\'zgartiring.' : 'Yangi tashkilot qo\'shish uchun ma\'lumotlarni kiriting.' }}</p>

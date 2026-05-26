@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace CashBox.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260526061605_CreateIncomeDocument")]
+    partial class CreateIncomeDocument
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,6 +37,10 @@ namespace CashBox.Repository.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("DATE");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ORGANIZATION_ID");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric")
@@ -56,6 +63,8 @@ namespace CashBox.Repository.Migrations
                         .HasColumnName("TOTAL_SUM");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
 
                     b.HasIndex("ProductId");
 
@@ -740,6 +749,12 @@ namespace CashBox.Repository.Migrations
 
             modelBuilder.Entity("CashBox.Repository.Entity.IncomeDocument", b =>
                 {
+                    b.HasOne("RepositoryLayer.Entity.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CashBox.Repository.Entity.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -751,6 +766,8 @@ namespace CashBox.Repository.Migrations
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Organization");
 
                     b.Navigation("Product");
 

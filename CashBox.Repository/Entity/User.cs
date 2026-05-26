@@ -62,7 +62,7 @@ namespace RepositoryLayer.Entity
         [StringLength(150)]
         public string? Email { get; set; }
 
-        [Column("CREATE_USER_ID")]
+        [Column("CREATED_USER_ID")]
         public int? CreateUserId { get; set; }
         [Column("CREATED_AT")]
         public DateTime CreatedAt { get; set; }

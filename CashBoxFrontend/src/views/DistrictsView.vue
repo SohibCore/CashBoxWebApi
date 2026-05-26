@@ -28,7 +28,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="district in districts" :key="district.id" @dblclick="startEdit(district)" style="cursor: pointer;">
+          <tr v-for="district in districts" :key="district.id" @dblclick="startEdit(district)">
             <td>{{ district.id || '-' }}</td>
             <td>{{ district.fullName || '-' }}</td>
             <td>{{ district.code || '-' }}</td>
@@ -74,9 +74,9 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { getDistricts, deleteDistrict, extractApiData, getRegions } from '../api';
+import { getDistricts, deleteDistrict, extractApiData, getRegions, getField } from '../api';
 
 export default {
   setup() {
@@ -84,16 +84,6 @@ export default {
     const districts = ref([]);
     const regionsMap = ref({});
     const expandedDistrictId = ref(null);
-
-    const getField = (obj, keys) => {
-      if (!obj) return null;
-      for (const key of keys) {
-        if (obj[key] !== undefined && obj[key] !== null) {
-          return obj[key];
-        }
-      }
-      return null;
-    };
 
     const loadRegionsMap = async () => {
       try {
@@ -202,6 +192,19 @@ export default {
   gap: 1rem;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+.search-and-count {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
 }
 
 .toggle-create {
@@ -330,6 +333,16 @@ tbody td {
   vertical-align: top;
   word-break: break-word;
 }
+
+tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+tbody tr:hover {
+  background-color: #eff6ff !important;
+}
+
 
 .actions {
   display: flex;

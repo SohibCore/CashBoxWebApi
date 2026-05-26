@@ -1,4 +1,5 @@
 ﻿using CashBox.Repository.Dtos.UserDtos;
+using CashBox.Service.Services.AccountServices;
 using CashBox.Service.Services.UserServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,11 @@ namespace CashBox.WebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly AccountService _account;
+        public UserController(IUserService userService, AccountService account)
         {
             _userService = userService;
+            _account = account;
         }
         [Authorize(Roles = "Admin")]
         [HttpGet]

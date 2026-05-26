@@ -1,6 +1,6 @@
 <template>
   <div class="auth-wrapper">
-    <div class="auth-container">
+    <div class="auth-container">    
       <div class="auth-box">
         <h1 class="auth-logo">CashBox</h1>
         <div class="auth-tabs">

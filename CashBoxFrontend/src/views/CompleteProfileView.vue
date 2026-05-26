@@ -14,15 +14,24 @@
         <label>PINFL<input v-model="form.pinfl" required maxlength="14" /></label>
         <label>Telefon<input v-model="form.phoneNumber" required maxlength="9" /></label>
         <label>Manzil<input v-model="form.address" required /></label>
-        <label>Tashkilot<select v-model.number="form.organizationId" required>
+        <label>Tashkilot
+          <input
+            v-model="organizationSearchTerm"
+            type="text"
+            placeholder="Tashkilotni qidirish..."
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+          />
+          <select v-model.number="form.organizationId" required>
             <option value="0" disabled>Tanlang</option>
-            <option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.shortName }}</option>
+            <option v-for="org in filteredOrganizations" :key="org.id" :value="org.id">{{ org.shortName }}</option>
           </select></label>
         <label>Tug‘ilgan sana<input type="text" v-model="form.dateOfBirth" placeholder="dd.MM.yyyy" required /></label>
         <label>Passport seriya<input v-model="form.passportSeries" required maxlength="9" /></label>
       </div>
       <div class="button-row">
-        <button type="submit">Saqlash</button>
+        <button type="submit" :disabled="isSaving">
+          {{ isSaving ? 'Saqlanmoqda...' : 'Saqlash' }}
+        </button>
         <button type="button" class="danger" @click="cancel">Bekor qilish</button>
       </div>
       <p v-if="error" class="error">{{ error }}</p>
@@ -32,7 +41,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { getMe, getOrganizations, updateUser, normalizeUser, extractApiData } from '../api';
 
@@ -51,6 +60,8 @@ export default {
       passportSeries: ''
     });
     const organizations = ref([]);
+    const organizationSearchTerm = ref('');
+    const isSaving = ref(false);
     const error = ref('');
     const success = ref('');
 
@@ -79,6 +90,16 @@ export default {
       return String(value).trim().toLowerCase();
     };
 
+    const filteredOrganizations = computed(() => {
+      if (!organizationSearchTerm.value) {
+        return organizations.value;
+      }
+      const lowerCaseSearchTerm = organizationSearchTerm.value.toLowerCase();
+      return organizations.value.filter(org =>
+        org.shortName.toLowerCase().includes(lowerCaseSearchTerm) ||
+        org.fullName.toLowerCase().includes(lowerCaseSearchTerm)
+      );
+    });
     const equals = (a, b) => {
       const left = normalize(a);
       const right = normalize(b);
@@ -152,6 +173,7 @@ export default {
         error.value = 'Foydalanuvchi aniqlanmadi.';
         return;
       }
+      isSaving.value = true;
       try {
         const payload = { ...form.value };
         delete payload.id;
@@ -180,7 +202,9 @@ export default {
           localStorage.setItem('email', updatedUser.email);
         }
         success.value = 'Maʼlumotlar saqlandi.';
-        router.push('/profile');
+        setTimeout(() => {
+          router.push('/profile');
+        }, 1500);
       } catch (err) {
         console.error('Save profile error:', err.response?.data || err.message);
         if (err.response?.data?.errors) {
@@ -188,6 +212,8 @@ export default {
         } else {
           error.value = 'Saqlashda xatolik yuz berdi.';
         }
+      } finally {
+        isSaving.value = false;
       }
     };
 
@@ -203,10 +229,13 @@ export default {
     return {
       form,
       organizations,
+      organizationSearchTerm,
+      isSaving,
       error,
       success,
       saveProfile,
-      cancel
+      cancel,
+      filteredOrganizations
     };
   }
 };

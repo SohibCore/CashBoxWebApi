@@ -50,14 +50,15 @@ export default {
       error.value = '';
       try {
         const response = await login({ userName: userName.value, password: password.value });
-        const payload = response.data?.data || response.data || {};
-        const token = payload.token || payload?.accessToken;
+        const data = extractApiData(response);
+        const token = data?.token || data?.accessToken;
+
         if (token) {
           localStorage.setItem('token', token);
           let currentUser = {
-            id: payload.id || payload?.Id || payload?.userId || payload?.userID,
-            userName: payload.userName || payload?.UserName || userName.value,
-            email: payload.email || payload?.Email || ''
+            id: data?.id || data?.Id || data?.userId,
+            userName: data?.userName || data?.UserName || userName.value,
+            email: data?.email || data?.Email || ''
           };
           try {
             const meResponse = await getMe();
@@ -82,8 +83,8 @@ export default {
           throw new Error('Token topilmadi');
         }
       } catch (err) {
-        console.error(err);
-        error.value = 'Login yoki parol noto‘g‘ri.';
+        console.error('Login error:', err);
+        error.value = err.response?.data?.message || err.message || 'Login yoki parol noto‘g‘ri.';
       }
     };
 

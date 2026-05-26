@@ -1,13 +1,17 @@
+using CashBox.Service.Services.AccountServices;
 using CashBox.Service.Services.AuthService;
 using CashBox.Service.Services.ConractorAccountServices;
 using CashBox.Service.Services.ContractorService;
 using CashBox.Service.Services.CorrencyRateServices;
 using CashBox.Service.Services.CorrencyServices;
 using CashBox.Service.Services.DistrictServices;
+using CashBox.Service.Services.IncomeDocumentSerives;
 using CashBox.Service.Services.NewFolder;
 using CashBox.Service.Services.OrganizationServices;
+using CashBox.Service.Services.ProductServices;
 using CashBox.Service.Services.RegionServices;
 using CashBox.Service.Services.RoleServices;
+using CashBox.Service.Services.SupplierServices;
 using CashBox.Service.Services.UserRoleService;
 using CashBox.Service.Services.UserServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -25,7 +29,7 @@ builder.Services.AddCors(options =>  // UIning ishlashi uchun http
 {
     options.AddPolicy("AllowLocalhostFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "http://localhost:5175", "http://127.0.0.1:5175")
+        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "http://localhost:5175", "http://127.0.0.1:5175", "http://localhost:5177", "http://127.0.0.1:5177")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -36,6 +40,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton<AccountService>();
 
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
 
@@ -65,6 +70,9 @@ builder.Services.AddScoped<IContractorService, ContractorService>();
 builder.Services.AddScoped<IContratorAccountService, ContratorAccountService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IIncomeDocumentService, IncomeDocumentService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
