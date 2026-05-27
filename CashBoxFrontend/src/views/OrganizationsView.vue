@@ -12,10 +12,9 @@
         <span>+</span> Yangi tashkilot qo'shish
       </router-link>
       <div class="search-and-count">
-        <input type="text" v-model="searchQuery" placeholder="Tashkilot nomini qidirish..." class="search-input" />
-        <span class="user-count">{{ filteredOrganizations.length }} ta tashkilot</span>
+        <input type="text" v-model="searchQuery" placeholder="Nom yoki INN bo'yicha qidirish..." class="search-input" />
+        <span class="user-count">{{ (filteredOrganizations || []).length }} ta tashkilot</span>
       </div>
-
     </div>
 
     <div class="data-panel">
@@ -33,7 +32,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="org in organizations" :key="org.id" @dblclick="startEdit(org)">
+          <tr v-for="org in filteredOrganizations" :key="org.id" @dblclick="startEdit(org)">
             <td>{{ org.id || '-' }}</td>
             <td>{{ org.inn || '-' }}</td>
             <td>{{ org.fullName || '-' }}</td>
@@ -90,6 +89,17 @@ export default {
     const router = useRouter();
     const organizations = ref([]);
     const expandedOrgId = ref(null);
+    const searchQuery = ref('');
+
+    const filteredOrganizations = computed(() => {
+      const q = searchQuery.value.toLowerCase();
+      if (!q) return organizations.value;
+      return organizations.value.filter(org => 
+        (org.fullName || '').toLowerCase().includes(q) || 
+        (org.shortName || '').toLowerCase().includes(q) ||
+        (org.inn || '').toLowerCase().includes(q)
+      );
+    });
 
     const toggleRow = (id) => {
       expandedOrgId.value = expandedOrgId.value === id ? null : id;
@@ -136,6 +146,8 @@ export default {
     return {
       organizations,
       expandedOrgId,
+      searchQuery,
+      filteredOrganizations,
       toggleRow,
       startEdit,
       deleteRow

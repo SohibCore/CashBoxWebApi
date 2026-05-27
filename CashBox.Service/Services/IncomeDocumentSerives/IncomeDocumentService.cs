@@ -26,6 +26,7 @@ namespace CashBox.Service.Services.IncomeDocumentSerives
                 Price = createIncomeDocumentDto.Price,
                 Quantity = createIncomeDocumentDto.Quantity,
                 TotalSum = createIncomeDocumentDto.TotalSum,
+                Status = createIncomeDocumentDto.Status,
             };
             await _context.AddAsync(incomeDocument);
             await _context.SaveChangesAsync();
@@ -59,6 +60,7 @@ namespace CashBox.Service.Services.IncomeDocumentSerives
                 Price = incomeDocument.Price,
                 Quantity = incomeDocument.Quantity,
                 TotalSum = incomeDocument.TotalSum,
+                Status = incomeDocument.Status,
             };
 
         }
@@ -98,41 +100,45 @@ namespace CashBox.Service.Services.IncomeDocumentSerives
                 Quantity = u.Quantity,
                 TotalSum = u.TotalSum,
                 ProductId = u.ProductId,
+                Status = u.Status,
             }).ToListAsync();
         }
 
-            public async Task UpdateAsync(int id, UpdateIncomeDocument updateIncomeDocument)
-            {
-                var incomeDocument = await _context.IncomeDocuments.FindAsync(id);
+        public async Task UpdateAsync(int id, UpdateIncomeDocument updateIncomeDocument)
+        {
+            var incomeDocument = await _context.IncomeDocuments.FindAsync(id);
 
-                if (incomeDocument == null)
-                    throw new KeyNotFoundException($"{id} topilmadi");
+            if (incomeDocument == null)
+                throw new KeyNotFoundException($"{id} topilmadi");
 
-                if (updateIncomeDocument.SupplierId.HasValue)
-                    incomeDocument.SupplierId = updateIncomeDocument.SupplierId.Value;
+            if (updateIncomeDocument.SupplierId.HasValue)
+                incomeDocument.SupplierId = updateIncomeDocument.SupplierId.Value;
 
-                //if (updateIncomeDocument.OrganizationId.HasValue && updateIncomeDocument.OrganizationId != 0)
-                //    incomeDocument.OrganizationId = updateIncomeDocument.OrganizationId.Value;
+            //if (updateIncomeDocument.OrganizationId.HasValue && updateIncomeDocument.OrganizationId != 0)
+            //    incomeDocument.OrganizationId = updateIncomeDocument.OrganizationId.Value;
 
-                if (updateIncomeDocument.Price.HasValue)
-                    incomeDocument.Price = updateIncomeDocument.Price.Value;
+            if (updateIncomeDocument.Price.HasValue)
+                incomeDocument.Price = updateIncomeDocument.Price.Value;
 
-                if (updateIncomeDocument.Quantity.HasValue)
-                    incomeDocument.Quantity = updateIncomeDocument.Quantity.Value;
+            if (updateIncomeDocument.Quantity.HasValue)
+                incomeDocument.Quantity = updateIncomeDocument.Quantity.Value;
 
-                if (updateIncomeDocument.TotalSum.HasValue)
-                    incomeDocument.TotalSum = updateIncomeDocument.TotalSum.Value;
+            if (updateIncomeDocument.TotalSum.HasValue)
+                incomeDocument.TotalSum = updateIncomeDocument.TotalSum.Value;
 
-                if (updateIncomeDocument.ProductId.HasValue)
-                    incomeDocument.ProductId = updateIncomeDocument.ProductId.Value;
+            if (updateIncomeDocument.ProductId.HasValue)
+                incomeDocument.ProductId = updateIncomeDocument.ProductId.Value;
 
-                if (updateIncomeDocument.Date.HasValue)
-                    incomeDocument.Date = updateIncomeDocument.Date.Value;
+            if (updateIncomeDocument.Date.HasValue)
+                incomeDocument.Date = updateIncomeDocument.Date.Value;
 
-                //product.ModifiedAt = DateTime.UtcNow;
-                //product.ModifiedUserId = _account.UserId;
+            if (updateIncomeDocument.Status.HasValue)
+                incomeDocument.Status = updateIncomeDocument.Status.Value;
 
-                await _context.SaveChangesAsync();
-            }
+            //product.ModifiedAt = DateTime.UtcNow;
+            //product.ModifiedUserId = _account.UserId;
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

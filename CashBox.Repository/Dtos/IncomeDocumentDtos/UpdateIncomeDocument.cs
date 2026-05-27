@@ -1,4 +1,6 @@
-﻿namespace CashBox.Repository.Dtos.IncomeDocumentDtos
+﻿using CashBox.Repository.Enums;
+
+namespace CashBox.Repository.Dtos.IncomeDocumentDtos
 {
     public class UpdateIncomeDocument
     {
@@ -9,5 +11,6 @@
         public decimal? Price { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? TotalSum { get; set; }
+        public PaymentStatus? Status { get; set; }
     }
 }

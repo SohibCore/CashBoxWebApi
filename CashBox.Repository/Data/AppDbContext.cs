@@ -20,10 +20,10 @@ namespace Repository.Data
         public DbSet<User> Users { get; set; } //DB da User class orqali Users table hosil qiladi
         public DbSet<UserRole> UserRoles { get; set; } //DB da UserRole class orqali UserRoles table hosil qiladi
         public DbSet<Role> Roles { get; set; } //DB da Role class orqali Roles table hosil qiladi
-        public DbSet<State> States { get; set; } //DB da State class orqali States table hosil qiladi
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<IncomeDocument> IncomeDocuments { get; set; }
+        public DbSet<OutcomeDocument> OutcomeDocuments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

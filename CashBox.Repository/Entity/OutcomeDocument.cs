@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CashBox.Repository.Entity
 {
-    [Table("INCOME_DOCUMENT")]
-    public class IncomeDocument
+    [Table("OUTCOME_DOCUMENT")]
+    public class OutcomeDocument
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,11 +26,6 @@ namespace CashBox.Repository.Entity
         [ForeignKey(nameof(ProductId))]
         public Product? Product { get; set; }
 
-        //[Column("ORGANIZATION_ID")]
-        //public int OrganizationId { get; set; }
-        //[ForeignKey(nameof(OrganizationId))]
-        //public Organization? Organization { get; set; }
-
         [Column("QUANTITY")]
         public decimal Quantity { get; set; }
 
@@ -41,6 +36,7 @@ namespace CashBox.Repository.Entity
         public decimal TotalSum { get; set; }
 
         [Column("STATUS")]
-        public PaymentStatus Status { get; set; } = PaymentStatus.Unpaid;
+
+        public PaymentStatus Status { get; set; } = PaymentStatus.Unpaid; // enum bo'lgani uchun
     }
 }

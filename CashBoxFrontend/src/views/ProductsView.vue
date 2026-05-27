@@ -82,7 +82,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { getProducts, deleteProduct, extractApiData } from '../api';
+import { getProducts, deleteProduct, extractApiData, getField } from '../api';
 
 export default {
   name: 'ProductsView',

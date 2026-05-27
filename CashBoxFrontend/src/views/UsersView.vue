@@ -176,7 +176,9 @@ import {
   getRoles, 
   getUserRoles, 
   assignUserRoles, 
-  removeUserRole 
+  removeUserRole,
+  extractApiData,
+  getField
 } from '../api';
 
 export default {
@@ -203,16 +205,9 @@ export default {
     const loadUsers = async () => {
       try {
         const response = await getUsers();
-        const result = response.data;
-        const rawUsers = Array.isArray(result)
-          ? result
-          : Array.isArray(result?.data)
-          ? result.data
-          : Array.isArray(result?.items)
-          ? result.items
-          : Array.isArray(result?.value)
-          ? result.value
-          : [];
+        const result = extractApiData(response);
+        const rawUsers = Array.isArray(result) ? result : [];
+
         users.value = rawUsers.map((user) => ({
           id: getField(user, ['id', 'Id', 'userId', 'userID']),
           userName: getField(user, ['userName', 'UserName', 'username', 'Username']),
@@ -232,29 +227,12 @@ export default {
       }
     };
 
-    const getField = (obj, keys) => {
-      if (!obj) return null;
-      for (const key of keys) {
-        if (obj[key] !== undefined && obj[key] !== null) {
-          return obj[key];
-        }
-      }
-      return null;
-    };
-
     const loadOrganizations = async () => {
       try {
         const response = await getOrganizations();
-        const result = response.data;
-        const rawOrgs = Array.isArray(result)
-          ? result
-          : Array.isArray(result?.data)
-          ? result.data
-          : Array.isArray(result?.items)
-          ? result.items
-          : Array.isArray(result?.value)
-          ? result.value
-          : [];
+        const result = extractApiData(response);
+        const rawOrgs = Array.isArray(result) ? result : [];
+
         organizations.value = rawOrgs.map((org) => ({
           id: getField(org, ['id', 'Id', 'organizationId', 'OrganizationId']),
           shortName: getField(org, ['shortName', 'ShortName']) || getField(org, ['fullName', 'FullName']) || '',

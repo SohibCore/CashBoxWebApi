@@ -1,9 +1,9 @@
 ﻿using CashBox.Repository.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace CashBox.Repository.Dtos.IncomeDocumentDtos
+namespace CashBox.Repository.Dtos.OutcomeDocumentDtos
 {
-    public class CreateIncomeDocumentDto
+    public class CreateOutcomeDocumentDto
     {
         [Required]
         public DateTime Date { get; set; }

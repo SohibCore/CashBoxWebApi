@@ -116,13 +116,7 @@ export default {
       try {
         const response = await getDistricts();
         const data = extractApiData(response);
-        const rawList = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.items)
-          ? data.items
-          : Array.isArray(data?.value)
-          ? data.value
-          : [];
+        const rawList = Array.isArray(data) ? data : [];
         districts.value = rawList.map(mapDistrict);
       } catch (error) {
         console.error('Error loading districts:', error);

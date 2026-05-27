@@ -94,13 +94,7 @@ export default {
       try {
         const response = await getRegions();
         const data = extractApiData(response);
-        const rawList = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.items)
-          ? data.items
-          : Array.isArray(data?.value)
-          ? data.value
-          : [];
+        const rawList = Array.isArray(data) ? data : [];
         regions.value = rawList.map(mapRegion);
       } catch (error) {
         console.error('Error loading regions:', error);

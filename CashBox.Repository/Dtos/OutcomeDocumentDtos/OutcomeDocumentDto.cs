@@ -1,8 +1,8 @@
 ﻿using CashBox.Repository.Enums;
 
-namespace CashBox.Repository.Dtos.IncomeDocumentDtos
+namespace CashBox.Repository.Dtos.OutcomeDocumentDtos
 {
-    public class IncomeDocumentDto
+    public class OutcomeDocumentDto
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
