@@ -1,5 +1,6 @@
 ﻿using CashBox.Repository.Dtos.OutcomeDocumentDtos;
 using CashBox.Repository.Entity;
+using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 
 namespace CashBox.Service.Services.OutcomeDocumentService
@@ -21,7 +22,6 @@ namespace CashBox.Service.Services.OutcomeDocumentService
                 Price = createOutcomeDocumentDto.Price,
                 Quantity = createOutcomeDocumentDto.Quantity,
                 TotalSum = createOutcomeDocumentDto.TotalSum,
-                Status = createOutcomeDocumentDto.Status
             };
             await _context.OutcomeDocuments.AddAsync(outcomeDocument);
             await _context.SaveChangesAsync();
@@ -53,12 +53,11 @@ namespace CashBox.Service.Services.OutcomeDocumentService
                 Price = outcomeDocument.Price,
                 ProductId = outcomeDocument.ProductId,
                 Quantity = outcomeDocument.Quantity,
-                Status = outcomeDocument.Status,
                 TotalSum = outcomeDocument.TotalSum
             };
         }
 
-        public Task<List<OutcomeDocumentDto>> GetListAsync(OutcomeDocumentFilterDto outcomeDocumentFilterDto)
+        public async Task<List<OutcomeDocumentDto>> GetListAsync(OutcomeDocumentFilterDto outcomeDocumentFilterDto)
         {
             var outcomeDocument = _context.OutcomeDocuments.AsQueryable();
 
@@ -80,13 +79,47 @@ namespace CashBox.Service.Services.OutcomeDocumentService
             if (outcomeDocumentFilterDto.Quantity.HasValue)
                 outcomeDocument = outcomeDocument.Where(x => x.Quantity == outcomeDocumentFilterDto.Quantity);
 
-            if (outcomeDocumentFilterDto.Status.HasValue)
-                outcomeDocument = outcomeDocument.Where(x => x.Status == outcomeDocumentFilterDto.Status);
+            if (outcomeDocumentFilterDto.TotalSum.HasValue)
+                outcomeDocument = outcomeDocument.Where(x => x.TotalSum == outcomeDocumentFilterDto.TotalSum);
+
+            return await outcomeDocument.Select(u => new OutcomeDocumentDto
+            {
+                Id = u.Id,
+                ProductId = u.ProductId,
+                SupplierId = u.SupplierId,
+                Date = u.Date,
+                Price = u.Price,
+                Quantity = u.Quantity,
+                TotalSum = u.TotalSum,
+            }).ToListAsync();
         }
 
-        public Task UpdateAsync(int id, UpdateOutcomeDocumentDto updateOutcomeDocumentDto)
+        public async Task UpdateAsync(int id, UpdateOutcomeDocumentDto updateOutcomeDocumentDto)
         {
-            throw new NotImplementedException();
+            var outcomeDocument = await _context.OutcomeDocuments.FindAsync(id);
+
+            if (outcomeDocument == null)
+                throw new KeyNotFoundException();
+
+            if (updateOutcomeDocumentDto.ProductId.HasValue)
+                outcomeDocument.ProductId = updateOutcomeDocumentDto.ProductId.Value;
+
+            if(updateOutcomeDocumentDto.SupplierId.HasValue)
+                outcomeDocument.SupplierId = updateOutcomeDocumentDto.SupplierId.Value;
+
+            if(updateOutcomeDocumentDto.Date.HasValue)
+                outcomeDocument.Date = updateOutcomeDocumentDto.Date.Value;
+
+            if(updateOutcomeDocumentDto.Price.HasValue)
+                outcomeDocument.Price = updateOutcomeDocumentDto.Price.Value;
+
+            if(updateOutcomeDocumentDto.Quantity.HasValue)
+                outcomeDocument.Quantity = updateOutcomeDocumentDto.Quantity.Value;
+
+            if(updateOutcomeDocumentDto.TotalSum.HasValue)
+                outcomeDocument.TotalSum = updateOutcomeDocumentDto.TotalSum.Value;
+
+            await _context.SaveChangesAsync();
         }
     }
 }

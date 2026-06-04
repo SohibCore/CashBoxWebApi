@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace CashBox.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260601073824_BuildTables")]
+    partial class BuildTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,54 +27,26 @@ namespace CashBox.Repository.Migrations
 
             modelBuilder.Entity("CashBox.Repository.Entity.IncomeDocument", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
+                        .HasColumnType("integer")
                         .HasColumnName("ID");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CreateUserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("CREATE_USER_ID");
-
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("CREATED_AT");
+                        .HasColumnName("DATE");
 
-                    b.Property<DateTime>("DocOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("DOC_ON");
-
-                    b.Property<decimal>("DocSum")
-                        .HasColumnType("numeric")
-                        .HasColumnName("DOC_SUM");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("MODIFIED_AT");
-
-                    b.Property<int?>("ModifiedUserId")
+                    b.Property<int>("Status")
                         .HasColumnType("integer")
-                        .HasColumnName("MODIFIED_USER_ID");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("integer")
-                        .HasColumnName("ORGANIZATION_ID");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("integer")
-                        .HasColumnName("STATUS_ID");
+                        .HasColumnName("STATUS");
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("integer")
                         .HasColumnName("SUPPLIER_ID");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.HasIndex("StatusId");
 
                     b.HasIndex("SupplierId");
 
@@ -80,15 +55,15 @@ namespace CashBox.Repository.Migrations
 
             modelBuilder.Entity("CashBox.Repository.Entity.IncomeDocumentTable", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
+                        .HasColumnType("integer")
                         .HasColumnName("ID");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<long>("OwnerId")
-                        .HasColumnType("bigint")
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("integer")
                         .HasColumnName("OWNER_ID");
 
                     b.Property<decimal>("Price")
@@ -102,10 +77,6 @@ namespace CashBox.Repository.Migrations
                     b.Property<decimal>("Quantity")
                         .HasColumnType("numeric")
                         .HasColumnName("QUANTITY");
-
-                    b.Property<decimal>("TotalSum")
-                        .HasColumnType("numeric")
-                        .HasColumnName("TOTAL_SUM");
 
                     b.HasKey("Id");
 
@@ -141,9 +112,9 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("QUANTITY");
 
-                    b.Property<int>("StatusId")
+                    b.Property<int>("Status")
                         .HasColumnType("integer")
-                        .HasColumnName("STATUS_ID");
+                        .HasColumnName("STATUS");
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("integer")
@@ -156,8 +127,6 @@ namespace CashBox.Repository.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("StatusId");
 
                     b.HasIndex("SupplierId");
 
@@ -338,38 +307,6 @@ namespace CashBox.Repository.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("SYS_USER_ROLE");
-                });
-
-            modelBuilder.Entity("CashBox.Repository.Enum.Status", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("ID");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("CODE");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)")
-                        .HasColumnName("FULL_NAME");
-
-                    b.Property<string>("ShortName")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)")
-                        .HasColumnName("SHORT_NAME");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ENUM_STATUS");
                 });
 
             modelBuilder.Entity("Repository.Entity.CorrencyRate", b =>
@@ -824,27 +761,11 @@ namespace CashBox.Repository.Migrations
 
             modelBuilder.Entity("CashBox.Repository.Entity.IncomeDocument", b =>
                 {
-                    b.HasOne("RepositoryLayer.Entity.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CashBox.Repository.Enum.Status", "Status")
-                        .WithMany()
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("CashBox.Repository.Entity.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("Status");
 
                     b.Navigation("Supplier");
                 });
@@ -852,7 +773,7 @@ namespace CashBox.Repository.Migrations
             modelBuilder.Entity("CashBox.Repository.Entity.IncomeDocumentTable", b =>
                 {
                     b.HasOne("CashBox.Repository.Entity.IncomeDocument", "IncomeDocument")
-                        .WithMany("Tables")
+                        .WithMany("EachTotalSum")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -876,12 +797,6 @@ namespace CashBox.Repository.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CashBox.Repository.Enum.Status", "Status")
-                        .WithMany()
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("CashBox.Repository.Entity.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
@@ -889,8 +804,6 @@ namespace CashBox.Repository.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
-
-                    b.Navigation("Status");
 
                     b.Navigation("Supplier");
                 });
@@ -988,7 +901,7 @@ namespace CashBox.Repository.Migrations
 
             modelBuilder.Entity("CashBox.Repository.Entity.IncomeDocument", b =>
                 {
-                    b.Navigation("Tables");
+                    b.Navigation("EachTotalSum");
                 });
 
             modelBuilder.Entity("CashBox.Repository.Entity.Role", b =>

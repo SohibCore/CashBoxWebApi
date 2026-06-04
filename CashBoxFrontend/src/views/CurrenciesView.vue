@@ -131,15 +131,21 @@ export default {
   background: white;
   padding: 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .wide-card {
-  max-width: 1000px;
-  margin: 0 auto;
+  max-width: none; /* Sahifani eniga to'liq uzaytiramiz */
+  margin: 0;
 }
 
 .section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   margin-bottom: 2rem;
   border-bottom: 1px solid #f1f5f9;
   padding-bottom: 1rem;
@@ -171,27 +177,30 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: white; /* Oq fon */
-  color: #2563eb; /* Ko'k matn */
-  border: 1px solid #2563eb; /* Ko'k ramka */
-  padding: 0.75rem 1.25rem;
+  background: #2563eb;
+  color: white;
+  padding: 0.85rem 1rem;
   border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
   text-decoration: none;
-  font-weight: 500;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  font-size: 0.95rem; /* Inherit o'rniga aniq qiymat */
+  font-family: inherit;
+  height: 38px; /* Chiqim hujjatlaridagi tugma balandligi */
+  justify-content: center; /* Kontentni vertikal markazlash */
+  font-weight: 600; /* Qalinroq matn */
 }
 
 .toggle-create:hover {
-  background: #eff6ff; /* Hoverda ochroq ko'k fon */
-  color: #1d4ed8; /* Hoverda to'qroq ko'k matn */
-  border-color: #1d4ed8; /* Hoverda to'qroq ko'k ramka */
+  background: #1d4ed8;
+  color: white;
 }
 
 th {
   text-align: left;
   padding: 0.75rem;
-  background: #f1f5f9;
-  color: #475569;
+  background-color: #f0f2f5;
+  color: #333;
   font-size: 0.875rem;
 }
 
@@ -204,6 +213,9 @@ td {
 tbody tr {
   cursor: pointer;
   transition: background-color 0.2s;
+}
+tbody tr:hover {
+  background-color: #f0f7ff;
 }
 .action-dropdown-wrapper {
   position: relative;

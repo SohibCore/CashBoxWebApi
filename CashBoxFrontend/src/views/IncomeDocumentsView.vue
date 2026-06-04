@@ -7,11 +7,42 @@
       </div>
     </div>
 
+    <div class="stats-cards">
+      <div class="stat-card total">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+          <span class="stat-label">Jami summa</span>
+          <span class="stat-value">{{ formatSum(totalSum) }}</span>
+        </div>
+      </div>
+      <div class="stat-card paid">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <span class="stat-label">To'langan</span>
+          <span class="stat-value">{{ formatSum(paidSum) }}</span>
+        </div>
+      </div>
+      <div class="stat-card unpaid">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+          <span class="stat-label">To'lanmagan</span>
+          <span class="stat-value">{{ formatSum(unpaidSum) }}</span>
+        </div>
+      </div>
+    </div>
+
     <div class="section-actions">
       <router-link to="/income-documents/new" class="toggle-create">
         <span>+</span> Yangi hujjat qo'shish
       </router-link>
-      <span class="user-count">{{ documents.length }} ta hujjat</span>
+      <div class="filter-panel">
+        <select v-model.number="filters.status" class="search-input">
+          <option :value="null">Barcha statuslar</option>
+          <option :value="0">To'lanmagan</option>
+          <option :value="1">To'langan</option>
+        </select>
+      </div>
+      <span class="user-count">{{ filteredDocuments.length }} ta hujjat</span>
     </div>
 
     <div class="data-panel">
@@ -26,14 +57,15 @@
             <th>Narxi</th>
             <th>Jami summa</th>
             <th>Sana</th>
+            <th>Status</th>
             <th>Amallar</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-if="documents.length === 0">
-            <td colspan="8" style="text-align: center; padding: 2rem; color: #64748b;">Ma'lumot yo'q</td>
+          <tr v-if="filteredDocuments.length === 0">
+            <td colspan="9" style="text-align: center; padding: 2rem; color: #64748b;">Ma'lumot yo'q</td>
           </tr>
-          <tr v-for="doc in documents" :key="doc.id" @dblclick="openEditModal(doc)">
+          <tr v-for="doc in filteredDocuments" :key="doc.id" @dblclick="openEditModal(doc)">
             <td>{{ doc.id }}</td>
             <td style="font-weight: 500;">{{ doc.supplierName || doc.supplierId }}</td>
             <td>{{ doc.productName || doc.productId }}</td>
@@ -41,6 +73,11 @@
             <td>{{ doc.price }}</td>
             <td style="font-weight: 600;">{{ doc.totalSum }}</td>
             <td style="color: #64748b;">{{ formatDate(doc.date) }}</td>
+            <td>
+              <span :class="['badge', statusClass(doc.status)]">
+                {{ statusLabel(doc.status) }}
+              </span>
+            </td>
             <td class="actions">
               <div class="action-dropdown-wrapper">
                 <button
@@ -81,7 +118,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { getIncomeDocuments, deleteIncomeDocument, extractApiData } from '../api';
 
@@ -91,10 +128,47 @@ export default {
     const router = useRouter();
     const documents = ref([]);
     const expandedDocId = ref(null);
+    const filters = reactive({
+      status: null
+    });
 
     const toggleRow = (id) => {
       expandedDocId.value = expandedDocId.value === id ? null : id;
     };
+
+    const statusLabel = (status) => {
+      const map = { 0: "To'lanmagan", 1: "To'langan" };
+      return map[status] ?? 'Noma\'lum';
+    };
+
+    const statusClass = (status) => {
+      const map = { 0: 'unpaid', 1: 'paid' };
+      return map[status] ?? '';
+    };
+
+    const totalSum = computed(() =>
+      documents.value.reduce((sum, d) => sum + (d.totalSum || 0), 0)
+    );
+
+    const paidSum = computed(() =>
+      documents.value
+        .filter(d => d.status === 1)
+        .reduce((sum, d) => sum + (d.totalSum || 0), 0)
+    );
+
+    const unpaidSum = computed(() =>
+      documents.value
+        .filter(d => d.status === 0)
+        .reduce((sum, d) => sum + (d.totalSum || 0), 0)
+    );
+
+    const formatSum = (val) =>
+      new Intl.NumberFormat('uz-UZ').format(val) + ' UZS';
+
+    const filteredDocuments = computed(() => {
+      if (filters.status === null) return documents.value;
+      return documents.value.filter(doc => doc.status === filters.status);
+    });
 
     const loadDocuments = async () => {
       try {
@@ -110,7 +184,8 @@ export default {
           quantity: parseFloat(doc.quantity || doc.Quantity || 0),
           price: parseFloat(doc.price || doc.Price || 0),
           totalSum: parseFloat(doc.totalSum || doc.TotalSum || 0),
-          date: doc.date || doc.Date
+          date: doc.date || doc.Date,
+          status: doc.status ?? doc.Status ?? 0
         }));
       } catch (err) {
         console.error('Load documents error:', err);
@@ -144,6 +219,14 @@ export default {
 
     return {
       documents,
+      filters,
+      totalSum,
+      paidSum,
+      unpaidSum,
+      formatSum,
+      filteredDocuments,
+      statusLabel,
+      statusClass,
       expandedDocId,
       toggleRow,
       openEditModal,
@@ -201,14 +284,16 @@ export default {
   gap: 0.5rem;
   background: #2563eb;
   color: white;
-  padding: 0.85rem 1rem;
+  padding: 0.85rem 2rem;
   border-radius: 0.75rem;
   border: none;
   cursor: pointer;
   text-decoration: none;
-  font-size: inherit;
+  font-size: 0.95rem;
   font-family: inherit;
   font-weight: 600;
+  height: 38px;
+  justify-content: center;
 }
 
 .user-count {
@@ -315,4 +400,37 @@ tbody tr {
 .icon-btn.expanded svg {
   transform: rotate(180deg);
 }
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge.paid    { background: #d1fae5; color: #065f46; }
+.badge.unpaid  { background: #fef3c7; color: #d97706; }
+
+.stats-cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.stat-card.total  { border-left: 4px solid #2563eb; }
+.stat-card.paid   { border-left: 4px solid #16a34a; }
+.stat-card.unpaid { border-left: 4px solid #d97706; }
+
+.stat-icon { font-size: 28px; }
+.stat-info { display: flex; flex-direction: column; }
+.stat-label { font-size: 13px; color: #64748b; }
+.stat-value { font-size: 18px; font-weight: 700; color: #1e293b; }
 </style>

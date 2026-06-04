@@ -1,4 +1,5 @@
-﻿using CashBox.Repository.Enums;
+﻿using CashBox.Repository.Enum;
+using RepositoryLayer.Entity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,36 +12,40 @@ namespace CashBox.Repository.Entity
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 
         [Column("ID")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
-        [Column("DATE")]
-        public DateTime Date { get; set; }
+        [Column("DOC_ON")]
+        public DateTime DocOn { get; set; }
 
         [Column("SUPPLIER_ID")]
-        public int SupplierId { get; set; }
+        public int SupplierId { get; set; }        
+
+        [Column("STATUS_ID")]
+        public int StatusId { get; set; } 
+
+        [Column("DOC_SUM")]
+        public decimal DocSum { get; set; }
+
+        [Column("ORGANIZATION_ID")]
+        public int? OrganizationId { get; set; }
+
+        [Column("CREATE_USER_ID")]
+        public int? CreateUserId { get; set; }
+        [Column("CREATED_AT")]
+        public DateTime? CreatedAt { get; set; }
+        [Column("MODIFIED_USER_ID")]
+        public int? ModifiedUserId { get; set; }
+        [Column("MODIFIED_AT")]
+        public DateTime? ModifiedAt { get; set; }
+
         [ForeignKey(nameof(SupplierId))]
-        public Supplier? Supplier { get; set; }
+        public Supplier Supplier { get; set; } = null!;
 
-        [Column("PRODUCT_ID")]
-        public int ProductId { get; set; }
-        [ForeignKey(nameof(ProductId))]
-        public Product? Product { get; set; }
+        [ForeignKey(nameof(StatusId))]
+        public Status Status { get; set; } = null!;
 
-        //[Column("ORGANIZATION_ID")]
-        //public int OrganizationId { get; set; }
-        //[ForeignKey(nameof(OrganizationId))]
-        //public Organization? Organization { get; set; }
-
-        [Column("QUANTITY")]
-        public decimal Quantity { get; set; }
-
-        [Column("PRICE")]
-        public decimal Price { get; set; }
-
-        [Column("TOTAL_SUM")]
-        public decimal TotalSum { get; set; }
-
-        [Column("STATUS")]
-        public PaymentStatus Status { get; set; } = PaymentStatus.Unpaid;
+        [ForeignKey(nameof(OrganizationId))]
+        public Organization Organization { get; set; } = null!;
+        public ICollection<IncomeDocumentTable> Tables { get; set; } = new List<IncomeDocumentTable>();
     }
 }

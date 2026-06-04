@@ -1,5 +1,4 @@
-﻿using CashBox.Repository.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CashBox.Repository.Dtos.OutcomeDocumentDtos
 {
@@ -16,10 +15,6 @@ namespace CashBox.Repository.Dtos.OutcomeDocumentDtos
         [Range(1, int.MaxValue)]
         public int ProductId { get; set; }
 
-        //[Required]
-        //[Range(1, int.MaxValue)]
-        //public int OrganizationId { get; set; }
-
         [Required]
         [Range(0.0000000000000000001, int.MaxValue)]
         public decimal Price { get; set; }
@@ -31,8 +26,5 @@ namespace CashBox.Repository.Dtos.OutcomeDocumentDtos
         [Required]
         [Range(0.0000000000000000001, int.MaxValue)]
         public decimal TotalSum { get; set; }
-
-        [Required]
-        public PaymentStatus Status { get; set; }
     }
 }

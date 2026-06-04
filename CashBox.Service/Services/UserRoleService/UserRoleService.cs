@@ -1,5 +1,4 @@
-﻿using CashBox.Core.Roles;
-using CashBox.Repository.Dtos.UserRoleDtos;
+﻿using CashBox.Repository.Dtos.UserRoleDtos;
 using CashBox.Repository.Entity;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;

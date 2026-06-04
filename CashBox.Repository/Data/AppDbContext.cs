@@ -1,5 +1,5 @@
 ﻿using CashBox.Repository.Entity;
-using CashBox.Repository.Enums;
+using CashBox.Repository.Enum;
 using Microsoft.EntityFrameworkCore;
 using Repository.Entity;
 using RepositoryLayer.Entity;
@@ -23,7 +23,9 @@ namespace Repository.Data
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<IncomeDocument> IncomeDocuments { get; set; }
+        public DbSet<IncomeDocumentTable> IncomeDocumentTables { get; set; }
         public DbSet<OutcomeDocument> OutcomeDocuments { get; set; }
+        public DbSet<Status> Statuses{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

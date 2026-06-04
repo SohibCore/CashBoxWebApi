@@ -22,6 +22,8 @@ import SuppliersView from './views/SuppliersView.vue';
 import ProductsView from './views/ProductsView.vue';
 import SupplierFormView from './views/SupplierFormView.vue';
 import ProductFormView from './views/ProductFormView.vue';
+import OutcomeDocumentView from './views/OutcomeDocumentView.vue';
+import OutcomeDocumentFormView from './views/OutcomeDocumentFormView.vue';
 
 const routes = [
   {
@@ -65,7 +67,10 @@ const routes = [
   { path: '/regions/edit/:id', component: RegionFormView, meta: { requiresAuth: true } },
   { path: '/districts', component: DistrictsView, meta: { requiresAuth: true } },
   { path: '/districts/new', component: DistrictFormView, meta: { requiresAuth: true } },
-  { path: '/districts/edit/:id', component: DistrictFormView, meta: { requiresAuth: true } }
+  { path: '/districts/edit/:id', component: DistrictFormView, meta: { requiresAuth: true } },
+  { path: '/outcome-documents', component: OutcomeDocumentView, meta: { requiresAuth: true } },
+  { path: '/outcome-documents/new', component: OutcomeDocumentFormView, meta: { requiresAuth: true } },
+  { path: '/outcome-documents/edit/:id', component: OutcomeDocumentFormView, meta: { requiresAuth: true } }
 ];
 
 const router = createRouter({

@@ -409,13 +409,17 @@ export default {
 }
 
 .wide-card {
-  max-width: 1000000px;
+  max-width: none !important;
   width: 100%;
-  margin: 1px;
+  margin: 0;
   box-sizing: border-box;
 }
 
 .section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   margin-bottom: 1.5rem;
 }
 
@@ -443,8 +447,11 @@ export default {
   border: none;
   cursor: pointer;
   text-decoration: none;
-  font-size: inherit;
+  font-size: 0.95rem; /* Inherit o'rniga aniq qiymat */
   font-family: inherit;
+  height: 38px; /* Chiqim hujjatlaridagi tugma balandligi */
+  justify-content: center; /* Kontentni vertikal markazlash */
+  font-weight: 600; /* Qalinroq matn */
 }
 
 .toggle-create:hover {
@@ -617,8 +624,8 @@ button {
 }
 
 .data-panel {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  width: 100%; /* Ensure it takes full width */
+  overflow-x: visible; /* Allow content to overflow if necessary, but text will wrap */
   background: #f8fafc;
   padding: 1.5rem;
   border-radius: 0.5rem;
@@ -626,22 +633,35 @@ button {
 
 table {
   width: 100%;
-  min-width: 1200px;
+  min-width: 0; /* Allow table to shrink if content wraps */
   border-collapse: collapse;
+  table-layout: auto;
 }
 
 thead th {
   text-align: left;
-  padding: 0.8rem;
+  padding: 0.65rem 0.5rem; /* OrganizationsView ga moslash */
   border-bottom: 1px solid #e2e8f0;
-  background: #f9fafb;
+  background-color: #f0f2f5;
+  color: #333;
   font-weight: 600;
-  white-space: nowrap;
+  font-size: 0.82rem; /* OrganizationsView ga moslash */
+  line-height: 1.3; /* OrganizationsView ga moslash */
+  white-space: normal; /* Matnni o'rashga ruxsat berish */
+}
+
+tbody tr:hover {
+  background-color: #f0f7ff;
+  cursor: pointer;
 }
 
 tbody td {
-  padding: 0.9rem 0.8rem;
+  padding: 0.75rem 0.5rem; /* OrganizationsView ga moslash */
   border-bottom: 1px solid #f1f5f9;
+  font-size: 0.88rem; /* OrganizationsView ga moslash */
+  line-height: 1.35; /* OrganizationsView ga moslash */
+  vertical-align: top; /* OrganizationsView ga moslash */
+  word-break: break-word; /* Matnni o'rashga ruxsat berish */
 }
 
 .actions {

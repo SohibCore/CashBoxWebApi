@@ -160,3 +160,146 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.products-page.page-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  width: 100%;
+  max-width: none; /* Sahifani eniga to'liq uzaytiramiz */
+  box-sizing: border-box;
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.search-and-count {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.toggle-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2563eb;
+  color: white;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0.85rem 2rem; /* Gorizontal padding oshirildi */
+  font-weight: 600; /* Qalinroq matn */
+  height: 38px; /* Chiqim hujjatlaridagi tugma balandligi */
+  justify-content: center; /* Kontentni vertikal markazlash */
+}
+
+.user-count {
+  color: #475569;
+  font-weight: 600;
+}
+
+.data-panel {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  overflow-x: visible; /* Gorizontal scrollni olib tashlaymiz */
+}
+
+table {
+  width: 100%;
+  min-width: 0; /* Majburiy kenglikni olib tashlaymiz */
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+thead th {
+  text-align: left;
+  padding: 0.8rem;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f0f2f5; /* Kulrang header */
+  color: #333;
+  font-weight: 600;
+  white-space: normal;
+}
+
+tbody td {
+  padding: 0.9rem 0.8rem;
+  border-bottom: 1px solid #f1f5f9;
+  word-break: break-word;
+}
+
+tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+tbody tr:hover {
+  background-color: #f0f7ff; /* Och ko'k hover */
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.action-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.action-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.3rem;
+  display: flex;
+  gap: 0.4rem;
+  background: white;
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+</style>

@@ -1,5 +1,5 @@
 ﻿using CashBox.Repository.Dtos.IncomeDocumentDtos;
-using CashBox.Service.Services.IncomeDocumentSerives;
+using CashBox.Service.Services.IncomeDocumentServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,43 +10,39 @@ namespace CashBox.WebApi.Controllers
     [Route("api/[controller]/[action]")]
     public class IncomeDocumentController : ControllerBase
     {
-        private readonly IIncomeDocumentService _incomeDocumentservice;
-        public IncomeDocumentController(IIncomeDocumentService incomeDocumentservice)
+        private readonly IIncomeDocumentService _service;
+        public IncomeDocumentController(IIncomeDocumentService service)
         {
-            _incomeDocumentservice = incomeDocumentservice;
+            _service = service;
         }
-        //[Authorize(Roles = "Admin,Manager,User")]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] IncomeDocumentFilterDto incomeDocumentFilterDto)
         {
-            var incomeDocuments = await _incomeDocumentservice.GetListAsync(incomeDocumentFilterDto);
+            var incomeDocuments = await _service.GetListAsync(incomeDocumentFilterDto);
             return Ok(incomeDocuments);
         }
-        [Authorize(Roles = "Admin,Manager,User")]
         [HttpGet("{Id}")]
-        public async Task<IActionResult> Get([FromRoute] int id)
+        public async Task<IActionResult> Get([FromRoute] long id)
         {
-            var incomeDocument = await _incomeDocumentservice.GetAsync(id);
+            var incomeDocument = await _service.GetAsync(id);
             return Ok(incomeDocument);
         }
-        //[Authorize(Roles = "Admin,Manager,User")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateIncomeDocumentDto createIncomeDocumentDto)
+        public async Task<IActionResult> Create([FromBody] CreateIncomeDocumentDlDto createIncomeDocumentDto)
         {
-            await _incomeDocumentservice.CreateAsync(createIncomeDocumentDto);
+            await _service.CreateAsync(createIncomeDocumentDto);
             return Ok();
         }
-        //[Authorize(Roles = "Admin,Manager,User")]
-        [HttpPut("{Id}")]
-        public async Task<IActionResult> Update([FromRoute] int id, UpdateIncomeDocument updateIncomeDocument)
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UpdateIncomeDocumentDlDto updateIncomeDocument)
         {
-            await _incomeDocumentservice.UpdateAsync(id, updateIncomeDocument);
+            await _service.UpdateAsync(updateIncomeDocument);
             return Ok();
         }
         [HttpDelete("{Id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] long id)
         {
-            await _incomeDocumentservice.DeleteAsync(id);
+            await _service.DeleteAsync(id);
             return Ok();
         }
     }

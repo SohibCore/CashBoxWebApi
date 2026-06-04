@@ -1,10 +1,12 @@
-﻿using CashBox.Repository.Dtos.IncomeDocumentDtos;
+﻿using CashBox.Core;
+using CashBox.Repository.Dtos.IncomeDocumentDtos;
 using CashBox.Repository.Entity;
 using CashBox.Service.Services.AccountServices;
+using CashBox.Service.Services.IncomeDocumentServes.QueryObjects;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 
-namespace CashBox.Service.Services.IncomeDocumentSerives
+namespace CashBox.Service.Services.IncomeDocumentServices
 {
     public class IncomeDocumentService : IIncomeDocumentService
     {
@@ -15,37 +17,30 @@ namespace CashBox.Service.Services.IncomeDocumentSerives
             _context = context;
             _account = account;
         }
-        public async Task CreateAsync(CreateIncomeDocumentDto createIncomeDocumentDto)
+        public async Task<List<IncomeDocumentListDto>> GetListAsync(IncomeDocumentFilterDto filter)
         {
-            var incomeDocument = new IncomeDocument
-            {
-                Date = createIncomeDocumentDto.Date,
-                SupplierId = createIncomeDocumentDto.SupplierId,
-                ProductId = createIncomeDocumentDto.ProductId,
-                //OrganizationId = createIncomeDocumentDto.OrganizationId,
-                Price = createIncomeDocumentDto.Price,
-                Quantity = createIncomeDocumentDto.Quantity,
-                TotalSum = createIncomeDocumentDto.TotalSum,
-                Status = createIncomeDocumentDto.Status,
-            };
-            await _context.AddAsync(incomeDocument);
-            await _context.SaveChangesAsync();
+            var result = await _context.IncomeDocuments
+                .Where(x => x.StatusId != StatusIdConst.DELETE && x.OrganizationId == _account.OrganizationId)
+                .Select(u => new IncomeDocumentListDto
+                {
+                    Id = u.Id,
+                    SupplierId = u.SupplierId,
+                    SupplierName = u.Supplier.Code,
+                    DocSum = u.DocSum,
+                    DocOn = u.DocOn,
+                    StatusName = u.Status.ShortName,
+                }).SortFilter(filter)
+            .ToListAsync();
+            return result;
         }
-
-        public async Task DeleteAsync(int id)
+        public async Task<IncomeDocumentDto> GetAsync(long id)
         {
-            var incomeDocument = await _context.IncomeDocuments.FindAsync(id);
-
-            if (incomeDocument == null)
-                throw new KeyNotFoundException();
-
-            _context.IncomeDocuments.Remove(incomeDocument);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<IncomeDocumentDto> GetAsync(int id)
-        {
-            var incomeDocument = await _context.IncomeDocuments.FindAsync(id);
+            var incomeDocument = await _context.IncomeDocuments
+                .Include(x => x.Tables)
+                .Include(x => x.Supplier)
+                .Include(x => x.Status)
+                .FirstOrDefaultAsync(x => x.StatusId != StatusIdConst.DELETE 
+                    && x.OrganizationId == _account.OrganizationId && x.Id == id);
 
             if (incomeDocument == null)
                 throw new KeyNotFoundException();
@@ -53,92 +48,106 @@ namespace CashBox.Service.Services.IncomeDocumentSerives
             return new IncomeDocumentDto
             {
                 Id = incomeDocument.Id,
-                Date = incomeDocument.Date,
+                DocOn = incomeDocument.DocOn,
                 SupplierId = incomeDocument.SupplierId,
-                ProductId = incomeDocument.ProductId,
-                //OrganizationId = incomeDocument.OrganizationId,
-                Price = incomeDocument.Price,
-                Quantity = incomeDocument.Quantity,
-                TotalSum = incomeDocument.TotalSum,
-                Status = incomeDocument.Status,
+                SupplierName = incomeDocument.Supplier.Code,
+                DocSum = incomeDocument.DocSum,
+                StatusName = incomeDocument.Status.ShortName,
+                Tables = incomeDocument.Tables.Select(x => new IncomeDocumentTableDto
+                {
+                    Id = x.Id,
+                    OwnerId = x.OwnerId,
+                    ProductId = x.ProductId,
+                    Price = x.Price,
+                    Quantity = x.Quantity,
+                    TotalSum = x.TotalSum,
+                }).ToList()
             };
-
         }
-
-        public async Task<List<IncomeDocumentDto>> GetListAsync(IncomeDocumentFilterDto incomeDocumentFilterDto)
+        public async Task<long> CreateAsync(CreateIncomeDocumentDlDto dto)
         {
-            var incomeDocument = _context.IncomeDocuments.AsQueryable();
-
-            if (incomeDocumentFilterDto.Id.HasValue)
-                incomeDocument = incomeDocument.Where(x => x.Id == incomeDocumentFilterDto.Id);
-
-            if (incomeDocumentFilterDto.SupplierId.HasValue)
-                incomeDocument = incomeDocument.Where(x => x.SupplierId == incomeDocumentFilterDto.SupplierId);
-
-            if (incomeDocumentFilterDto.ProductId.HasValue)
-                incomeDocument = incomeDocument.Where(x => x.ProductId == incomeDocumentFilterDto.ProductId);
-
-            //if (incomeDocumentFilterDto.OrganizationId.HasValue)
-            //    incomeDocument = incomeDocument.Where(x => x.OrganizationId == incomeDocumentFilterDto.OrganizationId);
-
-            if (incomeDocumentFilterDto.Price.HasValue)
-                incomeDocument = incomeDocument.Where(x => x.Price == incomeDocumentFilterDto.Price);
-
-            if (incomeDocumentFilterDto.Quantity.HasValue)
-                incomeDocument = incomeDocument.Where(x => x.Quantity == incomeDocumentFilterDto.Quantity);
-
-            if (incomeDocumentFilterDto.TotalSum.HasValue)
-                incomeDocument = incomeDocument.Where(x => x.TotalSum == incomeDocumentFilterDto.TotalSum);
-
-            return await incomeDocument.Select(u => new IncomeDocumentDto
+            var entity = new IncomeDocument
             {
-                Id = u.Id,
-                SupplierId = u.SupplierId,
-                Date = u.Date,
-                //OrganizationId = u.OrganizationId,
-                Price = u.Price,
-                Quantity = u.Quantity,
-                TotalSum = u.TotalSum,
-                ProductId = u.ProductId,
-                Status = u.Status,
-            }).ToListAsync();
-        }
+                DocOn = dto.DocOn,
+                SupplierId = dto.SupplierId,
+                DocSum = dto.Tables.Sum(x => x.Price * x.Quantity),
+                StatusId = StatusIdConst.CREATED,
+                CreatedAt = DateTime.UtcNow,
+                CreateUserId = _account.UserId,
+                OrganizationId = _account.OrganizationId,
 
-        public async Task UpdateAsync(int id, UpdateIncomeDocument updateIncomeDocument)
-        {
-            var incomeDocument = await _context.IncomeDocuments.FindAsync(id);
-
-            if (incomeDocument == null)
-                throw new KeyNotFoundException($"{id} topilmadi");
-
-            if (updateIncomeDocument.SupplierId.HasValue)
-                incomeDocument.SupplierId = updateIncomeDocument.SupplierId.Value;
-
-            //if (updateIncomeDocument.OrganizationId.HasValue && updateIncomeDocument.OrganizationId != 0)
-            //    incomeDocument.OrganizationId = updateIncomeDocument.OrganizationId.Value;
-
-            if (updateIncomeDocument.Price.HasValue)
-                incomeDocument.Price = updateIncomeDocument.Price.Value;
-
-            if (updateIncomeDocument.Quantity.HasValue)
-                incomeDocument.Quantity = updateIncomeDocument.Quantity.Value;
-
-            if (updateIncomeDocument.TotalSum.HasValue)
-                incomeDocument.TotalSum = updateIncomeDocument.TotalSum.Value;
-
-            if (updateIncomeDocument.ProductId.HasValue)
-                incomeDocument.ProductId = updateIncomeDocument.ProductId.Value;
-
-            if (updateIncomeDocument.Date.HasValue)
-                incomeDocument.Date = updateIncomeDocument.Date.Value;
-
-            if (updateIncomeDocument.Status.HasValue)
-                incomeDocument.Status = updateIncomeDocument.Status.Value;
-
-            //product.ModifiedAt = DateTime.UtcNow;
-            //product.ModifiedUserId = _account.UserId;
-
+                Tables = dto.Tables.Select(x => new IncomeDocumentTable
+                {
+                    ProductId = x.ProductId,
+                    Price = x.Price,
+                    Quantity = x.Quantity,
+                    TotalSum = x.Price * x.Quantity,
+                }).ToList()
+            };
+            await _context.AddAsync(entity);
             await _context.SaveChangesAsync();
+            return entity.Id;
+        }
+        public async Task UpdateAsync(UpdateIncomeDocumentDlDto dto)
+        {
+            var entity = await _context.IncomeDocuments
+                .Include(x => x.Tables)
+                .FirstOrDefaultAsync(x => x.StatusId != StatusIdConst.DELETE
+                    && x.OrganizationId == _account.OrganizationId && x.Id == dto.Id);
+
+            if (entity == null)
+                throw new KeyNotFoundException($"{dto.Id} topilmadi");
+
+            if (dto.SupplierId != entity.SupplierId)
+                entity.SupplierId = dto.SupplierId;
+
+            if (dto.DocOn.Equals(dto.DocOn))
+                entity.DocOn = dto.DocOn;
+
+            entity.StatusId = StatusIdConst.MODIFIED;
+            entity.ModifiedAt = DateTime.UtcNow;
+            entity.ModifiedUserId = _account.UserId;
+            entity.Tables = dto.Tables.Select(x => new IncomeDocumentTable
+            {
+                Id = x.Id,
+                ProductId = x.ProductId,
+                Price = x.Price,
+                Quantity = x.Quantity,
+                TotalSum = x.Price * x.Quantity,
+            }).ToList();
+            await _context.SaveChangesAsync();
+        }
+        public async Task DeleteAsync(long id)
+        {
+            var entity = await _context.IncomeDocuments.FindAsync(id);
+
+            if (entity == null)
+                throw new KeyNotFoundException();
+
+            entity.StatusId = StatusIdConst.DELETE;
+            await _context.SaveChangesAsync();
+        }
+        public async Task<long> Accept(int id)
+        {
+            var entity = await _context.IncomeDocuments.FindAsync(id);
+
+            if (entity == null)
+                throw new KeyNotFoundException();
+
+            entity.StatusId = StatusIdConst.ACCEPT;
+            await _context.SaveChangesAsync();
+            return entity.Id;
+        }
+        public async Task<long> NotAccept(int id)
+        {
+            var entity = await _context.IncomeDocuments.FindAsync(id);
+
+            if (entity == null)
+                throw new KeyNotFoundException();
+
+            entity.StatusId = StatusIdConst.NOT_ACCEPT;
+            await _context.SaveChangesAsync();
+            return entity.Id;
         }
     }
 }

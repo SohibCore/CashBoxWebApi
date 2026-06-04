@@ -172,6 +172,10 @@ export default {
 }
 
 .section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   margin-bottom: 1.5rem;
 }
 
@@ -208,8 +212,11 @@ export default {
   border: none;
   cursor: pointer;
   text-decoration: none;
-  font-size: inherit;
+  font-size: 0.95rem; /* Inherit o'rniga aniq qiymat */
   font-family: inherit;
+  height: 38px; /* Chiqim hujjatlaridagi tugma balandligi */
+  justify-content: center; /* Kontentni vertikal markazlash */
+  font-weight: 600; /* Qalinroq matn */
 }
 
 .user-count {
@@ -299,7 +306,8 @@ thead th {
   text-align: left;
   padding: 0.65rem 0.5rem;
   border-bottom: 1px solid #e2e8f0;
-  background: #f9fafb;
+  background-color: #f0f2f5;
+  color: #333;
   font-weight: 600;
   font-size: 0.82rem;
   line-height: 1.3;
@@ -318,6 +326,9 @@ tbody td {
 tbody tr {
   cursor: pointer;
   transition: background-color 0.2s;
+}
+tbody tr:hover {
+  background-color: #f0f7ff;
 }
 .actions {
   display: flex;

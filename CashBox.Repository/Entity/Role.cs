@@ -28,7 +28,6 @@ namespace CashBox.Repository.Entity
         [Column("MODIFIED_AT")]
         public DateTime? ModifiedAt { get; set; }
 
-        public ICollection<UserRole> UserRoles { get; set; }
-    = new List<UserRole>();
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

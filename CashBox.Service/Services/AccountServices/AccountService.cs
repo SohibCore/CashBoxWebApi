@@ -2,11 +2,6 @@
     {
         public class AccountService
         {
-            //public AccountService(int userId, int organizationId)
-            //{   
-            //    UserId = userId;
-            //    OrganizationId = organizationId;
-            //}
             public int UserId
             {
                 get { return _userId; }

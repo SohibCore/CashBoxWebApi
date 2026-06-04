@@ -1,4 +1,4 @@
-﻿using CashBox.Repository.Enums;
+﻿using CashBox.Repository.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -18,13 +18,9 @@ namespace CashBox.Repository.Entity
 
         [Column("SUPPLIER_ID")]
         public int SupplierId { get; set; }
-        [ForeignKey(nameof(SupplierId))]
-        public Supplier? Supplier { get; set; }
 
         [Column("PRODUCT_ID")]
         public int ProductId { get; set; }
-        [ForeignKey(nameof(ProductId))]
-        public Product? Product { get; set; }
 
         [Column("QUANTITY")]
         public decimal Quantity { get; set; }
@@ -35,8 +31,16 @@ namespace CashBox.Repository.Entity
         [Column("TOTAL_SUM")]
         public decimal TotalSum { get; set; }
 
-        [Column("STATUS")]
+        [Column("STATUS_ID")]
+        public int StatusId { get; set; }
 
-        public PaymentStatus Status { get; set; } = PaymentStatus.Unpaid; // enum bo'lgani uchun
+        [ForeignKey(nameof(StatusId))]
+        public Status Status { get; set; } = null!;
+
+        [ForeignKey(nameof(SupplierId))]
+        public Supplier Supplier { get; set; } = null!;
+
+        [ForeignKey(nameof(ProductId))]
+        public Product? Product { get; set; } = null!;
     }
 }

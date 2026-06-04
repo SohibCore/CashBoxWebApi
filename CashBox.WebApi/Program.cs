@@ -5,9 +5,10 @@ using CashBox.Service.Services.ContractorService;
 using CashBox.Service.Services.CorrencyRateServices;
 using CashBox.Service.Services.CorrencyServices;
 using CashBox.Service.Services.DistrictServices;
-using CashBox.Service.Services.IncomeDocumentSerives;
+using CashBox.Service.Services.IncomeDocumentServices;
 using CashBox.Service.Services.NewFolder;
 using CashBox.Service.Services.OrganizationServices;
+using CashBox.Service.Services.OutcomeDocumentService;
 using CashBox.Service.Services.ProductServices;
 using CashBox.Service.Services.RegionServices;
 using CashBox.Service.Services.RoleServices;
@@ -73,6 +74,7 @@ builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IIncomeDocumentService, IncomeDocumentService>();
+builder.Services.AddScoped<IOutcomeDocumentService, OutcomeDocumentService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
