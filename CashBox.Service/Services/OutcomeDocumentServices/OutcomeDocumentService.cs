@@ -1,5 +1,9 @@
-﻿using CashBox.Repository.Dtos.OutcomeDocumentDtos;
+﻿using CashBox.Core;
+using CashBox.Repository.Dtos.OutcomeDocumentDtos;
 using CashBox.Repository.Entity;
+using CashBox.Service.Services.AccountServices;
+using CashBox.Service.Services.OutcomeDocumentServices;
+using CashBox.Service.Services.OutcomeDocumentServices.QueryObjects;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 
@@ -8,39 +12,39 @@ namespace CashBox.Service.Services.OutcomeDocumentService
     public class OutcomeDocumentService : IOutcomeDocumentService
     {
         private readonly AppDbContext _context;
-        public OutcomeDocumentService(AppDbContext context)
+        private readonly AccountService _account;
+
+        public OutcomeDocumentService(AppDbContext context, AccountService account)
         {
             _context = context;
-        }
-        public async Task CreateAsync(CreateOutcomeDocumentDto createOutcomeDocumentDto)
-        {
-            var outcomeDocument = new OutcomeDocument
-            {
-                Date = createOutcomeDocumentDto.Date,
-                SupplierId = createOutcomeDocumentDto.SupplierId,
-                ProductId = createOutcomeDocumentDto.ProductId,
-                Price = createOutcomeDocumentDto.Price,
-                Quantity = createOutcomeDocumentDto.Quantity,
-                TotalSum = createOutcomeDocumentDto.TotalSum,
-            };
-            await _context.OutcomeDocuments.AddAsync(outcomeDocument);
-            await _context.SaveChangesAsync();
+            _account = account;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<List<OutcomeDocumentListDto>> GetListAsync(OutcomeDocumentFilterDto filter)
         {
-            var outcomeDocument = await _context.OutcomeDocuments.FindAsync(id);
-
-            if (outcomeDocument == null)
-                throw new KeyNotFoundException();
-
-            _context.OutcomeDocuments.Remove(outcomeDocument);
-            await _context.SaveChangesAsync();
+            var result = await _context.OutcomeDocuments
+                .Where(x => x.StatusId != StatusIdConst.DELETE && x.OrganizationId == _account.OrganizationId)
+                .Select(x => new OutcomeDocumentListDto
+                {
+                    Id = x.Id,
+                    DocOn = x.DocOn,
+                    SupplierId = x.SupplierId,
+                    SupplierName = x.Supplier.Code,
+                    StatusId = x.StatusId,
+                    StatusName = x.Status.ShortName,
+                    DocSum = x.DocSum
+                }).SortFilter(filter)
+                .ToListAsync();
+            return result;
         }
 
-        public async Task<OutcomeDocumentDto> GetAsync(int id)
+        public async Task<OutcomeDocumentDto> GetAsync(long id)
         {
-            var outcomeDocument = await _context.OutcomeDocuments.FindAsync(id);
+            var outcomeDocument = await _context.OutcomeDocuments
+                .Include(x => x.Tables)
+                .Include(x => x.Supplier)
+                .Include(x => x.Status)
+                .FirstOrDefaultAsync(x => x.Id == id && x.OrganizationId == _account.OrganizationId);
 
             if (outcomeDocument == null)
                 throw new KeyNotFoundException();
@@ -48,78 +52,116 @@ namespace CashBox.Service.Services.OutcomeDocumentService
             return new OutcomeDocumentDto
             {
                 Id = outcomeDocument.Id,
-                Date = outcomeDocument.Date,
+                DocOn = outcomeDocument.DocOn,
                 SupplierId = outcomeDocument.SupplierId,
                 Price = outcomeDocument.Price,
                 ProductId = outcomeDocument.ProductId,
                 Quantity = outcomeDocument.Quantity,
-                TotalSum = outcomeDocument.TotalSum
+                DocSum = outcomeDocument.DocSum,
+                Tables = outcomeDocument.Tables.Select(t => new OutcomeDocumentTableDto
+                {
+                    Id = t.Id,
+                    ProductId = t.ProductId,
+                    Quantity = t.Quantity,
+                    Price = t.Price,
+                    TotalSum = t.Price * t.Quantity
+                }).ToList()
             };
         }
 
-        public async Task<List<OutcomeDocumentDto>> GetListAsync(OutcomeDocumentFilterDto outcomeDocumentFilterDto)
+        public async Task<long> CreateAsync(CreateOutcomeDocumentDlDto dto)
         {
-            var outcomeDocument = _context.OutcomeDocuments.AsQueryable();
-
-            if (outcomeDocumentFilterDto.Id.HasValue)
-                outcomeDocument = outcomeDocument.Where(x => x.Id == outcomeDocumentFilterDto.Id);
-
-            if (outcomeDocumentFilterDto.ProductId.HasValue)
-                outcomeDocument = outcomeDocument.Where(x => x.ProductId == outcomeDocumentFilterDto.ProductId);
-
-            if (outcomeDocumentFilterDto.SupplierId.HasValue)
-                outcomeDocument = outcomeDocument.Where(x => x.SupplierId == outcomeDocumentFilterDto.SupplierId);
-
-            if (outcomeDocumentFilterDto.Date.HasValue)
-                outcomeDocument = outcomeDocument.Where(x => x.Date == outcomeDocumentFilterDto.Date);
-
-            if (outcomeDocumentFilterDto.Price.HasValue)
-                outcomeDocument = outcomeDocument.Where(x => x.Price == outcomeDocumentFilterDto.Price);
-
-            if (outcomeDocumentFilterDto.Quantity.HasValue)
-                outcomeDocument = outcomeDocument.Where(x => x.Quantity == outcomeDocumentFilterDto.Quantity);
-
-            if (outcomeDocumentFilterDto.TotalSum.HasValue)
-                outcomeDocument = outcomeDocument.Where(x => x.TotalSum == outcomeDocumentFilterDto.TotalSum);
-
-            return await outcomeDocument.Select(u => new OutcomeDocumentDto
+            var entity = new OutcomeDocument
             {
-                Id = u.Id,
-                ProductId = u.ProductId,
-                SupplierId = u.SupplierId,
-                Date = u.Date,
-                Price = u.Price,
-                Quantity = u.Quantity,
-                TotalSum = u.TotalSum,
-            }).ToListAsync();
+                DocOn = DateTime.SpecifyKind(dto.DocOn, DateTimeKind.Utc),
+                SupplierId = dto.SupplierId,
+                DocSum = dto.Tables.Sum(x => x.Price * x.Quantity),
+                OrganizationId = _account.OrganizationId,
+                StatusId = StatusIdConst.CREATED,
+                Tables = dto.Tables.Select(t => new OutcomeDocumentTable
+                {
+                    ProductId = t.ProductId,
+                    Quantity = t.Quantity,
+                    Price = t.Price,
+                    TotalSum = t.Price * t.Quantity
+                }).ToList()
+            };
+            await _context.OutcomeDocuments.AddAsync(entity);
+            await _context.SaveChangesAsync();
+            return entity.Id;
         }
 
-        public async Task UpdateAsync(int id, UpdateOutcomeDocumentDto updateOutcomeDocumentDto)
+        public async Task UpdateAsync(UpdateOutcomeDocumentDto dto)
         {
-            var outcomeDocument = await _context.OutcomeDocuments.FindAsync(id);
+            var entity = await _context.OutcomeDocuments
+                 .Include(x => x.Tables)
+                 .FirstOrDefaultAsync(x => x.Id == dto.Id && x.OrganizationId == _account.OrganizationId &&
+                 x.StatusId != StatusIdConst.DELETE);
 
-            if (outcomeDocument == null)
+            if (entity == null)
                 throw new KeyNotFoundException();
 
-            if (updateOutcomeDocumentDto.ProductId.HasValue)
-                outcomeDocument.ProductId = updateOutcomeDocumentDto.ProductId.Value;
+            if (entity.DocOn != dto.DocOn)
+                entity.DocOn = DateTime.SpecifyKind(dto.DocOn, DateTimeKind.Utc);
 
-            if(updateOutcomeDocumentDto.SupplierId.HasValue)
-                outcomeDocument.SupplierId = updateOutcomeDocumentDto.SupplierId.Value;
+            if (entity.SupplierId != dto.SupplierId)
+                entity.SupplierId = dto.SupplierId;
 
-            if(updateOutcomeDocumentDto.Date.HasValue)
-                outcomeDocument.Date = updateOutcomeDocumentDto.Date.Value;
+            if (entity.DocSum != dto.DocSum)
+                entity.DocSum = dto.Tables.Sum(x => x.Price * x.Quantity);
 
-            if(updateOutcomeDocumentDto.Price.HasValue)
-                outcomeDocument.Price = updateOutcomeDocumentDto.Price.Value;
+            entity.StatusId = StatusIdConst.MODIFIED;
+            entity.ModifiedAt = DateTime.UtcNow;
+            entity.ModifiedUserId = _account.UserId;
 
-            if(updateOutcomeDocumentDto.Quantity.HasValue)
-                outcomeDocument.Quantity = updateOutcomeDocumentDto.Quantity.Value;
+            //_context.OutcomeDocumentTables.RemoveRange(entity.Tables);
 
-            if(updateOutcomeDocumentDto.TotalSum.HasValue)
-                outcomeDocument.TotalSum = updateOutcomeDocumentDto.TotalSum.Value;
+            entity.Tables = dto.Tables.Select(t => new OutcomeDocumentTable
+            {
+                OwnerId = entity.Id,
+                ProductId = t.ProductId,
+                Quantity = t.Quantity,
+                Price = t.Price,
+                TotalSum = t.Price * t.Quantity
+            }).ToList();
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(long id)
+        {
+            var entity = await _context.OutcomeDocuments.FindAsync(id);
+
+            if (entity == null)
+                throw new KeyNotFoundException();
+
+            entity.StatusId = StatusIdConst.DELETE;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<long> Accept(int id)
+        {
+            var entity = await _context.OutcomeDocuments.FindAsync(id);
+
+            if (entity == null)
+                throw new KeyNotFoundException();
+
+            entity.StatusId = StatusIdConst.ACCEPT;
+            await _context.SaveChangesAsync();
+            return entity.Id;
+        }
+
+        public async Task<long> NotAccept(int id)
+        {
+            var entity = await _context.OutcomeDocuments.FindAsync(id);
+
+            if (entity == null)
+                throw new KeyNotFoundException();
+
+            entity.StatusId = StatusIdConst.NOT_ACCEPT;
+            await _context.SaveChangesAsync();
+            return entity.Id;
+        }
+
     }
 }

@@ -163,10 +163,10 @@ export default {
 
 <style scoped>
 .products-page.page-card {
-  background: white;
+  background: #111827;
   padding: 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   width: 100%;
   max-width: none; /* Sahifani eniga to'liq uzaytiramiz */
   box-sizing: border-box;
@@ -197,9 +197,12 @@ export default {
 
 .search-input {
   padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
   border-radius: 0.75rem;
   font-size: 0.95rem;
+  outline: none;
 }
 
 .toggle-create {
@@ -220,12 +223,12 @@ export default {
 }
 
 .user-count {
-  color: #475569;
+  color: #94a3b8;
   font-weight: 600;
 }
 
 .data-panel {
-  background: #f8fafc;
+  background: transparent;
   padding: 1.5rem;
   border-radius: 0.5rem;
   overflow-x: visible; /* Gorizontal scrollni olib tashlaymiz */
@@ -241,17 +244,22 @@ table {
 thead th {
   text-align: left;
   padding: 0.8rem;
-  border-bottom: 1px solid #e2e8f0;
-  background-color: #f0f2f5; /* Kulrang header */
-  color: #333;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background-color: #0f172a; /* Kulrang header */
+  color: #475569;
   font-weight: 600;
   white-space: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 11px;
 }
 
 tbody td {
   padding: 0.9rem 0.8rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  color: #94a3b8;
   word-break: break-word;
+  font-size: 13.5px;
 }
 
 tbody tr {
@@ -260,7 +268,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background-color: #f0f7ff; /* Och ko'k hover */
+  background-color: rgba(255, 255, 255, 0.03); /* Och ko'k hover */
 }
 
 .actions {
@@ -281,11 +289,10 @@ tbody tr:hover {
   margin-top: 0.3rem;
   display: flex;
   gap: 0.4rem;
-  background: white;
+  background: #1e293b;
   padding: 0.4rem;
   border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 10;
   white-space: nowrap;
 }

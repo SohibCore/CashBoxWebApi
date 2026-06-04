@@ -121,10 +121,10 @@ export default {
 
 <style scoped>
 .page-card {
-  background: white;
+  background: #111827;
   padding: 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .wide-card {
@@ -134,17 +134,17 @@ export default {
 
 .section-header {
   margin-bottom: 2rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   padding-bottom: 1rem;
 }
 
 .entity-form {
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.02);
   padding: 2rem;
   border-radius: 1rem;
   /* Ko'k romka huddi boshqa modern formalardek */
   border: 1px solid #2563eb;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.05);
   margin-bottom: 1.5rem;
 }
 
@@ -157,14 +157,16 @@ export default {
 label {
   display: block;
   font-weight: 600;
-  color: #1e293b;
+  color: #94a3b8;
   margin-bottom: 0.5rem;
 }
 
 input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
   border-radius: 0.5rem;
   font-size: 1rem;
   transition: border-color 0.2s;

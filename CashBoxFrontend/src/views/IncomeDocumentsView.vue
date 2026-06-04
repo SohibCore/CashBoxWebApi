@@ -1,5 +1,5 @@
 <template>
-  <div class="page-card wide-card income-documents-page">
+  <div class="income-documents-page">
     <div class="section-header"> 
       <div>
         <h2>Kirim hujjatlari</h2>
@@ -36,10 +36,12 @@
         <span>+</span> Yangi hujjat qo'shish
       </router-link>
       <div class="filter-panel">
-        <select v-model.number="filters.status" class="search-input">
+        <select v-model.number="filters.status" class="filter-select">
           <option :value="null">Barcha statuslar</option>
-          <option :value="0">To'lanmagan</option>
-          <option :value="1">To'langan</option>
+          <option :value="1">Yaratildi</option>
+          <option :value="2">Tasdiqlandi</option>
+          <option :value="3">Rad etildi</option>
+          <option :value="4">O'zgartirildi</option>
         </select>
       </div>
       <span class="user-count">{{ filteredDocuments.length }} ta hujjat</span>
@@ -50,11 +52,9 @@
       <table>
         <thead>
           <tr>
+            <th style="width: 40px;"></th>
             <th>ID</th>
             <th>Ta'minotchi</th>
-            <th>Mahsulot</th>
-            <th>Miqdori</th>
-            <th>Narxi</th>
             <th>Jami summa</th>
             <th>Sana</th>
             <th>Status</th>
@@ -62,55 +62,80 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="filteredDocuments.length === 0">
-            <td colspan="9" style="text-align: center; padding: 2rem; color: #64748b;">Ma'lumot yo'q</td>
+          <tr v-if="filteredDocuments.length === 0" class="no-data-row">
+            <td colspan="7">Ma'lumot yo'q</td>
           </tr>
-          <tr v-for="doc in filteredDocuments" :key="doc.id" @dblclick="openEditModal(doc)">
-            <td>{{ doc.id }}</td>
-            <td style="font-weight: 500;">{{ doc.supplierName || doc.supplierId }}</td>
-            <td>{{ doc.productName || doc.productId }}</td>
-            <td>{{ doc.quantity }}</td>
-            <td>{{ doc.price }}</td>
-            <td style="font-weight: 600;">{{ doc.totalSum }}</td>
-            <td style="color: #64748b;">{{ formatDate(doc.date) }}</td>
-            <td>
-              <span :class="['badge', statusClass(doc.status)]">
-                {{ statusLabel(doc.status) }}
-              </span>
-            </td>
-            <td class="actions">
-              <div class="action-dropdown-wrapper">
-                <button
-                  type="button"
-                  @click="toggleRow(doc.id)"
-                  :class="['icon-btn', { expanded: expandedDocId === doc.id }]"
-                  title="Amallarni ko'rsatish"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
+          <template v-for="doc in filteredDocuments" :key="doc.id">
+            <tr :class="{ 'row-expanded': expandedRowId === doc.id }" @click="toggleExpand(doc.id)">
+              <td>
+                <span class="expand-icon" :class="{ 'is-active': expandedRowId === doc.id }">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
-                </button>
-                <div v-if="expandedDocId === doc.id" class="action-dropdown">
-                  <button type="button" @click="openEditModal(doc)" class="dropdown-btn">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </span>
+              </td>
+              <td>{{ doc.id }}</td>
+              <td style="font-weight: 500;">{{ doc.supplierName || doc.supplierId }}</td>
+              <td style="font-weight: 600;">{{ formatSum(doc.totalSum) }}</td>
+              <td>{{ formatDate(doc.date) }}</td>
+              <td>
+                <span :class="['badge', statusClass(doc.status)]">
+                  {{ statusLabel(doc.status) }}
+                </span>
+              </td>
+              <td class="actions" @click.stop>
+                <div class="action-dropdown-wrapper">
+                  <button
+                    type="button"
+                    @click="toggleDropdown(doc.id)"
+                    :class="['icon-btn', { expanded: expandedDocId === doc.id }]"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
-                    Tahrirlash
                   </button>
-                  <button type="button" @click="deleteItem(doc.id)" class="dropdown-btn danger">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      <line x1="10" y1="11" x2="10" y2="17"></line>
-                      <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
-                    O'chirish
-                  </button>
+                  <div v-if="expandedDocId === doc.id" class="action-dropdown">
+                    <button type="button" @click="openEditModal(doc)" class="dropdown-btn">
+                      Tahrirlash
+                    </button>
+                    <button type="button" @click="deleteItem(doc.id)" class="dropdown-btn danger">
+                      O'chirish
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </td>
-          </tr>
+              </td>
+            </tr>
+            <tr v-if="expandedRowId === doc.id" class="nested-row">
+              <td colspan="7">
+                <div class="nested-container">
+                  <div v-if="loadingDetails" class="nested-loading">Yuklanmoqda...</div>
+                  <table v-else class="nested-table">
+                    <thead>
+                      <tr>
+                        <th>Mahsulot ID</th>
+                        <th>Mahsulot nomi</th>
+                        <th>Miqdori</th>
+                        <th>Narxi</th>
+                        <th>Jami</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="item in (documentDetails[doc.id]?._items || [])" :key="item.id">
+                        <td>{{ item.productId ?? item.ProductId }}</td>
+                        <td>{{ getProductName(item.productId ?? item.ProductId) }}</td>
+                        <td>{{ item.quantity ?? item.Quantity }}</td>
+                        <td>{{ formatSum(item.price ?? item.Price) }}</td>
+                        <td style="color: #f1f5f9;">{{ formatSum(item.totalSum ?? item.TotalSum) }}</td>
+                      </tr>
+                      <tr v-if="!documentDetails[doc.id]?._items || documentDetails[doc.id]?._items.length === 0">
+                        <td colspan="5" style="text-align: center;">Tarkib topilmadi</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -119,30 +144,82 @@
 
 <script>
 import { ref, onMounted, computed, reactive } from 'vue';
-import { useRouter } from 'vue-router';
-import { getIncomeDocuments, deleteIncomeDocument, extractApiData } from '../api';
+import { useRouter } from 'vue-router'; // Keep this for router.push
+import { incomeDocumentService } from './incomeDocumentService'; // Import the service
 
 export default {
   name: 'IncomeDocumentsView',
   setup() {
     const router = useRouter();
     const documents = ref([]);
+    const products = ref([]);
     const expandedDocId = ref(null);
+    const expandedRowId = ref(null);
+    const documentDetails = reactive({});
+    const loadingDetails = ref(false);
     const filters = reactive({
       status: null
     });
 
-    const toggleRow = (id) => {
+    const toggleDropdown = (id) => {
       expandedDocId.value = expandedDocId.value === id ? null : id;
     };
 
+    const toggleExpand = async (id) => {
+      if (expandedRowId.value === id) {
+        expandedRowId.value = null;
+        return;
+      }
+      
+      expandedRowId.value = id;
+      if (!documentDetails[id]) {
+        loadingDetails.value = true;
+        try {
+          const res = await incomeDocumentService.getById(id);
+          const data = res.data?.data || res.data?.value || res.data;
+          
+          if (data) {
+            // Backenddan Tables, tables yoki items bo'lib kelishidan qat'i nazar '_items'ga o'tkazamiz
+            documentDetails[id] = {
+              ...data,
+              _items: data.tables || data.Tables || data.items || data.Items || []
+            };
+          }
+        } catch (err) {
+          console.error('Error fetching details:', err);
+        } finally {
+          loadingDetails.value = false;
+        }
+      }
+    };
+
+    const loadMetaData = async () => {
+      try {
+        const res = await incomeDocumentService.getProducts();
+        products.value = res.data?.data || res.data || [];
+      } catch (err) {
+        console.error('Mahsulotlarni yuklashda xato:', err);
+      }
+    };
+
+    const getProductName = (id) => {
+      const p = products.value.find(x => (x.id || x.Id) === id);
+      return p ? p.name : 'Mahsulot #' + id;
+    };
+
     const statusLabel = (status) => {
-      const map = { 0: "To'lanmagan", 1: "To'langan" };
+      const map = {
+        1: "Yaratildi",
+        2: "Tasdiqlandi",
+        3: "Rad etildi",
+        4: "O'zgartirildi",
+        5: "O'chirildi"
+      };
       return map[status] ?? 'Noma\'lum';
     };
 
     const statusClass = (status) => {
-      const map = { 0: 'unpaid', 1: 'paid' };
+      const map = { 1: 'created', 2: 'accepted', 3: 'not-accepted', 4: 'modified', 5: 'deleted' };
       return map[status] ?? '';
     };
 
@@ -152,13 +229,13 @@ export default {
 
     const paidSum = computed(() =>
       documents.value
-        .filter(d => d.status === 1)
+        .filter(d => d.status === 2) // StatusIdConst.ACCEPT
         .reduce((sum, d) => sum + (d.totalSum || 0), 0)
     );
 
     const unpaidSum = computed(() =>
       documents.value
-        .filter(d => d.status === 0)
+        .filter(d => [1, 3, 4].includes(d.status)) // StatusIdConst.CREATED, StatusIdConst.NOT_ACCEPT, StatusIdConst.MODIFIED
         .reduce((sum, d) => sum + (d.totalSum || 0), 0)
     );
 
@@ -172,20 +249,16 @@ export default {
 
     const loadDocuments = async () => {
       try {
-        const res = await getIncomeDocuments();
-        const data = extractApiData(res);
-        const raw = Array.isArray(data) ? data : [];
+        const res = await incomeDocumentService.getList();
+        const raw = res.data?.data || res.data || []; // Assuming service returns data in res.data.data or res.data
         documents.value = raw.map(doc => ({
           id: doc.id || doc.Id,
           supplierId: doc.supplierId || doc.SupplierId,
           supplierName: doc.supplierName || doc.SupplierName,
-          productId: doc.productId || doc.ProductId,
-          productName: doc.productName || doc.ProductName,
-          quantity: parseFloat(doc.quantity || doc.Quantity || 0),
-          price: parseFloat(doc.price || doc.Price || 0),
-          totalSum: parseFloat(doc.totalSum || doc.TotalSum || 0),
-          date: doc.date || doc.Date,
-          status: doc.status ?? doc.Status ?? 0
+          totalSum: doc.docSum ?? doc.DocSum ?? 0, // '??' 0 ni o'tkazib yubormaydi
+          date: doc.docOn ?? doc.DocOn, 
+          status: doc.statusId ?? doc.StatusId ?? 1, // Default to 1 (CREATED) if statusId is missing
+          statusName: doc.statusName || doc.StatusName // Added StatusName
         }));
       } catch (err) {
         console.error('Load documents error:', err);
@@ -201,7 +274,7 @@ export default {
       if (!window.confirm("O'chirishni tasdiqlaysizmi?")) return;
       expandedDocId.value = null;
       try {
-        await deleteIncomeDocument(id);
+        await incomeDocumentService.delete(id);
         await loadDocuments();
       } catch (err) {
         console.error('Delete document error:', err);
@@ -215,6 +288,7 @@ export default {
 
     onMounted(() => {
       loadDocuments();
+      loadMetaData();
     });
 
     return {
@@ -228,16 +302,28 @@ export default {
       statusLabel,
       statusClass,
       expandedDocId,
-      toggleRow,
+      expandedRowId,
+      documentDetails,
+      loadingDetails,
+      toggleDropdown,
+      toggleExpand,
       openEditModal,
       deleteItem,
-      formatDate
+      formatDate,
+      getProductName
     };
   }
 };
 </script>
 
 <style scoped>
+.income-documents-page {
+  background: #0d1117 !important;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .income-documents-page.page-card {
   background: white;
   padding: 1.5rem;
@@ -297,18 +383,20 @@ export default {
 }
 
 .user-count {
-  color: #475569;
+  color: #94a3b8;
   font-weight: 600;
 }
 
 .data-panel {
-  background: #f8fafc;
+  background: #111827;
   padding: 1.5rem;
   border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .data-panel h3 {
   margin-top: 0;
+  color: #f1f5f9;
 }
 
 table {
@@ -319,22 +407,28 @@ table {
 thead th {
   text-align: left;
   padding: 0.65rem 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f9fafb;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: #0f172a;
   font-weight: 600;
   font-size: 0.82rem;
   color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 tbody td {
   padding: 0.75rem 0.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   font-size: 0.88rem;
+  color: #94a3b8;
 }
 
 tbody tr {
   cursor: pointer;
   transition: background-color 0.2s;
+}
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
 }
 .actions {
   display: flex;
@@ -353,11 +447,11 @@ tbody tr {
   margin-top: 0.3rem;
   display: flex;
   gap: 0.4rem;
-  background: white;
+  background: #1e293b;
   padding: 0.4rem;
   border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   z-index: 10;
   white-space: nowrap;
 }
@@ -366,18 +460,18 @@ tbody tr {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  border: 1px solid transparent;
-  background: #ffffff;
-  color: #0f172a;
+  background: transparent;
+  color: #f1f5f9;
   padding: 0.35rem 0.6rem;
   font-size: 0.78rem;
   border-radius: 0.4rem;
   cursor: pointer;
+  border: 1px solid transparent;
 }
 
 .dropdown-btn:hover {
-  background: #eff6ff;
-  border-color: #cbd5e1;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .dropdown-btn.danger {
@@ -407,8 +501,11 @@ tbody tr {
   font-size: 12px;
   font-weight: 600;
 }
-.badge.paid    { background: #d1fae5; color: #065f46; }
-.badge.unpaid  { background: #fef3c7; color: #d97706; }
+.badge.created      { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); }
+.badge.accepted     { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25); }
+.badge.not-accepted { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); }
+.badge.modified     { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.25); }
+.badge.deleted      { background: rgba(100, 116, 139, 0.15); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.25); }
 
 .stats-cards {
   display: flex;
@@ -422,8 +519,8 @@ tbody tr {
   gap: 16px;
   padding: 20px;
   border-radius: 12px;
-  background: white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 .stat-card.total  { border-left: 4px solid #2563eb; }
 .stat-card.paid   { border-left: 4px solid #16a34a; }
@@ -432,5 +529,11 @@ tbody tr {
 .stat-icon { font-size: 28px; }
 .stat-info { display: flex; flex-direction: column; }
 .stat-label { font-size: 13px; color: #64748b; }
-.stat-value { font-size: 18px; font-weight: 700; color: #1e293b; }
+.stat-value { font-size: 18px; font-weight: 700; color: #f1f5f9; }
+
+.no-data-row td {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
 </style>

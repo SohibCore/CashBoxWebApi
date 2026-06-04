@@ -1,104 +1,159 @@
   <template>
-    <div class="page-card">
-      <h2>Ro'yxatdan o'tish</h2>
+    <div class="register-form-wrap">
+      <div class="form-header">
+        <h2 class="form-title">Hisob yaratish</h2>
+        <p class="form-subtitle">Barcha maydonlarni to'ldiring</p>
+      </div>
+
       <form @submit.prevent="submit">
         <div class="form-grid">
-          <label>
-            <span class="required-star">*</span> Login
-            <input v-model="userName" type="text" maxlength="100" placeholder="Maksimal 100 belgi" required />
-            <small v-if="userNameError" class="error">{{ userNameError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> Email
-            <input v-model="email" type="email" required />
-            <small v-if="emailError" class="error">{{ emailError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> Parol
-            <input v-model="password" type="password" minlength="6" placeholder="Kamida 6 belgi" required />
-            <small v-if="passwordError" class="error">{{ passwordError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> To'liq ism
-            <input v-model="fullName" type="text" maxlength="300" required />
-            <small v-if="fullNameError" class="error">{{ fullNameError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> Qisqa ism
-            <input v-model="shortName" type="text" maxlength="200" required />
-            <small v-if="shortNameError" class="error">{{ shortNameError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> PINFL
-            <input v-model="pinfl" type="text" maxlength="14" inputmode="numeric" placeholder="14 raqam" required />
-            <small v-if="pinflError" class="error">{{ pinflError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> Telefon raqam
-            <input v-model="phoneNumber" type="tel" maxlength="9" inputmode="numeric" placeholder="9 raqam" required />
-            <small v-if="phoneNumberError" class="error">{{ phoneNumberError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> Manzil
-            <select v-model.number="selectedRegionId" @change="onRegionChange" required>
-              <option value="0" disabled>Viloyatni tanlang</option>
-              <option v-for="reg in regions" :key="reg.id" :value="reg.id">
-                {{ reg.fullName }}
-              </option>
-            </select>
-          </label>
-          <label>
-            <span class="required-star">*</span> Tuman
-            <select v-model.number="selectedDistrictId" :disabled="!selectedRegionId" required>
-              <option value="0" disabled>
-                {{ selectedRegionId ? 'Tumanni tanlang' : 'Avval viloyat tanlang' }}
-              </option>
-              <option v-for="dist in districts" :key="dist.id" :value="dist.id">
-                {{ dist.fullName }}
-              </option>
-            </select>
-            <small v-if="addressError" class="error">{{ addressError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> Tashkilot (INN orqali qidiring)
-            <input
-              v-model="innSearch"
-              type="text"
-              placeholder="INN kiriting..."
-              @input="handleInnInput"
-              inputmode="numeric"
-              pattern="\d*"
-            />
-            <small v-if="innSearchError" class="error">{{ innSearchError }}</small>
-            <div v-if="isLoadingOrganizations" class="dropdown-list loading-indicator">
-              Yuklanmoqda...
+
+          <div class="field">
+            <label><span class="req">*</span> Login</label>
+            <div class="input-wrap">
+            <span class="input-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
+              <input v-model="userName" type="text" maxlength="100" placeholder="Maksimal 100 belgi" required />
+          </div>
+              <small v-if="userNameError" class="field-error">{{ userNameError }}</small>
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> Email</label>
+            <div class="input-wrap">
+            <span class="input-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </span>
+              <input v-model="email" type="email" required />
+          </div>
+              <small v-if="emailError" class="field-error">{{ emailError }}</small>
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> Parol</label>
+            <div class="input-wrap">
+            <span class="input-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+              <input v-model="password" type="password" minlength="6" placeholder="Kamida 6 belgi" required />
+          </div>
+              <small v-if="passwordError" class="field-error">{{ passwordError }}</small>
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> To'liq ism</label>
+            <div class="input-wrap">
+              <input v-model="fullName" type="text" maxlength="300" required />
+              <small v-if="fullNameError" class="field-error">{{ fullNameError }}</small>
             </div>
-            <div v-else-if="orgResults.length > 0" class="dropdown-list">
-              <div v-for="org in orgResults" :key="org.id" class="dropdown-item" @click="selectOrganization(org)">
-                {{ org.fullName }} ({{ org.inn }})
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> Qisqa ism</label>
+            <div class="input-wrap">
+              <input v-model="shortName" type="text" maxlength="200" required />
+              <small v-if="shortNameError" class="field-error">{{ shortNameError }}</small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> PINFL</label>
+            <div class="input-wrap">
+              <input v-model="pinfl" type="text" maxlength="14" inputmode="numeric" placeholder="14 raqam" required />
+              <small v-if="pinflError" class="field-error">{{ pinflError }}</small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> Telefon raqam</label>
+            <div class="input-wrap">
+              <input v-model="phoneNumber" type="tel" maxlength="9" inputmode="numeric" placeholder="9 raqam" required />
+              <small v-if="phoneNumberError" class="field-error">{{ phoneNumberError }}</small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> Viloyat</label>
+            <div class="input-wrap">
+              <select v-model.number="selectedRegionId" @change="onRegionChange" required>
+                <option value="0" disabled>Viloyatni tanlang</option>
+                <option v-for="reg in regions" :key="reg.id" :value="reg.id">{{ reg.fullName }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> Tuman</label>
+            <div class="input-wrap">
+              <select v-model.number="selectedDistrictId" :disabled="!selectedRegionId" required>
+                <option value="0" disabled>{{ selectedRegionId ? 'Tumanni tanlang' : 'Avval viloyat tanlang' }}</option>
+                <option v-for="dist in districts" :key="dist.id" :value="dist.id">{{ dist.fullName }}</option>
+              </select>
+              <small v-if="addressError" class="field-error">{{ addressError }}</small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> Tashkilot (INN)</label>
+            <div class="input-wrap inn-wrap">
+              <input
+                v-model="innSearch"
+                type="text"
+                placeholder="INN kiriting..."
+                @input="handleInnInput"
+                inputmode="numeric"
+                pattern="\d*"
+              />
+              <small v-if="innSearchError" class="field-error">{{ innSearchError }}</small>
+              <div v-if="isLoadingOrganizations" class="dropdown-list loading-text">Yuklanmoqda...</div>
+              <div v-else-if="orgResults.length > 0" class="dropdown-list">
+                <div v-for="org in orgResults" :key="org.id" class="dropdown-item" @click="selectOrganization(org)">
+                  {{ org.fullName }} ({{ org.inn }})
+                </div>
               </div>
+              <div v-else-if="innSearch.length >= 3 && !isLoadingOrganizations && orgResults.length === 0 && !selectedOrg" class="dropdown-list no-results">
+                Natijalar topilmadi
+              </div>
+              <small v-if="selectedOrg" class="selected-org">✅ {{ selectedOrg.fullName }}</small>
+              <small v-if="organizationIdError" class="field-error">{{ organizationIdError }}</small>
             </div>
-            <div v-else-if="innSearch.length >= 3 && !isLoadingOrganizations && orgResults.length === 0 && !selectedOrg" class="dropdown-list no-results">
-              Natijalar topilmadi
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> Tug'ilgan sana</label>
+            <div class="input-wrap">
+              <input v-model="dateOfBirth" type="text" placeholder="dd.MM.yyyy" required />
+              <small v-if="dateOfBirthError" class="field-error">{{ dateOfBirthError }}</small>
             </div>
-            <small v-if="selectedOrg">✅ {{ selectedOrg.fullName }}</small>
-            <small v-if="organizationIdError" class="error">{{ organizationIdError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> Tug'ilgan sana
-            <input v-model="dateOfBirth" type="text" placeholder="dd.MM.yyyy" required />
-            <small v-if="dateOfBirthError" class="error">{{ dateOfBirthError }}</small>
-          </label>
-          <label>
-            <span class="required-star">*</span> Passport seriyasi
-            <input v-model="passportSeries" type="text" maxlength="9" placeholder="Masalan: AA123456" required />
-            <small v-if="passportSeriesError" class="error">{{ passportSeriesError }}</small>
-          </label>
+          </div>
+
+          <div class="field">
+            <label><span class="req">*</span> Passport seriyasi</label>
+            <div class="input-wrap">
+              <input v-model="passportSeries" type="text" maxlength="9" placeholder="Masalan: AA123456" required />
+              <small v-if="passportSeriesError" class="field-error">{{ passportSeriesError }}</small>
+            </div>
+          </div>
+
         </div>
-        <button type="submit">Ro'yxatdan o'tish</button>
-        <p v-if="error" class="error">{{ error }}</p>
+
+        <button type="submit" class="submit-btn">Ro'yxatdan o'tish</button>
+        <p v-if="error" class="error-msg">{{ error }}</p>
       </form>
-      <p class="login-link">Allaqachon akauntingiz bormi? <router-link to="/auth/login">Kirib olish</router-link></p>
+
+      <div class="divider">yoki</div>
+      <p class="bottom-link">
+        Allaqachon hisobingiz bormi?
+        <router-link to="/auth/login">Kirish</router-link>
+      </p>
     </div>
   </template>
 
@@ -498,170 +553,142 @@
   };
   </script>
 
-  <style>
-  .page-card {
-    width: min(1200px, 100%);
-    margin: 0;
-    padding: 2rem;
-    background: transparent;
-    border-radius: 1rem;
-    box-shadow: none;
-  }
+  <style scoped>
+.register-form-wrap input,
+.register-form-wrap select {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
 
-  .page-card h2 {
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    font-size: 1.75rem;
-  }
+.register-form-wrap input:hover,
+.register-form-wrap select:hover {
+  background: rgba(255,255,255,0.07) !important;
+  border-color: rgba(255,255,255,0.18) !important;
+}
 
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-  }
+.register-form-wrap input:focus,
+.register-form-wrap select:focus {
+  background: rgba(255,255,255,0.07) !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.25) !important;
+  outline: none !important;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
 
-  @media (max-width: 1040px) {
-    .form-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
+/* Brauzer autocomplete oq background ni o'chirish */
+.register-form-wrap input:-webkit-autofill,
+.register-form-wrap input:-webkit-autofill:hover,
+.register-form-wrap input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px rgba(22,29,47,0.98) inset !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  border-color: #3b82f6 !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
 
-  @media (max-width: 720px) {
-    .page-card {
-      width: 100%;
-      padding: 1.5rem;
-      margin: 1rem auto;
-    }
+.register-form-wrap { width: 100%; }
 
-    .form-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+.form-header { margin-bottom: 20px; }
+.form-title { font-size: 26px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.form-subtitle { font-size: 13px; color: var(--text-secondary); }
 
-  label {
-    display: block;
-    margin-bottom: 1.25rem;
-    font-weight: 600;
-    color: #0f172a;
-  }
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+@media (max-width: 900px)  { .form-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px)  { .form-grid { grid-template-columns: 1fr; } }
 
-  label small {
-    display: block;
-    margin-top: 0.35rem;
-    font-size: 0.8rem;
-    font-weight: 400;
-  }
+.field { display: flex; flex-direction: column; }
+.field > label {
+  font-size: 12px; color: var(--text-secondary);
+  margin-bottom: 5px; font-weight: 500;
+}
+.req { color: #ef4444; margin-right: 2px; }
 
-  label small.error {
-    color: #dc2626;
-    margin-top: 0.35rem;
-  }
+.input-wrap { position: relative; }
 
-  .required-star {
-    color: #dc2626;
-    margin-right: 0.25rem;
-  }
+.input-wrap input,
+.input-wrap select {
+  width: 100%;
+  padding: 9px 11px;
+  background: var(--input-bg) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 9px; color: var(--text-primary);
+  font-family: 'Outfit', sans-serif; font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  appearance: none; margin-top: 0;
+}
 
-  input {
-    width: 100%;
-    padding: 0.85rem;
-    margin-top: 0.5rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 0.65rem;
-    font-size: 1rem;
-    box-sizing: border-box;
-    background: #f8fafc;
-  }
+/* Faqat ikonka bor inputlar uchun padding */
+.input-wrap:has(.input-icon) input {
+  padding-left: 38px;
+}
 
-  .dropdown-list {
-    border: 1px solid #cbd5e1;
-    border-radius: 0.5rem;
-    background: white;
-    max-height: 150px;
-    overflow-y: auto;
-    z-index: 10;
-    position: relative;
-  }
+.input-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); pointer-events: none;
+  display: flex; align-items: center; z-index: 1;
+}
+.input-wrap input:hover,
+.input-wrap select:hover { /* Hover holati uchun fon */
+  background: rgba(255,255,255,0.08) !important;
+}
+.input-wrap input::placeholder { color: var(--text-muted); }
+.input-wrap select option { background: #1e293b; color: var(--text-primary); }
+.input-wrap select:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .dropdown-list.loading-indicator,
-  .dropdown-list.no-results {
-    padding: 0.6rem 0.85rem;
-    color: #64748b;
-    text-align: center;
-    z-index: 10;
-    position: relative;
-  }
+.inn-wrap { position: relative; }
 
-  .dropdown-item {
-    padding: 0.6rem 0.85rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-  }
+.dropdown-list {
+  position: absolute; left: 0; right: 0;
+  border: 1px solid var(--navy-border);
+  border-radius: 8px; background: #1e293b;
+  max-height: 140px; overflow-y: auto;
+  z-index: 100; margin-top: 2px;
+}
+.dropdown-item {
+  padding: 7px 11px; cursor: pointer;
+  font-size: 12px; color: var(--text-secondary);
+  transition: background 0.15s;
+}
+.dropdown-item:hover { background: rgba(59,130,246,0.12); color: var(--text-primary); }
+.dropdown-list.loading-text,
+.dropdown-list.no-results {
+  padding: 8px 11px; color: var(--text-muted);
+  text-align: center; font-size: 12px;
+}
 
-  .dropdown-item:hover {
-    background: #eff6ff;
-  }
+.field-error { color: #ef4444; font-size: 11px; margin-top: 3px; display: block; font-weight: 400; }
+.selected-org { color: var(--green); font-size: 11px; margin-top: 3px; display: block; }
 
-  select {
-    width: 100%;
-    padding: 0.85rem;
-    margin-top: 0.5rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 0.65rem;
-    font-size: 1rem;
-    box-sizing: border-box;
-    background: #f8fafc;
-  }
+.submit-btn {
+  width: 100%; padding: 12px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none; border-radius: 10px; color: white;
+  font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(59,130,246,0.35);
+  margin-top: 0;
+}
+.submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(59,130,246,0.55); }
 
-  select:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+.error-msg { color: #ef4444; font-size: 13px; margin-top: 10px; text-align: center; }
 
-  input:focus {
-    outline: none;
-    border-color: #2563eb;
-    background: white;
-  }
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 16px 0; color: var(--text-muted); font-size: 12px;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--navy-border);
+}
 
-  button {
-    width: 100%;
-    padding: 0.95rem;
-    border: none;
-    border-radius: 0.75rem;
-    background: #2563eb;
-    color: white;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 1.5rem;
-    transition: background 0.3s ease;
-  }
-
-  button:hover {
-    background: #1d4ed8;
-  }
-
-  .error {
-    margin-top: 1rem;
-    color: #dc2626;
-    font-size: 0.95rem;
-  }
-
-  .login-link {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.95rem;
-  }
-
-  .login-link a {
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 600;
-  }
-
-  .login-link a:hover {
-    text-decoration: underline;
-  }
-  </style>
+.bottom-link { text-align: center; font-size: 13px; color: var(--text-secondary); }
+.bottom-link a { color: var(--accent-light); text-decoration: none; }
+.bottom-link a:hover { text-decoration: underline; }
+</style>

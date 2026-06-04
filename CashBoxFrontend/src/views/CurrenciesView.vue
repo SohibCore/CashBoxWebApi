@@ -128,10 +128,10 @@ export default {
 
 <style scoped>
 .page-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  background: #111827;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
   width: 100%;
   box-sizing: border-box;
 }
@@ -147,7 +147,7 @@ export default {
   align-items: center;
   text-align: center;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   padding-bottom: 1rem;
 }
 
@@ -199,15 +199,22 @@ export default {
 th {
   text-align: left;
   padding: 0.75rem;
-  background-color: #f0f2f5;
-  color: #333;
-  font-size: 0.875rem;
+  background-color: #0f172a;
+  color: #475569;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 td {
   padding: 0.75rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  color: #94a3b8;
   vertical-align: middle;
+  font-size: 13.5px;
 }
 
 tbody tr {
@@ -215,7 +222,7 @@ tbody tr {
   transition: background-color 0.2s;
 }
 tbody tr:hover {
-  background-color: #f0f7ff;
+  background-color: rgba(255, 255, 255, 0.03);
 }
 .action-dropdown-wrapper {
   position: relative;
@@ -227,10 +234,10 @@ tbody tr:hover {
   top: 100%;
   right: 0;
   margin-top: 0.3rem;
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   z-index: 100;
   display: flex;
   gap: 0.25rem;
@@ -244,6 +251,9 @@ tbody tr:hover {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #f1f5f9;
   border-radius: 0.35rem;
 }
 

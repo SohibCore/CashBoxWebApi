@@ -390,3 +390,10 @@ export async function getIncomeDocumentById(id) { return api.get(`/api/incomedoc
 export async function createIncomeDocument(data) { return api.post('/api/incomedocument/create', mapIncomeDocumentPayload(data)); }
 export async function updateIncomeDocument(id, data) { return api.put(`/api/incomedocument/update/${id}`, mapIncomeDocumentPayload(data)); }
 export async function deleteIncomeDocument(id) { return api.delete(`/api/incomedocument/delete/${id}`); }
+
+// ========== OUTCOME DOCUMENTS ==========
+export async function getOutcomeDocuments() { return api.get('/api/OutcomeDocument/GetList'); }
+export async function getOutcomeDocumentById(id) { return api.get(`/api/OutcomeDocument/Get/${id}`); }
+export async function createOutcomeDocument(data) { return api.post('/api/OutcomeDocument/Create', data); }
+export async function updateOutcomeDocument(id, data) { return api.put(`/api/OutcomeDocument/Update?id=${id}`, data); }
+export async function deleteOutcomeDocument(id) { return api.delete(`/api/OutcomeDocument/Delete?id=${id}`); }

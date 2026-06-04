@@ -187,11 +187,12 @@ const formatCurrency = (val) => {
 
 const getStatusClass = (id) => {
   switch (id) {
-    case 1: return 'bg-blue-100 text-blue-800';   // CREATED
-    case 2: return 'bg-purple-100 text-purple-800'; // MODIFIED
-    case 3: return 'bg-green-100 text-green-800'; // ACCEPTED
-    case 4: return 'bg-orange-100 text-orange-800'; // NOT_ACCEPTED
-    default: return 'bg-gray-100 text-gray-800';
+    case 1: return 'bg-blue-900/30 text-blue-400 border border-blue-500/30';     // CREATED
+    case 2: return 'bg-green-900/30 text-green-400 border border-green-500/30';   // ACCEPT
+    case 3: return 'bg-red-900/30 text-red-400 border border-red-500/30';         // NOT_ACCEPT
+    case 4: return 'bg-purple-900/30 text-purple-400 border border-purple-500/30'; // MODIFIED
+    case 5: return 'bg-gray-900/30 text-gray-400 border border-gray-500/30';      // DELETE
+    default: return 'bg-gray-800 text-gray-400';
   }
 };
 

@@ -1,5 +1,6 @@
 ﻿using CashBox.Repository.Dtos.OutcomeDocumentDtos;
 using CashBox.Service.Services.OutcomeDocumentService;
+using CashBox.Service.Services.OutcomeDocumentServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,25 +24,25 @@ namespace CashBox.WebApi.Controllers
             return Ok(outcomeDocument);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromRoute] int id)
+        public async Task<IActionResult> Get([FromRoute] long id)
         {
             var outcomeDocument = await _service.GetAsync(id);
             return Ok(outcomeDocument);
         }
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOutcomeDocumentDto createOutcomeDocumentDto)
+        public async Task<IActionResult> Create([FromBody] CreateOutcomeDocumentDlDto createOutcomeDocumentDto)
         {
             await _service.CreateAsync(createOutcomeDocumentDto);
             return Ok();
         }
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] int id, [FromBody] UpdateOutcomeDocumentDto updateOutcomeDocumentDto)
+        public async Task<IActionResult> Update([FromBody] UpdateOutcomeDocumentDto updateOutcomeDocumentDto)
         {
-            await _service.UpdateAsync(id, updateOutcomeDocumentDto);
+            await _service.UpdateAsync(updateOutcomeDocumentDto);
             return Ok();
         }
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromQuery] int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] long id)
         {
             await _service.DeleteAsync(id);
             return Ok();

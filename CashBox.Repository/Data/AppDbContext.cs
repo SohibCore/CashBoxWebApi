@@ -25,6 +25,7 @@ namespace Repository.Data
         public DbSet<IncomeDocument> IncomeDocuments { get; set; }
         public DbSet<IncomeDocumentTable> IncomeDocumentTables { get; set; }
         public DbSet<OutcomeDocument> OutcomeDocuments { get; set; }
+        public DbSet<IncomeDocumentTable> OutcomeDocumentTables { get; set; }
         public DbSet<Status> Statuses{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

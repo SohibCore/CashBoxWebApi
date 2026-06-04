@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CashBox.Repository.Dtos.IncomeDocumentDtos
+namespace CashBox.Repository.Dtos.OutcomeDocumentDtos
 {
-    public class CreateIncomeDocumentDlDto
+    public class CreateOutcomeDocumentDlDto
     {
         [Required]
         public DateTime DocOn { get; set; }
@@ -14,6 +14,7 @@ namespace CashBox.Repository.Dtos.IncomeDocumentDtos
         [Required]
         [Range(0.0000000000000000001, int.MaxValue)]
         public decimal DocSum { get; set; }
-        public ICollection<IncomeDocumentTableDlDto> Tables { get; set; } = new List<IncomeDocumentTableDlDto>();
+
+        public ICollection<OutcomeDocumentTableDlDto> Tables = new List<OutcomeDocumentTableDlDto>();
     }
 }
