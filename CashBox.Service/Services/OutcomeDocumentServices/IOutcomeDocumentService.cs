@@ -10,7 +10,7 @@ namespace CashBox.Service.Services.OutcomeDocumentServices
         Task<long> CreateAsync(CreateOutcomeDocumentDlDto dto); //long tipdagi qiymat qaytaradi
         Task UpdateAsync(UpdateOutcomeDocumentDto dto);
         Task DeleteAsync(long id);
-        Task<long> Accept(int id);
-        Task<long> NotAccept(int id);
+        Task<long> Accept(long id);
+        Task<long> NotAccept(long id);
     }
 }

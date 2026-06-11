@@ -1,642 +1,226 @@
 <template>
-  <div class="page-container">
-    <div class="page-card">
-      <!-- Header -->
-      <div class="header-section">
-        <div>
-          <h1>Chiqim hujjatlari</h1>
-          <p class="subtitle">Chiqim hujjatlarini boshqarish</p>
-        </div>
-        <button class="btn btn-primary" @click="$router.push('/outcome-documents/new')">
-          + Yangi hujjat qo'shish
+  <div class="p-6 bg-[#0d1117] min-height-screen">
+    <div class="bg-[#111827] rounded-lg border border-white/5 p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-white">Chiqim Hujjatlari</h2>
+        <button @click="$router.push('/outcome-documents/create')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          + Yangi hujjat
         </button>
       </div>
 
-      <div class="stats-cards">
-        <div class="stat-card total">
-          <div class="stat-icon">💰</div>
-          <div class="stat-info">
-            <span class="stat-label">Jami summa</span>
-            <span class="stat-value">{{ formatSum(totalSum) }}</span>
-          </div>
-        </div>
-        <div class="stat-card paid">
-          <div class="stat-icon">✅</div>
-          <div class="stat-info">
-            <span class="stat-label">To'langan</span>
-            <span class="stat-value">{{ formatSum(paidSum) }}</span>
-          </div>
-        </div>
-        <div class="stat-card unpaid">
-          <div class="stat-icon">⏳</div>
-          <div class="stat-info">
-            <span class="stat-label">To'lanmagan</span>
-            <span class="stat-value">{{ formatSum(unpaidSum) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="total-count" style="margin-bottom: 20px;">
-        Jami: {{ documents.length }} ta hujjat
-      </div>
-
-      <!-- Table -->
-      <div class="table-container">
-        <table class="data-table">
+      <!-- Asosiy Jadval -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
           <thead>
-            <tr>
-              <th style="width: 40px;"></th>
-              <th>ID</th>
-              <th>Sana</th>
-              <th>Ta'minotchi</th>
-              <th>Jami summa</th>
-              <th>Status</th>
-              <th>Amallar</th>
+            <tr class="bg-[#0f172a] border-b border-white/5 text-[#475569] uppercase text-xs">
+              <th class="p-3">ID</th>
+              <th class="p-3">Sana</th>
+              <th class="p-3">Ta'minotchi</th>
+              <th class="p-3">Mahsulot</th>
+              <th class="p-3">Miqdori</th>
+              <th class="p-3">Narxi</th>
+              <th class="p-3">Jami summa</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Amallar</th>
             </tr>
           </thead>
           <tbody>
-            <template v-for="doc in documents" :key="doc.id">
-              <tr :class="{ 'row-expanded': expandedRowId === doc.id }" @click="toggleExpand(doc.id)">
-                <td>
-                  <span class="expand-icon" :class="{ 'is-active': expandedRowId === doc.id }">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </span>
-                </td>
-                <td>{{ doc.id }}</td>
-                <td>{{ doc.date ? doc.date.slice(0, 10) : '' }}</td>
-                <td style="font-weight: 500;">{{ getSupplierName(doc.supplierId) }}</td>
-                <td style="font-weight: 600;">{{ formatSum(doc.totalSum) }}</td>
-                <td>
-                  <span class="status-badge" :class="statusClass(doc.status)">
-                    {{ statusLabel(doc.status) }}
-                  </span>
-                </td>
-                <td class="actions" @click.stop>
-                  <div class="action-dropdown-wrapper">
-                    <button @click="toggleRow(doc.id)" :class="['icon-btn', { expanded: expandedDocId === doc.id }]" title="Amallarni ko'rsatish">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                    </button>
-                    <div v-if="expandedDocId === doc.id" class="action-dropdown">
-                      <button @click="$router.push(`/outcome-documents/edit/${doc.id}`)" class="dropdown-btn">
-                        Tahrirlash
-                      </button>
-                      <button @click="deleteDocument(doc.id)" class="dropdown-btn danger">
-                        O'chirish
-                      </button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr v-if="expandedRowId === doc.id" class="nested-row">
-                <td colspan="7">
-                  <div class="nested-container">
-                    <div v-if="loadingDetails" class="nested-loading">Yuklanmoqda...</div>
-                    <table v-else class="nested-table">
-                      <thead>
-                        <tr>
-                          <th>Mahsulot ID</th>
-                          <th>Mahsulot nomi</th>
-                          <th>Miqdori</th>
-                          <th>Narxi</th>
-                          <th>Jami</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="item in documentDetails[doc.id]?.tables" :key="item.id">
-                          <td>{{ item.productId }}</td>
-                          <td>{{ getProductName(item.productId) }}</td>
-                          <td>{{ item.quantity }}</td>
-                          <td>{{ formatSum(item.price) }}</td>
-                          <td style="color: #f1f5f9;">{{ formatSum(item.totalSum) }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </td>
-              </tr>
-            </template>
+            <tr 
+              v-for="doc in documents" 
+              :key="doc.id" 
+              @dblclick="viewDetails(doc.id)"
+              class="border-b border-white/5 text-[#94a3b8] hover:bg-white/[0.02] cursor-pointer transition"
+              title="Batafsil ko'rish uchun ikki marta bosing"
+            >
+              <td class="p-3">#{{ doc.id }}</td>
+              <td class="p-3">{{ formatDate(doc.docOn) }}</td>
+              <td class="p-3">{{ doc.supplierName }}</td>
+              <td class="p-3">{{ (doc as any).productName || '-' }}</td>
+              <td class="p-3">{{ (doc as any).quantity || 0 }}</td>
+              <td class="p-3">{{ formatCurrency((doc as any).price || 0) }}</td>
+              <td class="p-3 font-semibold">{{ formatCurrency(doc.docSum) }}</td>
+              <td class="p-3">
+                <span :class="getStatusClass(doc.statusId)" class="px-2 py-1 rounded text-xs font-medium">
+                  {{ doc.statusName }}
+                </span>
+              </td>
+              <td class="p-3">
+                <div class="flex gap-2">
+                  <button v-if="doc.statusId !== 3" @click.stop="$router.push('/outcome-documents/' + doc.id + '/edit')" class="text-blue-600 hover:underline font-medium">Tahrirlash</button>
+                  <button v-if="[1,2].includes(doc.statusId)" @click.stop="deleteDoc(doc.id)" class="text-red-600 hover:underline">O'chirish</button>
+                  <button @click.stop="viewDetails(doc.id)" class="text-gray-600 hover:underline">Ko'rish</button>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Detal ko'rinishi (Modal) -->
+    <div v-if="selectedDoc || detailLoading" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div v-if="detailLoading" class="bg-[#111827] p-8 rounded-lg border border-white/10 shadow-2xl">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="mt-4 text-[#94a3b8]">Ma'lumotlar yuklanmoqda...</p>
+      </div>
+      
+      <div v-else class="bg-[#111827] rounded-lg border border-white/10 shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-white/5 flex justify-between items-center bg-[#0f172a]">
+          <div>
+            <h3 class="text-xl font-bold text-white">Hujjat ma'lumotlari #{{ selectedDoc.id }}</h3>
+            <p class="text-sm text-[#64748b]">Ta'minotchi: <strong class="text-[#f1f5f9]">{{ selectedDoc.supplierName }}</strong> | Sana: <strong class="text-blue-500">{{ formatDate(selectedDoc.docOn) }}</strong></p>
+          </div>
+          <button @click="closeModal" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto flex-1">
+          <h4 class="font-bold mb-4 text-gray-700 uppercase text-sm tracking-wider">Mahsulotlar ro'yxati</h4>
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-[#0f172a] border-b border-white/5 text-xs font-bold text-[#475569] uppercase">
+                <th class="p-2">Mahsulot</th>
+                <th class="p-2 text-right w-32">Narxi</th>
+                <th class="p-2 text-center w-24">Miqdori</th>
+                <th class="p-2 text-right w-40">Jami</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in selectedDoc.tables" :key="item.id" class="border-b border-white/5"> <!-- Bola table -->
+                <td class="p-2 text-[#f1f5f9] font-medium">{{ item.productName || 'Mahsulot #' + item.productId }}</td>
+                <td class="p-2 text-right">{{ formatCurrency(item.price) }}</td>
+                <td class="p-2 text-center text-[#94a3b8]">{{ item.quantity }}</td>
+                <td class="p-2 text-right font-bold text-blue-400">{{ formatCurrency(item.totalSum) }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="font-black bg-blue-600/5 text-xl border-t border-blue-500/20">
+                <td colspan="3" class="p-4 text-right text-[#64748b]">JAMI HUJJAT SUMMASI:</td>
+                <td class="p-4 text-right text-blue-500">{{ formatCurrency(selectedDoc.docSum) }} UZS</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        
+        <div class="p-4 border-t border-white/5 bg-[#0f172a] flex justify-between items-center px-6">
+          <div class="text-sm text-gray-500 italic">* Hujjat holati: {{ selectedDoc.statusName }}</div>
+          <div class="flex gap-3">
+            <button @click="closeModal" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition">Yopish</button>
+            <button v-if="selectedDoc.statusId !== 3" @click="handleAccept(selectedDoc.id)" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition">Tasdiqlash</button>
+            <button v-if="selectedDoc.statusId === 3" @click="handleNotAccept(selectedDoc.id)" class="bg-orange-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-orange-600 transition">Qaytarish (Not Accept)</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
-import axios from 'axios';
+<script setup lang="ts">
+import { ref, onMounted, type Ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { outcomeDocumentService } from './outcomeDocumentService';
+import { type OutcomeDocumentListDto, type OutcomeDocumentDetailDto } from '../types/outcomeDocument';
 
-// Axios instance sozlamalari
-const api = axios.create({
-  baseURL: 'http://localhost:5107',
-});
+const router = useRouter();
+const documents: Ref<OutcomeDocumentListDto[]> = ref([]);
+const selectedDoc = ref<OutcomeDocumentDetailDto | null>(null);
+const detailLoading = ref(false);
+const filterStatus = ref('all');
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  // GET request larda Content-Type o'chirish
-  if (config.method === 'get') {
-    delete config.headers['Content-Type'];
-  }
-  return config;
-});
-
-// Holatlar (State)
-const documents = ref([]);
-const suppliers = ref([]);
-const products = ref([]);
-const isEditMode = ref(false);
-const currentId = ref(null);
-const expandedDocId = ref(null);
-const expandedRowId = ref(null);
-const documentDetails = reactive({});
-const loadingDetails = ref(false);
-
-const toggleRow = (id) => {
-  expandedDocId.value = expandedDocId.value === id ? null : id;
-};
-
-const toggleExpand = async (id) => {
-  if (expandedRowId.value === id) {
-    expandedRowId.value = null;
-    return;
-  }
-  expandedRowId.value = id;
-  if (!documentDetails[id]) {
-    loadingDetails.value = true;
-    try {
-      const response = await api.get(`/api/OutcomeDocument/Get?id=${id}`);
-      documentDetails[id] = response.data?.data || response.data;
-    } catch (err) {
-      console.error('Error fetching details:', err);
-    } finally {
-      loadingDetails.value = false;
-    }
-  }
-};
-
-const statusLabel = (status) => {
-  const map = {
-    1: "Yaratildi",
-    2: "Tasdiqlandi",
-    3: "Rad etildi",
-    4: "O'zgartirildi",
-    5: "O'chirildi"
-  };
-  return map[status] ?? 'Noma\'lum';
-};
-
-const statusClass = (status) => {
-  const map = { 1: 'created', 2: 'accepted', 3: 'not-accepted', 4: 'modified', 5: 'deleted' };
-  return map[status] ?? '';
-};
-
-const totalSum = computed(() =>
-  documents.value.reduce((sum, d) => sum + (d.docSum || 0), 0)
-);
-
-const paidSum = computed(() =>
-  documents.value
-    .filter(d => d.statusId === 2) // StatusIdConst.ACCEPT
-    .reduce((sum, d) => sum + (d.docSum || 0), 0)
-);
-
-const unpaidSum = computed(() =>
-  documents.value
-    .filter(d => [1, 3, 4].includes(d.statusId)) // StatusIdConst.CREATED, StatusIdConst.NOT_ACCEPT, StatusIdConst.MODIFIED
-    .reduce((sum, d) => sum + (d.docSum || 0), 0)
-);
-
-const formatSum = (val) =>
-  new Intl.NumberFormat('uz-UZ').format(val) + ' UZS';
-
-// API Funksiyalari
-const loadMetaData = async () => {
+const fetchList = async () => {
   try {
-    const [sRes, pRes] = await Promise.all([
-      api.get('/api/Supplier/GetList'),
-      api.get('/api/Product/GetList')
-    ]);
-    suppliers.value = sRes.data?.data || sRes.data || [];
-    products.value = pRes.data?.data || pRes.data || [];
-  } catch (err) {
-    console.error('Metadata yuklashda xato:', err);
-  }
-};
-
-const getSupplierName = (id) => 
-  suppliers.value.find(s => (s.id || s.Id) === id)?.code || id || '-';
-
-const getProductName = (id) => 
-  products.value.find(p => (p.id || p.Id) === id)?.name || id || '-';
-
-const initialForm = {
-  date: '',
-  supplierId: null,
-  productId: null,
-  price: null,
-  quantity: null,
-  totalSum: null,
-  status: 0
-};
-const formData = reactive({ ...initialForm });
-const fetchDocuments = async () => {
-  try {
-    const response = await api.get('/api/OutcomeDocument/GetList');
-    documents.value = (response.data?.data || response.data || []).map(doc => ({
-      ...doc,
-      date: doc.docOn // Backenddan kelayotgan DocOn ni date ga o'tkazamiz
+    const res = await outcomeDocumentService.getList();
+    // Backend ma'lumotni res.data.data yoki res.data ichida qaytarishini tekshiramiz
+    const data = (res.data as any).data || res.data;
+    documents.value = Array.isArray(data) ? data : [];
+    // IncomeDocumentListView.vue dagi kabi status va docSum ni to'g'irlash
+    documents.value = documents.value.map(doc => ({
+      id: doc.id || doc.Id,
+      supplierId: doc.supplierId || doc.SupplierId,
+      supplierName: doc.supplierName || doc.SupplierName,
+      docSum: doc.docSum ?? doc.DocSum ?? 0,
+      docOn: doc.docOn ?? doc.DocOn,
+      statusId: doc.statusId ?? doc.StatusId ?? 1,
+      statusName: doc.statusName || doc.StatusName,
+      productName: doc.productName,
+      quantity: doc.quantity,
+      price: doc.price,
     }));
-  } catch (error) {
-    console.error('Fetch error:', error.response?.status, error.response?.data);
-    alert('Xatolik: ' + (error.response?.status || error.message));
-  }
+  } catch (err) { console.error('Xatolik:', err); }
 };
 
-const saveDocument = async () => {
+const viewDetails = async (id: number) => {
+  detailLoading.value = true;
+  selectedDoc.value = null;
   try {
-    if (isEditMode.value) {
-      await api.put(`/api/OutcomeDocument/Update?id=${currentId.value}`, formData);
-    } else {
-      await api.post('/api/OutcomeDocument/Create', formData);
-    }
-    showModal.value = false;
-    fetchDocuments();
-  } catch (error) {
-    console.error('Save error:', error);
-    alert('Saqlashda xatolik yuz berdi');
-  }
+    const res = await outcomeDocumentService.getById(id);
+    selectedDoc.value = res.data;
+  } catch (err) { console.error('Yuklashda xatolik:', err); }
+  finally { detailLoading.value = false; }
 };
 
-const deleteDocument = async (id) => {
-  if (!confirm('Haqiqatan ham ushbu hujjatni o\'chirmoqchimisiz?')) return;
+const closeModal = () => {
+  selectedDoc.value = null;
+  detailLoading.value = false;
+};
+
+const handleAccept = async (id: number) => {
+  if (!confirm('Ushbu hujjatni tasdiqlaysizmi?')) return;
   try {
-    await api.delete(`/api/OutcomeDocument/Delete?id=${id}`);
-    fetchDocuments();
-  } catch (error) {
-    console.error('Delete error:', error);
-    alert('O\'chirishda xatolik yuz berdi');
+    await outcomeDocumentService.accept(id);
+    closeModal();
+    fetchList();
+  } catch (err) { alert('Tasdiqlashda xatolik'); }
+};
+
+const handleNotAccept = async (id: number) => {
+  if (!confirm('Ushbu hujjatni "Tasdiqlanmagan" holatiga qaytarmoqchimisiz?')) return;
+  try {
+    await outcomeDocumentService.notAccept(id);
+    closeModal();
+    fetchList();
+  } catch (err) { alert('Amalni bajarishda xatolik'); }
+};
+
+const deleteDoc = async (id: number) => {
+  if (!confirm('Hujjatni o\'chirmoqchimisiz?')) return;
+  try {
+    await outcomeDocumentService.delete(id);
+    fetchList();
+  } catch (err) { alert('O\'chirishda xatolik'); }
+};
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('ru-RU'); // DD.MM.YYYY
+};
+
+// IncomeDocumentListView.vue dagi formatCurrency funksiyasi
+// formatPrice o'rniga formatCurrency ishlatiladi
+const formatCurrency = (val: number) => {
+  return new Intl.NumberFormat('ru-RU').format(val || 0);
+};
+
+const getStatusClass = (id: any) => {
+  switch (id) {
+    case 1: return 'bg-blue-900/30 text-blue-400 border border-blue-500/30';     // CREATED
+    case 2: return 'bg-green-900/30 text-green-400 border border-green-500/30';   // ACCEPT
+    case 3: return 'bg-red-900/30 text-red-400 border border-red-500/30';         // NOT_ACCEPT
+    case 4: return 'bg-purple-900/30 text-purple-400 border border-purple-500/30'; // MODIFIED
+    case 5: return 'bg-gray-900/30 text-gray-400 border border-gray-500/30';      // DELETE
+    default: return 'bg-gray-800 text-gray-400';
   }
 };
 
-onMounted(async () => {
-  await loadMetaData();
-  await fetchDocuments();
-});
-
+onMounted(fetchList);
 </script>
 
 <style scoped>
-.page-container {
-  background-color: #0d1117;
-  min-height: 100vh;
-  padding: 24px;
-  font-family: inherit;
+.cursor-pointer {
+  user-select: none;
 }
-
-.page-card {
-  background: #111827;
-  padding: 24px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-/* Header */
-.header-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.header-section h1 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: #f1f5f9;
-}
-
-.subtitle {
-  margin: 4px 0 0;
-  font-size: 14px;
-  color: #64748b;
-}
-
-/* Filter Section */
-.filter-section {
-  margin-bottom: 20px;
-}
-
-.filter-panel {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.filter-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.input-small { max-width: 150px; }
-.input-medium { max-width: 180px; }
-
-.total-count {
-  margin-top: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #94a3b8;
-}
-
-/* Base UI Elements */
-.input {
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: #f1f5f9;
-  border-radius: 8px;
-  padding: 8px 12px;
-  width: 100%;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.input:focus {
-  border-color: #2563eb;
-}
-
-.btn {
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s;
-}
-
-.btn-primary { background-color: #2563eb; color: white; }
-.btn-gray { background-color: #f1f5f9; color: #475569; }
-.btn-icon { width: 38px; padding: 0; font-size: 18px; }
-.btn:hover { opacity: 0.9; }
-
-/* Table */
-.table-container {
-  overflow-x: auto;
-  background: #111827;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  overflow: hidden;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 8px;
-}
-
-.data-table thead tr {
-  background-color: #0f172a;
-}
-
-.data-table th {
-  padding: 12px 16px;
-  text-align: left;
-  font-size: 11px;
+table th {
   font-weight: 600;
-  color: #475569 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.data-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  color: #94a3b8;
-  font-size: 14px;
-}
-
-.data-table tbody tr {
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.data-table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.03);
-  cursor: pointer;
-}
-
-/* Status Badges */
-.status-badge {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.status-created      { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); }
-.status-accepted     { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25); }
-.status-not-accepted { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); }
-.status-modified     { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.25); }
-.status-deleted      { background: rgba(100, 116, 139, 0.15); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.25); }
-
-/* Action Links */
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-.action-dropdown-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.action-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.3rem;
-  display: flex;
-  gap: 0.4rem;
-  background: #1e293b;
-  padding: 0.4rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 10;
-  white-space: nowrap;
-}
-
-.dropdown-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin: 0;
-  border: 1px solid transparent;
-  background: transparent;
-  color: #f1f5f9;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.78rem;
-  border-radius: 0.4rem;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.dropdown-btn:hover {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.35);
-  color: #60a5fa;
-}
-
-.dropdown-btn.danger {
-  color: white;
-  background: #dc2626;
-}
-
-.icon-btn.expanded svg {
-  transform: rotate(180deg);
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-box {
-  background: white;
-  border-radius: 12px;
-  width: 480px;
-  padding: 24px;
-}
-
-.modal-header h3 {
-  margin: 0 0 20px;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-group label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #64748b;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.stats-cards {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.stat-card {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  border-radius: 12px;
-  background: #111827;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-.stat-card.total  { border-left: 4px solid #2563eb; }
-.stat-card.paid   { border-left: 4px solid #16a34a; }
-.stat-card.unpaid { border-left: 4px solid #d97706; }
-
-.stat-icon { font-size: 28px; }
-.stat-info { display: flex; flex-direction: column; }
-.stat-label { font-size: 13px; color: #64748b; }
-.stat-value { font-size: 18px; font-weight: 700; color: #f1f5f9; }
-
-/* Nested Table Styles */
-.expand-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s;
-  color: #64748b;
-}
-.expand-icon.is-active {
-  transform: rotate(90deg);
-  color: #3b82f6;
-}
-.nested-row td {
-  padding: 0;
-  background: #0a0f1e !important;
-}
-.nested-container {
-  padding: 1rem 1rem 1.5rem 3rem;
-  border-left: 2px solid #3b82f6;
-  margin: 5px 0;
-}
-.nested-table {
-  width: 100%;
-  background: #111827;
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px;
-  border-collapse: collapse;
-}
-.nested-table th {
-  background: #1e293b;
-  font-size: 10px;
-  padding: 8px;
-  color: #475569;
-  text-transform: uppercase;
-}
-.nested-table td {
-  font-size: 12px;
-  padding: 8px;
-  color: #94a3b8;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-}
-.nested-loading {
-  padding: 10px;
-  color: #3b82f6;
-  font-size: 13px;
+  color: #374151;
 }
 </style>

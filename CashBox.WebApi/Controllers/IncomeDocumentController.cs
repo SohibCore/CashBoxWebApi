@@ -30,8 +30,8 @@ namespace CashBox.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateIncomeDocumentDlDto createIncomeDocumentDto)
         {
-            await _service.CreateAsync(createIncomeDocumentDto);
-            return Ok();
+            var id = await _service.CreateAsync(createIncomeDocumentDto);
+            return Ok(id);  
         }
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateIncomeDocumentDlDto updateIncomeDocument)
@@ -44,6 +44,18 @@ namespace CashBox.WebApi.Controllers
         {
             await _service.DeleteAsync(id);
             return Ok();
+        }
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Accept([FromRoute] long id)
+        {
+            var result = await _service.Accept(id);
+            return Ok(result);
+        }
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> NotAccept([FromRoute] long id)
+        {
+            var result = await _service.NotAccept(id);
+            return Ok(result);
         }
     }
 }

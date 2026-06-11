@@ -30,9 +30,9 @@ namespace CashBox.WebApi.Controllers
             return Ok(outcomeDocument);
         }
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOutcomeDocumentDlDto createOutcomeDocumentDto)
+        public async Task<IActionResult> Create([FromBody] CreateOutcomeDocumentDlDto dto)
         {
-            await _service.CreateAsync(createOutcomeDocumentDto);
+            await _service.CreateAsync(dto);
             return Ok();
         }
         [HttpPut]
@@ -46,6 +46,19 @@ namespace CashBox.WebApi.Controllers
         {
             await _service.DeleteAsync(id);
             return Ok();
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Accept(long id)
+        {
+            var result = await _service.Accept(id);
+                return Ok(result);
+        }
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> NotAccept(long id)
+        {
+            var result = await _service.NotAccept(id);
+            return Ok(result);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace CashBox.WebApi.Controllers
         {
             _organizationService = organizationService;
         }
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] OrganizationFilterDto organizationFilterDto)
         {
@@ -23,7 +23,15 @@ namespace CashBox.WebApi.Controllers
 
             return Ok(organization);
         }
-        [Authorize]
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetListForRegister([FromQuery] OrganizationFilterDto organizationFilterDto)
+        {
+            var organization = await _organizationService.GetListAsync(organizationFilterDto);
+
+            return Ok(organization);
+        }
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {

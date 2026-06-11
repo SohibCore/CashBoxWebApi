@@ -9,7 +9,7 @@ namespace CashBox.Service.Services.IncomeDocumentServices
         Task<long> CreateAsync(CreateIncomeDocumentDlDto dto);
         Task UpdateAsync(UpdateIncomeDocumentDlDto dto);
         Task DeleteAsync(long id);
-        Task<long> Accept(int id);
-        Task<long> NotAccept(int id);
+        Task<long> Accept(long id);
+        Task<long> NotAccept(long id);
     }
 }

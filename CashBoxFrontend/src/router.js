@@ -24,11 +24,12 @@ import SupplierFormView from './views/SupplierFormView.vue';
 import ProductFormView from './views/ProductFormView.vue';
 import OutcomeDocumentView from './views/OutcomeDocumentView.vue';
 import OutcomeDocumentFormView from './views/OutcomeDocumentFormView.vue';
+import OutcomeDocumentTableEditView from './views/OutcomeDocumentTableEditView.vue';
 
 const routes = [
   {
     path: '/',
-    redirect: () => (localStorage.getItem('token') ? '/users' : '/auth/login')
+    redirect: () => (localStorage.getItem('token') ? '/income-documents' : '/auth/login')
   },
   {
     path: '/auth',
@@ -49,6 +50,7 @@ const routes = [
   { path: '/income-documents', component: IncomeDocumentsView, meta: { requiresAuth: true } },
   { path: '/income-documents/new', component: IncomeDocumentFormView, meta: { requiresAuth: true } },
   { path: '/income-documents/edit/:id', component: IncomeDocumentFormView, meta: { requiresAuth: true } },
+  { path: '/income-documents/table-edit/:id', component: () => import('./views/IncomeDocumentTableEditView.vue'), meta: { requiresAuth: true } },
   { path: '/suppliers', component: SuppliersView, meta: { requiresAuth: true } },
   { path: '/suppliers/new', component: SupplierFormView, meta: { requiresAuth: true } },
   { path: '/suppliers/edit/:id', component: SupplierFormView, meta: { requiresAuth: true } },
@@ -70,7 +72,8 @@ const routes = [
   { path: '/districts/edit/:id', component: DistrictFormView, meta: { requiresAuth: true } },
   { path: '/outcome-documents', component: OutcomeDocumentView, meta: { requiresAuth: true } },
   { path: '/outcome-documents/new', component: OutcomeDocumentFormView, meta: { requiresAuth: true } },
-  { path: '/outcome-documents/edit/:id', component: OutcomeDocumentFormView, meta: { requiresAuth: true } }
+  { path: '/outcome-documents/edit/:id', component: OutcomeDocumentFormView, meta: { requiresAuth: true } },
+  { path: '/outcome-documents/table-edit/:id', component: OutcomeDocumentTableEditView, meta: { requiresAuth: true } }
 ];
 
 const router = createRouter({
@@ -84,9 +87,9 @@ router.beforeEach((to, from, next) => {
     return next('/auth/login');
   }
   if (to.path === '/auth/login' && token) {
-    return next('/users');
+    return next('/income-documents');
   }
   next();
 });
-
+  
 export default router;

@@ -35,6 +35,7 @@ namespace CashBox.Service.Services.OutcomeDocumentService
                     DocSum = x.DocSum
                 }).SortFilter(filter)
                 .ToListAsync();
+
             return result;
         }
 
@@ -44,24 +45,25 @@ namespace CashBox.Service.Services.OutcomeDocumentService
                 .Include(x => x.Tables)
                 .Include(x => x.Supplier)
                 .Include(x => x.Status)
-                .FirstOrDefaultAsync(x => x.Id == id && x.OrganizationId == _account.OrganizationId);
+                .FirstOrDefaultAsync(x => x.Id == id && x.OrganizationId == _account.OrganizationId && x.StatusId != StatusIdConst.DELETE);
 
             if (outcomeDocument == null)
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException($"{id} topilmadi yoki sizning tashkilotingizga tegishli emas");
 
             return new OutcomeDocumentDto
             {
                 Id = outcomeDocument.Id,
                 DocOn = outcomeDocument.DocOn,
                 SupplierId = outcomeDocument.SupplierId,
-                Price = outcomeDocument.Price,
-                ProductId = outcomeDocument.ProductId,
-                Quantity = outcomeDocument.Quantity,
                 DocSum = outcomeDocument.DocSum,
+                StatusName = outcomeDocument.Status.ShortName,
+                SupplierName = outcomeDocument.Supplier.Code,
+
                 Tables = outcomeDocument.Tables.Select(t => new OutcomeDocumentTableDto
                 {
                     Id = t.Id,
                     ProductId = t.ProductId,
+                    ProductName = t.Product?.Name,  
                     Quantity = t.Quantity,
                     Price = t.Price,
                     TotalSum = t.Price * t.Quantity
@@ -78,6 +80,9 @@ namespace CashBox.Service.Services.OutcomeDocumentService
                 DocSum = dto.Tables.Sum(x => x.Price * x.Quantity),
                 OrganizationId = _account.OrganizationId,
                 StatusId = StatusIdConst.CREATED,
+                CreatedAt = DateTime.UtcNow,
+                CreateUserId = _account.UserId,
+
                 Tables = dto.Tables.Select(t => new OutcomeDocumentTable
                 {
                     ProductId = t.ProductId,
@@ -101,20 +106,15 @@ namespace CashBox.Service.Services.OutcomeDocumentService
             if (entity == null)
                 throw new KeyNotFoundException();
 
-            if (entity.DocOn != dto.DocOn)
-                entity.DocOn = DateTime.SpecifyKind(dto.DocOn, DateTimeKind.Utc);
-
-            if (entity.SupplierId != dto.SupplierId)
-                entity.SupplierId = dto.SupplierId;
-
-            if (entity.DocSum != dto.DocSum)
-                entity.DocSum = dto.Tables.Sum(x => x.Price * x.Quantity);
+            entity.DocOn = DateTime.SpecifyKind(dto.DocOn, DateTimeKind.Utc);
+            entity.SupplierId = dto.SupplierId;
+            entity.DocSum = dto.Tables.Sum(x => x.Price * x.Quantity);
 
             entity.StatusId = StatusIdConst.MODIFIED;
             entity.ModifiedAt = DateTime.UtcNow;
             entity.ModifiedUserId = _account.UserId;
 
-            //_context.OutcomeDocumentTables.RemoveRange(entity.Tables);
+            _context.OutcomeDocumentTables.RemoveRange(entity.Tables);
 
             entity.Tables = dto.Tables.Select(t => new OutcomeDocumentTable
             {
@@ -139,7 +139,7 @@ namespace CashBox.Service.Services.OutcomeDocumentService
             await _context.SaveChangesAsync();
         }
 
-        public async Task<long> Accept(int id)
+        public async Task<long> Accept(long id)
         {
             var entity = await _context.OutcomeDocuments.FindAsync(id);
 
@@ -151,7 +151,7 @@ namespace CashBox.Service.Services.OutcomeDocumentService
             return entity.Id;
         }
 
-        public async Task<long> NotAccept(int id)
+        public async Task<long> NotAccept(long id)
         {
             var entity = await _context.OutcomeDocuments.FindAsync(id);
 

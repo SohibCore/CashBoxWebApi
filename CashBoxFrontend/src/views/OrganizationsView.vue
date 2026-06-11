@@ -1,5 +1,6 @@
 <template>
   <div class="page-card wide-card organizations-page">
+    <NavigationHistory />
     <div class="section-header"> 
       <div>
         <h2>Tashkilotlar</h2>
@@ -8,9 +9,6 @@
     </div>
 
     <div class="section-actions">
-      <router-link to="/organizations/new" class="toggle-create">
-        <span>+</span> Yangi tashkilot qo'shish
-      </router-link>
       <div class="search-and-count">
         <input type="text" v-model="searchQuery" placeholder="Nom yoki INN bo'yicha qidirish..." class="search-input" />
         <span class="user-count">{{ (filteredOrganizations || []).length }} ta tashkilot</span>
@@ -18,7 +16,16 @@
     </div>
 
     <div class="data-panel">
-      <h3>Tashkilotlar ro‘yxati</h3>
+      <div class="table-header">
+        <h3>Tashkilotlar ro‘yxati</h3>
+        <router-link to="/organizations/new" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Yangi tashkilot qo'shish
+        </router-link>
+      </div>
       <table>
         <thead>
           <tr>
@@ -82,7 +89,8 @@
 <script>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { getOrganizations, deleteOrganization, extractApiData, getField } from '../api';
+import NavigationHistory from './NavigationHistory.vue';
+import { getOrganizations, deleteOrganization, extractApiData, getField, getMe, normalizeUser } from '../api';
 
 export default {
   setup() {
@@ -106,12 +114,26 @@ export default {
     };
 
     const loadOrganizations = async () => {
+      let currentUserRole = '';
+      try {
+        const meResponse = await getMe();
+        const user = normalizeUser(extractApiData(meResponse));
+        currentUserRole = user?.role || '';
+      } catch (err) {
+        console.error('Foydalanuvchi rolini yuklashda xatolik:', err);
+        // Xatolik yuz bersa, default "User" deb hisoblaymiz yoki ma'lumot yuklamaymiz
+        organizations.value = [];
+        return;
+      }
+
+      if (currentUserRole.toLowerCase() !== 'admin') {
+        organizations.value = []; // Agar Admin bo'lmasa, ma'lumotlarni yuklamaymiz
+        return;
+      }
+
       try {
         const response = await getOrganizations();
-        const result = extractApiData(response);
-        const rawOrgs = Array.isArray(result) ? result : [];
-
-        organizations.value = rawOrgs.map((org) => ({
+        organizations.value = extractApiData(response).map(org => ({
           id: getField(org, ['id', 'Id', 'organizationId', 'OrganizationId']),
           inn: getField(org, ['inn', 'Inn']) || '',
           fullName: getField(org, ['fullName', 'FullName']) || '',
@@ -125,7 +147,7 @@ export default {
         console.error(error);
       }
     };
-
+ 
     const startEdit = (org) => {
       expandedOrgId.value = null;
       router.push(`/organizations/edit/${org.id}`);
@@ -157,11 +179,11 @@ export default {
 </script>
 
 <style scoped>
-.organizations-page.page-card {
-  background: white;
+.page-card {
+  background: #111827;
   padding: 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .organizations-page.wide-card {
@@ -178,6 +200,9 @@ export default {
   text-align: center;
   margin-bottom: 1.5rem;
 }
+
+.section-header h2 { color: #f1f5f9; }
+.section-header p { color: #94a3b8; }
 
 .section-actions {
   display: flex;
@@ -196,9 +221,12 @@ export default {
 
 .search-input {
   padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
   border-radius: 0.75rem;
   font-size: 0.95rem;
+  outline: none;
 }
 
 .toggle-create {
@@ -220,15 +248,16 @@ export default {
 }
 
 .user-count {
-  color: #475569;
+  color: #94a3b8;
   font-weight: 600;
 }
 
 .entity-form {
   margin-bottom: 1.5rem;
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.02);
   padding: 1.5rem;
   border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .entity-form h3 {
@@ -244,13 +273,16 @@ export default {
 label {
   display: block;
   font-weight: 600;
+  color: #94a3b8;
 }
 
 input {
   width: 100%;
   padding: 0.75rem;
   margin-top: 0.5rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
   border-radius: 0.7rem;
   font-size: 0.95rem;
   box-sizing: border-box;
@@ -285,14 +317,37 @@ input {
 }
 
 .data-panel {
-  overflow-x: visible;
-  background: #f8fafc;
-  padding: 1.5rem;
+  background: #111827;
   border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
 }
 
-.data-panel h3 {
-  margin-top: 0;
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.table-header h3 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 15px;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 table {
@@ -304,23 +359,22 @@ table {
 
 thead th {
   text-align: left;
-  padding: 0.65rem 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background-color: #f0f2f5;
-  color: #333;
+  padding: 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background-color: #0f172a;
+  color: #475569;
   font-weight: 600;
-  font-size: 0.82rem;
-  line-height: 1.3;
-  white-space: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 11px;
 }
 
 tbody td {
-  padding: 0.75rem 0.5rem;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 0.88rem;
-  line-height: 1.35;
-  vertical-align: top;
+  padding: 0.9rem 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  color: #94a3b8;
   word-break: break-word;
+  font-size: 13.5px;
 }
 
 tbody tr {
@@ -328,7 +382,7 @@ tbody tr {
   transition: background-color 0.2s;
 }
 tbody tr:hover {
-  background-color: #f0f7ff;
+  background-color: rgba(255, 255, 255, 0.03);
 }
 .actions {
   display: flex;
@@ -349,11 +403,11 @@ tbody tr:hover {
   margin-top: 0.3rem;
   display: flex;
   gap: 0.4rem;
-  background: white;
+  background: #1e293b;
   padding: 0.4rem;
   border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   z-index: 10;
   white-space: nowrap;
 }
@@ -364,8 +418,8 @@ tbody tr:hover {
   gap: 0.3rem;
   margin: 0;
   border: 1px solid transparent;
-  background: #ffffff;
-  color: #0f172a;
+  background: transparent;
+  color: #f1f5f9;
   padding: 0.35rem 0.6rem;
   font-size: 0.78rem;
   border-radius: 0.4rem;
@@ -379,8 +433,8 @@ tbody tr:hover {
 }
 
 .dropdown-btn:hover {
-  background: #eff6ff;
-  border-color: #cbd5e1;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .dropdown-btn.danger {

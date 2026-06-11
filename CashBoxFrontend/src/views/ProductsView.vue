@@ -1,5 +1,7 @@
 <template>
   <div class="page-card wide-card products-page">
+    <NavigationHistory />
+    
     <div class="section-header"> 
       <div>
         <h2>Mahsulotlar</h2>
@@ -8,9 +10,6 @@
     </div>
 
     <div class="section-actions">
-      <router-link to="/products/new" class="toggle-create">
-        <span>+</span> Yangi mahsulot qo'shish
-      </router-link>
       <div class="search-and-count">
         <input type="text" v-model="searchQuery" placeholder="Nom yoki kod bo'yicha qidirish..." class="search-input" />
         <span class="user-count">{{ filteredProducts.length }} ta mahsulot</span>
@@ -18,7 +17,16 @@
     </div>
 
     <div class="data-panel">
-      <h3>Mahsulotlar ro'yxati</h3>
+      <div class="table-header">
+        <h3>Mahsulotlar ro'yxati</h3>
+        <router-link to="/products/new" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Yangi mahsulot qo'shish
+        </router-link>
+      </div>
       <table>
         <thead>
           <tr>
@@ -82,6 +90,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import NavigationHistory from './NavigationHistory.vue';
 import { getProducts, deleteProduct, extractApiData, getField } from '../api';
 
 export default {
@@ -155,7 +164,8 @@ export default {
       toggleRow,
       startEdit,
       deleteItem,
-      formatDate
+      formatDate,
+      NavigationHistory
     };
   }
 };
@@ -228,10 +238,37 @@ export default {
 }
 
 .data-panel {
-  background: transparent;
-  padding: 1.5rem;
+  background: #111827;
   border-radius: 0.5rem;
-  overflow-x: visible; /* Gorizontal scrollni olib tashlaymiz */
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.table-header h3 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 15px;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 table {
@@ -295,6 +332,41 @@ tbody tr:hover {
   border: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 10;
   white-space: nowrap;
+}
+
+.dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: transparent;
+  color: #f1f5f9;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.dropdown-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.dropdown-btn:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.dropdown-btn.danger {
+  color: white;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.dropdown-btn.danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
 }
 
 .icon-btn {

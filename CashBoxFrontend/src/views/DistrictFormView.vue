@@ -26,8 +26,20 @@
         </label>
       </div>
       <div class="button-row">
-        <button type="submit" :disabled="isSaving">{{ isSaving ? 'Saqlanmoqda...' : (isEdit ? 'Yangilash' : 'Saqlash') }}</button>
-        <button type="button" class="btn-secondary" @click="cancel">Bekor qilish</button>
+        <button type="submit" class="btn-save" :disabled="isSaving">
+          <svg v-if="!isSaving" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span v-else class="spinner"></span>
+          <span>{{ isSaving ? 'Saqlanmoqda...' : (isEdit ? 'Yangilash' : 'Saqlash') }}</span>
+        </button>
+        <button type="button" class="btn-cancel" @click="cancel">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Bekor qilish</span>
+        </button>
       </div>
       <p v-if="error" class="error">{{ error }}</p>
       <p v-if="successMessage" class="success">{{ successMessage }}</p>
@@ -126,33 +138,116 @@ export default {
 </script>
 
 <style scoped>
-.page-card { background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08); }
+.page-card {
+  background: #0d1117;
+  padding: 1.5rem;
+  border-radius: 1rem;
+}
+
 .wide-card { max-width: 800px; margin: 0 auto; }
-.section-header { margin-bottom: 2rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1rem; }
+
+.section-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding-bottom: 1rem;
+}
+
+.section-header h2 { color: #f1f5f9; }
+.section-header p { color: #94a3b8; }
+
 .entity-form {
-  background: #f8fafc; padding: 2rem; border-radius: 1rem;
-  border: 1px solid #2563eb; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+  background: #111827;
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid #2563eb;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.05);
   margin-bottom: 1.5rem;
 }
+
 .form-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-label { display: block; font-weight: 600; color: #1e293b; margin-bottom: 0.5rem; }
-input {
-  width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1;
-  border-radius: 0.5rem; font-size: 1rem; transition: border-color 0.2s;
+
+label {
+  display: block;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
 }
-input:focus { outline: none; border-color: #2563eb; }
-.button-row { display: flex; gap: 1rem; margin-top: 2rem; }
-.button-row button {
-  border: none; background: #2563eb; color: white; padding: 0.85rem 1rem;
-  border-radius: 0.75rem; cursor: pointer; font-weight: 500;
+
+input, select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
 }
-.btn-secondary { background: #e2e8f0 !important; color: #475569 !important; border: 1px solid #cbd5e1 !important; }
-.error {
-  color: #dc2626; margin-top: 1.5rem; padding: 0.75rem;
-  background: #fef2f2; border-radius: 0.5rem; border: 1px solid #fee2e2;
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #1e293b !important;
 }
-.success {
-  color: #16a34a; margin-top: 1.5rem; padding: 0.75rem;
-  background: #f0fdf4; border: 1px solid #dcfce7;
+
+select option {
+  background: #1e293b;
+  color: #f1f5f9;
 }
+
+.button-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.btn-save, .btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.8rem 2rem;
+  border-radius: 0.6rem;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-save:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-cancel {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>

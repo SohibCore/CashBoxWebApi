@@ -178,6 +178,8 @@ export default {
         const payload = { ...form.value };
         delete payload.id;
         await updateUser(form.value.id, payload);
+        
+        const existingUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
         const updatedUser = normalizeUser({
           id: form.value.id,
           fullName: form.value.fullName,
@@ -188,8 +190,9 @@ export default {
           organizationId: form.value.organizationId,
           dateOfBirth: form.value.dateOfBirth,
           passportSeries: form.value.passportSeries,
-          userName: JSON.parse(localStorage.getItem('currentUser') || '{}').userName,
-          email: JSON.parse(localStorage.getItem('currentUser') || '{}').email
+          userName: existingUser.userName || existingUser.UserName,
+          email: existingUser.email || existingUser.Email,
+          role: existingUser.role || existingUser.Role
         });
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
         if (updatedUser.id) {

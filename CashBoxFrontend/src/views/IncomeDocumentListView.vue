@@ -1,8 +1,8 @@
 <template>
-  <div class="p-6">
-    <div class="bg-white rounded-lg shadow p-6">
+  <div class="p-6 bg-[#0d1117] min-height-screen">
+    <div class="bg-[#111827] rounded-lg border border-white/5 p-6">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Kirim Hujjatlari</h2>
+        <h2 class="text-2xl font-bold text-white">Kirim Hujjatlari</h2>
         <button @click="$router.push('/income-documents/create')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
           + Yangi hujjat
         </button>
@@ -12,7 +12,7 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-gray-100 border-b">
+            <tr class="bg-[#0f172a] border-b border-white/5 text-[#475569] uppercase text-xs">
               <th class="p-3">ID</th>
               <th class="p-3">Sana</th>
               <th class="p-3">Ta'minotchi</th>
@@ -29,7 +29,7 @@
               v-for="doc in documents" 
               :key="doc.id" 
               @dblclick="viewDetails(doc.id)"
-              class="border-b hover:bg-blue-50 cursor-pointer transition"
+              class="border-b border-white/5 text-[#94a3b8] hover:bg-white/[0.02] cursor-pointer transition"
               title="Batafsil ko'rish uchun ikki marta bosing"
             >
               <td class="p-3">#{{ doc.id }}</td>
@@ -58,17 +58,17 @@
     </div>
 
     <!-- Detal ko'rinishi (Modal) -->
-    <div v-if="selectedDoc || detailLoading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div v-if="detailLoading" class="bg-white p-8 rounded-lg shadow-xl">
+    <div v-if="selectedDoc || detailLoading" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div v-if="detailLoading" class="bg-[#111827] p-8 rounded-lg border border-white/10 shadow-2xl">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p class="mt-4 text-gray-600">Ma'lumotlar yuklanmoqda...</p>
+        <p class="mt-4 text-[#94a3b8]">Ma'lumotlar yuklanmoqda...</p>
       </div>
       
-      <div v-else class="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div class="p-6 border-b flex justify-between items-center bg-gray-50">
+      <div v-else class="bg-[#111827] rounded-lg border border-white/10 shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-white/5 flex justify-between items-center bg-[#0f172a]">
           <div>
-            <h3 class="text-xl font-bold text-gray-800">Hujjat ma'lumotlari #{{ selectedDoc.id }}</h3>
-            <p class="text-sm text-gray-600">Ta'minotchi: <strong>{{ selectedDoc.supplierName }}</strong> | Sana: <strong class="text-blue-600">{{ formatDate(selectedDoc.docOn) }}</strong></p>
+            <h3 class="text-xl font-bold text-white">Hujjat ma'lumotlari #{{ selectedDoc.id }}</h3>
+            <p class="text-sm text-[#64748b]">Ta'minotchi: <strong class="text-[#f1f5f9]">{{ selectedDoc.supplierName }}</strong> | Sana: <strong class="text-blue-500">{{ formatDate(selectedDoc.docOn) }}</strong></p>
           </div>
           <button @click="closeModal" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
         </div>
@@ -77,7 +77,7 @@
           <h4 class="font-bold mb-4 text-gray-700 uppercase text-sm tracking-wider">Mahsulotlar ro'yxati</h4>
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-gray-100 border-b text-xs font-bold text-gray-600 uppercase">
+              <tr class="bg-[#0f172a] border-b border-white/5 text-xs font-bold text-[#475569] uppercase">
                 <th class="p-2">Mahsulot</th>
                 <th class="p-2 text-right w-32">Narxi</th>
                 <th class="p-2 text-center w-24">Miqdori</th>
@@ -85,23 +85,23 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in selectedDoc.tables" :key="item.id" class="border-b"> <!-- Bola table -->
-                <td class="p-2 text-gray-700 font-medium">{{ item.productName || 'Mahsulot #' + item.productId }}</td>
+              <tr v-for="item in selectedDoc.tables" :key="item.id" class="border-b border-white/5"> <!-- Bola table -->
+                <td class="p-2 text-[#f1f5f9] font-medium">{{ item.productName || 'Mahsulot #' + item.productId }}</td>
                 <td class="p-2 text-right">{{ formatCurrency(item.price) }}</td>
-                <td class="p-2 text-center">{{ item.quantity }}</td>
-                <td class="p-2 text-right font-bold text-gray-900">{{ formatCurrency(item.totalSum) }}</td>
+                <td class="p-2 text-center text-[#94a3b8]">{{ item.quantity }}</td>
+                <td class="p-2 text-right font-bold text-blue-400">{{ formatCurrency(item.totalSum) }}</td>
               </tr>
             </tbody>
             <tfoot>
-              <tr class="font-black bg-blue-50 text-xl border-t-2 border-blue-200">
-                <td colspan="3" class="p-4 text-right text-gray-700">JAMI HUJJAT SUMMASI:</td>
-                <td class="p-4 text-right text-blue-700">{{ formatCurrency(selectedDoc.docSum) }}</td>
+              <tr class="font-black bg-blue-600/5 text-xl border-t border-blue-500/20">
+                <td colspan="3" class="p-4 text-right text-[#64748b]">JAMI HUJJAT SUMMASI:</td>
+                <td class="p-4 text-right text-blue-500">{{ formatCurrency(selectedDoc.docSum) }} UZS</td>
               </tr>
             </tfoot>
           </table>
         </div>
         
-        <div class="p-4 border-t bg-gray-50 flex justify-between items-center px-6">
+        <div class="p-4 border-t border-white/5 bg-[#0f172a] flex justify-between items-center px-6">
           <div class="text-sm text-gray-500 italic">* Hujjat holati: {{ selectedDoc.statusName }}</div>
           <div class="flex gap-3">
             <button @click="closeModal" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition">Yopish</button>
@@ -118,11 +118,11 @@
 import { ref, onMounted, type Ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { incomeDocumentService } from './incomeDocumentService';
-import { type IncomeDocumentListDto } from '../types/incomeDocument';
+import { type IncomeDocumentListDto, type IncomeDocumentDetailDto } from '../types/incomeDocument';
 
 const router = useRouter();
 const documents: Ref<IncomeDocumentListDto[]> = ref([]);
-const selectedDoc = ref(null);
+const selectedDoc = ref<IncomeDocumentDetailDto | null>(null);
 const detailLoading = ref(false);
 
 const fetchList = async () => {
@@ -134,7 +134,7 @@ const fetchList = async () => {
   } catch (err) { console.error('Xatolik:', err); }
 };
 
-const viewDetails = async (id) => {
+const viewDetails = async (id: number) => {
   detailLoading.value = true;
   selectedDoc.value = null;
   try {
@@ -149,7 +149,7 @@ const closeModal = () => {
   detailLoading.value = false;
 };
 
-const handleAccept = async (id) => {
+const handleAccept = async (id: number) => {
   if (!confirm('Ushbu hujjatni tasdiqlaysizmi?')) return;
   try {
     await incomeDocumentService.accept(id);
@@ -158,7 +158,7 @@ const handleAccept = async (id) => {
   } catch (err) { alert('Tasdiqlashda xatolik'); }
 };
 
-const handleNotAccept = async (id) => {
+const handleNotAccept = async (id: number) => {
   if (!confirm('Ushbu hujjatni "Tasdiqlanmagan" holatiga qaytarmoqchimisiz?')) return;
   try {
     await incomeDocumentService.notAccept(id);
@@ -167,7 +167,7 @@ const handleNotAccept = async (id) => {
   } catch (err) { alert('Amalni bajarishda xatolik'); }
 };
 
-const deleteDoc = async (id) => {
+const deleteDoc = async (id: number) => {
   if (!confirm('Hujjatni o\'chirmoqchimisiz?')) return;
   try {
     await incomeDocumentService.delete(id);
@@ -175,13 +175,13 @@ const deleteDoc = async (id) => {
   } catch (err) { alert('O\'chirishda xatolik'); }
 };
 
-const formatDate = (dateStr) => {
+const formatDate = (dateStr: string) => {
   if (!dateStr) return '';
   const date = new Date(dateStr);
   return date.toLocaleDateString('ru-RU'); // DD.MM.YYYY
 };
 
-const formatCurrency = (val) => {
+const formatCurrency = (val: number) => {
   return new Intl.NumberFormat('ru-RU').format(val || 0);
 };
 

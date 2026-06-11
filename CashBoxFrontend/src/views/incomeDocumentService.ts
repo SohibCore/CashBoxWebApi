@@ -14,38 +14,33 @@ api.interceptors.request.use((config) => {
 
 export const incomeDocumentService = {
   // Hujjatlar ro'yxatini olish
-  getList() {
-    return api.get('/api/IncomeDocument/GetList');
+  getList(filter?: any) {
+    return api.get('/api/IncomeDocument/GetList', { params: filter });
   },
-  // ID bo'yicha bitta hujjatni olish
+  // ID bo'yicha bitta hujjatni ota va bola ma'lumotlari bilan olish
   getById(id: string | number) {
     return api.get(`/api/IncomeDocument/Get/${id}`);
   },
-  // Yangi hujjat yaratish
+  // Yangi kirim hujjati yaratish
   create(data: any) {
     return api.post('/api/IncomeDocument/Create', data);
   },
-  // Mavjud hujjatni tahrirlash
+  // Mavjud hujjatni yangilash
   update(data: any) {
     return api.put('/api/IncomeDocument/Update', data);
   },
   // Hujjatni o'chirish
-  delete(id: number) {
+  delete(id: number | string) {
     return api.delete(`/api/IncomeDocument/Delete/${id}`);
   },
-  // Hujjatni tasdiqlash
-  accept(id: number) {
-    return api.post(`/api/IncomeDocument/Accept?id=${id}`);
+  // Hujjatni tasdiqlash yoki rad etish (Backend HttpPatch route-ga moslab)
+  accept(id: number | string) { 
+    return api.patch(`/api/IncomeDocument/Accept/${id}`);
   },
-  // Tasdiqni bekor qilish
-  notAccept(id: number) {
-    return api.post(`/api/IncomeDocument/NotAccept?id=${id}`);
+  notAccept(id: number | string) { 
+    return api.patch(`/api/IncomeDocument/NotAccept/${id}`);
   },
-  // Ta'minotchilar va mahsulotlar ro'yxati (Forma uchun)
-  getSuppliers() {
-    return api.get('/api/Supplier/GetList');
-  },
-  getProducts() {
-    return api.get('/api/Product/GetList');
-  }
+  // Metadata yuklash
+  getSuppliers() { return api.get('/api/Supplier/GetList'); },
+  getProducts() { return api.get('/api/Product/GetList'); }
 };

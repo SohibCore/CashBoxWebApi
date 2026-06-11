@@ -11,10 +11,6 @@ namespace CashBox.Repository.Dtos.OutcomeDocumentDtos
         [Range(1, int.MaxValue)]
         public int SupplierId { get; set; }
 
-        [Required]
-        [Range(0.0000000000000000001, int.MaxValue)]
-        public decimal DocSum { get; set; }
-
-        public ICollection<OutcomeDocumentTableDlDto> Tables = new List<OutcomeDocumentTableDlDto>();
+        public List<CreateOutcomeDocumentTableDlDto> Tables { get; set; } = new();
     }
 }

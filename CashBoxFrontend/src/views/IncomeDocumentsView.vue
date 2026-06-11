@@ -1,10 +1,7 @@
 <template>
   <div class="income-documents-page">
     <div class="section-header"> 
-      <div>
-        <h2>Kirim hujjatlari</h2>
-        <p>Kirim hujjatlarini qo'shish, ko'rish va boshqarish.</p>
-      </div>
+      <h2>Kirim hujjatlari</h2>
     </div>
 
     <div class="stats-cards">
@@ -32,27 +29,23 @@
     </div>
 
     <div class="section-actions">
-      <router-link to="/income-documents/new" class="toggle-create">
-        <span>+</span> Yangi hujjat qo'shish
-      </router-link>
-      <div class="filter-panel">
-        <select v-model.number="filters.status" class="filter-select">
-          <option :value="null">Barcha statuslar</option>
-          <option :value="1">Yaratildi</option>
-          <option :value="2">Tasdiqlandi</option>
-          <option :value="3">Rad etildi</option>
-          <option :value="4">O'zgartirildi</option>
-        </select>
-      </div>
       <span class="user-count">{{ filteredDocuments.length }} ta hujjat</span>
     </div>
 
     <div class="data-panel">
-      <h3>Hujjatlar ro'yxati</h3>
+      <div class="table-header">
+        <h3>Hujjatlar ro'yxati</h3>
+        <router-link to="/income-documents/new" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Yangi hujjat qo'shish
+        </router-link>
+      </div>
       <table>
         <thead>
           <tr>
-            <th style="width: 40px;"></th>
             <th>ID</th>
             <th>Ta'minotchi</th>
             <th>Jami summa</th>
@@ -66,14 +59,7 @@
             <td colspan="7">Ma'lumot yo'q</td>
           </tr>
           <template v-for="doc in filteredDocuments" :key="doc.id">
-            <tr :class="{ 'row-expanded': expandedRowId === doc.id }" @click="toggleExpand(doc.id)">
-              <td>
-                <span class="expand-icon" :class="{ 'is-active': expandedRowId === doc.id }">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                  </svg>
-                </span>
-              </td>
+            <tr @dblclick="router.push(`/income-documents/edit/${doc.id}`)">
               <td>{{ doc.id }}</td>
               <td style="font-weight: 500;">{{ doc.supplierName || doc.supplierId }}</td>
               <td style="font-weight: 600;">{{ formatSum(doc.totalSum) }}</td>
@@ -95,6 +81,12 @@
                     </svg>
                   </button>
                   <div v-if="expandedDocId === doc.id" class="action-dropdown">
+                    <button type="button" @click="handleAccept(doc.id)" class="dropdown-btn success-btn">
+                      Tasdiqlash
+                    </button>
+                    <button type="button" @click="handleReject(doc.id)" class="dropdown-btn warning-btn">
+                      Rad etish
+                    </button>
                     <button type="button" @click="openEditModal(doc)" class="dropdown-btn">
                       Tahrirlash
                     </button>
@@ -105,36 +97,6 @@
                 </div>
               </td>
             </tr>
-            <tr v-if="expandedRowId === doc.id" class="nested-row">
-              <td colspan="7">
-                <div class="nested-container">
-                  <div v-if="loadingDetails" class="nested-loading">Yuklanmoqda...</div>
-                  <table v-else class="nested-table">
-                    <thead>
-                      <tr>
-                        <th>Mahsulot ID</th>
-                        <th>Mahsulot nomi</th>
-                        <th>Miqdori</th>
-                        <th>Narxi</th>
-                        <th>Jami</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="item in (documentDetails[doc.id]?._items || [])" :key="item.id">
-                        <td>{{ item.productId ?? item.ProductId }}</td>
-                        <td>{{ getProductName(item.productId ?? item.ProductId) }}</td>
-                        <td>{{ item.quantity ?? item.Quantity }}</td>
-                        <td>{{ formatSum(item.price ?? item.Price) }}</td>
-                        <td style="color: #f1f5f9;">{{ formatSum(item.totalSum ?? item.TotalSum) }}</td>
-                      </tr>
-                      <tr v-if="!documentDetails[doc.id]?._items || documentDetails[doc.id]?._items.length === 0">
-                        <td colspan="5" style="text-align: center;">Tarkib topilmadi</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
           </template>
         </tbody>
       </table>
@@ -142,178 +104,118 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted, computed, reactive } from 'vue';
-import { useRouter } from 'vue-router'; // Keep this for router.push
-import { incomeDocumentService } from './incomeDocumentService'; // Import the service
+import { useRouter } from 'vue-router';
+import { incomeDocumentService } from './incomeDocumentService';
 
-export default {
-  name: 'IncomeDocumentsView',
-  setup() {
-    const router = useRouter();
-    const documents = ref([]);
-    const products = ref([]);
-    const expandedDocId = ref(null);
-    const expandedRowId = ref(null);
-    const documentDetails = reactive({});
-    const loadingDetails = ref(false);
-    const filters = reactive({
-      status: null
-    });
+const router = useRouter();
+const documents = ref([]);
+const products = ref([]);
+const expandedDocId = ref(null);
+const filters = reactive({ status: null });
 
-    const toggleDropdown = (id) => {
-      expandedDocId.value = expandedDocId.value === id ? null : id;
-    };
+const toggleDropdown = (id) => {
+  expandedDocId.value = expandedDocId.value === id ? null : id;
+};
 
-    const toggleExpand = async (id) => {
-      if (expandedRowId.value === id) {
-        expandedRowId.value = null;
-        return;
-      }
-      
-      expandedRowId.value = id;
-      if (!documentDetails[id]) {
-        loadingDetails.value = true;
-        try {
-          const res = await incomeDocumentService.getById(id);
-          const data = res.data?.data || res.data?.value || res.data;
-          
-          if (data) {
-            // Backenddan Tables, tables yoki items bo'lib kelishidan qat'i nazar '_items'ga o'tkazamiz
-            documentDetails[id] = {
-              ...data,
-              _items: data.tables || data.Tables || data.items || data.Items || []
-            };
-          }
-        } catch (err) {
-          console.error('Error fetching details:', err);
-        } finally {
-          loadingDetails.value = false;
-        }
-      }
-    };
-
-    const loadMetaData = async () => {
-      try {
-        const res = await incomeDocumentService.getProducts();
-        products.value = res.data?.data || res.data || [];
-      } catch (err) {
-        console.error('Mahsulotlarni yuklashda xato:', err);
-      }
-    };
-
-    const getProductName = (id) => {
-      const p = products.value.find(x => (x.id || x.Id) === id);
-      return p ? p.name : 'Mahsulot #' + id;
-    };
-
-    const statusLabel = (status) => {
-      const map = {
-        1: "Yaratildi",
-        2: "Tasdiqlandi",
-        3: "Rad etildi",
-        4: "O'zgartirildi",
-        5: "O'chirildi"
-      };
-      return map[status] ?? 'Noma\'lum';
-    };
-
-    const statusClass = (status) => {
-      const map = { 1: 'created', 2: 'accepted', 3: 'not-accepted', 4: 'modified', 5: 'deleted' };
-      return map[status] ?? '';
-    };
-
-    const totalSum = computed(() =>
-      documents.value.reduce((sum, d) => sum + (d.totalSum || 0), 0)
-    );
-
-    const paidSum = computed(() =>
-      documents.value
-        .filter(d => d.status === 2) // StatusIdConst.ACCEPT
-        .reduce((sum, d) => sum + (d.totalSum || 0), 0)
-    );
-
-    const unpaidSum = computed(() =>
-      documents.value
-        .filter(d => [1, 3, 4].includes(d.status)) // StatusIdConst.CREATED, StatusIdConst.NOT_ACCEPT, StatusIdConst.MODIFIED
-        .reduce((sum, d) => sum + (d.totalSum || 0), 0)
-    );
-
-    const formatSum = (val) =>
-      new Intl.NumberFormat('uz-UZ').format(val) + ' UZS';
-
-    const filteredDocuments = computed(() => {
-      if (filters.status === null) return documents.value;
-      return documents.value.filter(doc => doc.status === filters.status);
-    });
-
-    const loadDocuments = async () => {
-      try {
-        const res = await incomeDocumentService.getList();
-        const raw = res.data?.data || res.data || []; // Assuming service returns data in res.data.data or res.data
-        documents.value = raw.map(doc => ({
-          id: doc.id || doc.Id,
-          supplierId: doc.supplierId || doc.SupplierId,
-          supplierName: doc.supplierName || doc.SupplierName,
-          totalSum: doc.docSum ?? doc.DocSum ?? 0, // '??' 0 ni o'tkazib yubormaydi
-          date: doc.docOn ?? doc.DocOn, 
-          status: doc.statusId ?? doc.StatusId ?? 1, // Default to 1 (CREATED) if statusId is missing
-          statusName: doc.statusName || doc.StatusName // Added StatusName
-        }));
-      } catch (err) {
-        console.error('Load documents error:', err);
-      }
-    };
-
-    const openEditModal = (doc) => {
-      expandedDocId.value = null;
-      router.push(`/income-documents/edit/${doc.id}`);
-    };
-
-    const deleteItem = async (id) => {
-      if (!window.confirm("O'chirishni tasdiqlaysizmi?")) return;
-      expandedDocId.value = null;
-      try {
-        await incomeDocumentService.delete(id);
-        await loadDocuments();
-      } catch (err) {
-        console.error('Delete document error:', err);
-      }
-    };
-
-    const formatDate = (date) => {
-      if (!date) return '-';
-      return new Date(date).toLocaleDateString();
-    };
-
-    onMounted(() => {
-      loadDocuments();
-      loadMetaData();
-    });
-
-    return {
-      documents,
-      filters,
-      totalSum,
-      paidSum,
-      unpaidSum,
-      formatSum,
-      filteredDocuments,
-      statusLabel,
-      statusClass,
-      expandedDocId,
-      expandedRowId,
-      documentDetails,
-      loadingDetails,
-      toggleDropdown,
-      toggleExpand,
-      openEditModal,
-      deleteItem,
-      formatDate,
-      getProductName
-    };
+const loadMetaData = async () => {
+  try {
+    const res = await incomeDocumentService.getProducts();
+    products.value = res.data?.data || res.data || [];
+  } catch (err) {
+    console.error('Mahsulotlarni yuklashda xato:', err);
   }
 };
+
+const getProductName = (id) => {
+  const p = products.value.find(x => (x.id || x.Id) === id);
+  return p ? p.name : 'Mahsulot #' + id;
+};
+
+const statusLabel = (status) => {
+  const map = { 1: "Yaratildi", 2: "Tasdiqlandi", 3: "Rad etildi", 4: "O'zgartirildi", 5: "O'chirildi" };
+  return map[status] ?? 'Noma\'lum';
+};
+
+const statusClass = (status) => {
+  const map = { 1: 'created', 2: 'accepted', 3: 'not-accepted', 4: 'modified', 5: 'deleted' };
+  return map[status] ?? '';
+};
+
+const totalSum = computed(() => documents.value.reduce((sum, d) => sum + (d.totalSum || 0), 0));
+const paidSum = computed(() => documents.value.filter(d => d.status === 2).reduce((sum, d) => sum + (d.totalSum || 0), 0));
+const unpaidSum = computed(() => documents.value.filter(d => [1, 3, 4].includes(d.status)).reduce((sum, d) => sum + (d.totalSum || 0), 0));
+const formatSum = (val) => new Intl.NumberFormat('uz-UZ').format(val) + ' UZS';
+
+const filteredDocuments = computed(() => {
+  if (filters.status === null) return documents.value;
+  return documents.value.filter(doc => doc.status === filters.status);
+});
+
+const loadDocuments = async () => {
+  try {
+    const res = await incomeDocumentService.getList();
+    const raw = res.data?.data || res.data || [];
+    documents.value = raw.map(doc => ({
+      id: doc.id || doc.Id,
+      supplierId: doc.supplierId || doc.SupplierId,
+      supplierName: doc.supplierName || doc.SupplierName,
+      totalSum: doc.docSum ?? doc.DocSum ?? 0,
+      date: doc.docOn ?? doc.DocOn,
+      status: doc.statusId ?? doc.StatusId ?? 1,
+      statusName: doc.statusName || doc.StatusName
+    }));
+  } catch (err) {
+    console.error('Load documents error:', err);
+  }
+};
+
+const handleAccept = async (id) => {
+  try {
+    await incomeDocumentService.accept(id);
+    await loadDocuments();
+    expandedDocId.value = null;
+  } catch (err) {
+    console.error('Accept error:', err);
+  }
+};
+
+const handleReject = async (id) => {
+  try {
+    await incomeDocumentService.notAccept(id);
+    await loadDocuments();
+    expandedDocId.value = null;
+  } catch (err) {
+    console.error('Reject error:', err);
+  }
+};
+
+const openEditModal = (doc) => {
+  expandedDocId.value = null;
+  router.push(`/income-documents/edit/${doc.id}`);
+};
+
+const deleteItem = async (id) => {
+  if (!window.confirm("O'chirishni tasdiqlaysizmi?")) return;
+  expandedDocId.value = null;
+  try {
+    await incomeDocumentService.delete(id);
+    await loadDocuments();
+  } catch (err) {
+    console.error('Delete document error:', err);
+  }
+};
+
+const formatDate = (date) => {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString();
+};
+
+onMounted(() => {
+  loadDocuments();
+  loadMetaData();
+});
 </script>
 
 <style scoped>
@@ -340,6 +242,7 @@ export default {
 
 .section-header {
   margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .section-actions {
@@ -389,14 +292,36 @@ export default {
 
 .data-panel {
   background: #111827;
-  padding: 1.5rem;
   border-radius: 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
 }
 
-.data-panel h3 {
-  margin-top: 0;
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.table-header h3 {
+  margin: 0;
   color: #f1f5f9;
+  font-size: 15px;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 table {
@@ -479,6 +404,16 @@ tbody tr:hover {
   background: #dc2626;
 }
 
+.dropdown-btn.success-btn {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.dropdown-btn.warning-btn {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
 .icon-btn {
   background: #2563eb;
   color: white;
@@ -535,5 +470,52 @@ tbody tr:hover {
   text-align: center;
   padding: 2rem;
   color: #64748b;
+}
+
+/* Nested Table Styles */
+.expand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  color: #64748b;
+}
+.expand-icon.is-active {
+  transform: rotate(90deg);
+  color: #3b82f6;
+}
+.nested-row td {
+  padding: 0;
+  background: #0a0f1e !important;
+}
+.nested-container {
+  padding: 1rem 1rem 1.5rem 3rem;
+  border-left: 2px solid #3b82f6;
+  margin: 5px 0;
+}
+.nested-table {
+  width: 100%;
+  background: #111827;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  border-collapse: collapse;
+}
+.nested-table th {
+  background: #0f172a;
+  font-size: 10px;
+  padding: 8px;
+  color: #475569;
+  text-transform: uppercase;
+}
+.nested-table td {
+  font-size: 12px;
+  padding: 8px;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.nested-loading {
+  padding: 10px;
+  color: #3b82f6;
+  font-size: 13px;
 }
 </style>

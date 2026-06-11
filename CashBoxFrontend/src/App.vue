@@ -1,18 +1,14 @@
 <template>
   <div class="app-layout">
-    <!-- Asosiy Top Header - Faqat login qilinganda ko'rinadi -->
-    <header v-if="token" class="topbar">
-      <button @click="isCollapsed = !isCollapsed" class="menu-toggle" aria-label="Toggle Menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      <div class="header-brand">CashBox — Boshqaruv Paneli</div>
-    </header>
-
     <div class="app-shell">
       <!-- Sidebar (Chap menyu) -->
       <aside v-if="token" class="sidebar" :class="{ 'collapsed': isCollapsed }">
+        <!-- Sidebar Logo -->
+        <div class="sidebar-logo" @click="isCollapsed = !isCollapsed" title="Menyuni boshqarish">
+          <div class="logo-icon">CB</div>
+          <span class="logo-text">CashBox</span>
+        </div>
+
         <nav class="sidebar-nav">
           <!-- Asosiy operatsiyalar -->
           <div class="nav-section-label">Asosiy</div>
@@ -30,28 +26,35 @@
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             <span>Mahsulotlar</span>
           </router-link>
-          <router-link to="/organizations" class="nav-link">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-            <span>Tashkilotlar</span>
+          <router-link to="/suppliers" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+            <span>Ta'minotchilar</span>
           </router-link>
-          <router-link to="/users" class="nav-link">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Foydalanuvchilar</span>
-          </router-link>
-          <router-link to="/currencies" class="nav-link">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            <span>Valyutalar</span>
-          </router-link>
+          
+          <template v-if="role?.toLowerCase() === 'admin'">
+            <router-link to="/organizations" class="nav-link">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              <span>Tashkilotlar</span>
+            </router-link>
+            <router-link to="/users" class="nav-link">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>Foydalanuvchilar</span>
+            </router-link>
+            <router-link to="/currencies" class="nav-link">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>Valyutalar</span>
+            </router-link>
 
-          <div class="nav-section-label">Joylashuv</div>
-          <router-link to="/regions" class="nav-link">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span>Viloyatlar</span>
-          </router-link>
-          <router-link to="/districts" class="nav-link">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Tumanlar</span>
-          </router-link>
+            <div class="nav-section-label">Joylashuv</div>
+            <router-link to="/regions" class="nav-link">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Viloyatlar</span>
+            </router-link>
+            <router-link to="/districts" class="nav-link">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Tumanlar</span>
+            </router-link>
+          </template>
         </nav>
         
         <button @click="logout" class="logout-btn">
@@ -67,6 +70,7 @@
           <router-link to="/auth/register" class="unauth-link">Ro'yxatdan o'tish</router-link>
         </header>
 
+        <NavigationHistory v-if="token && !isAuthPage" />
         <main class="router-content" :class="{ 'auth-mode': isAuthPage }">
           <router-view />
         </main>
@@ -76,21 +80,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
+import NavigationHistory from './views/NavigationHistory.vue';
 const router = useRouter();
 const route = useRoute();
 const token = ref(localStorage.getItem('token'));
 const isCollapsed = ref(false);
+const role = ref('');
 
 // Check if the current route is an authentication page
 const isAuthPage = computed(() => route.path.startsWith('/auth/'));
 
 // Sahifa o'zgarganda token borligini tekshirib turish (Login/Logout uchun)
-watch(() => route.path, () => {
+const updateAuthStatus = () => {
   token.value = localStorage.getItem('token');
-});
+  const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const rawRole = storedUser.role || storedUser.Role || 'user';
+  role.value = Array.isArray(rawRole) ? rawRole[0] : rawRole;
+};
+
+watch(() => route.path, updateAuthStatus);
+onMounted(updateAuthStatus);
 
 const logout = () => {
   localStorage.removeItem('token');
@@ -111,11 +123,48 @@ const logout = () => {
 }
 
 body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color: #f1f5f9; height: 100vh; overflow: hidden; }
-.topbar { height: 46px; background: #3b82f6; display: flex; align-items: center; padding: 0 16px; gap: 12px; }
-.header-brand { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: white; }
 .app-shell { display: flex; flex: 1; background: #0d1117; overflow: hidden; }
 .sidebar { width: 220px; background: #0a0f1e; border-right: 1px solid rgba(255,255,255,0.07); padding: 0; transition: all 0.3s ease; }
 .sidebar.collapsed { width: 64px; }
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  height: 64px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.sidebar-logo:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+.logo-text {
+  font-weight: 700;
+  font-size: 18px;
+  color: white;
+  white-space: nowrap;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.sidebar.collapsed .sidebar-logo {
+  justify-content: center;
+  padding: 16px 0;
+}
 .nav-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #475569; padding: 16px 16px 8px; }
 .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: #94a3b8; text-decoration: none; font-size: 13px; transition: 0.2s; }
 .nav-link:hover { background: rgba(255,255,255,0.04); color: #f1f5f9; }
@@ -261,7 +310,7 @@ body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color:
 .p-6 { padding: 1.5rem; }
 .max-w-5xl { max-width: 80rem; }
 .mx-auto { margin-left: auto; margin-right: auto; }
-.bg-white { background-color: #fff; }
+.bg-white { background-color: #111827; } /* Dark card background */
 .rounded-lg { border-radius: 0.5rem; }
 .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
 .p-8 { padding: 2rem; }
@@ -271,7 +320,6 @@ body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color:
 .text-gray-800 { color: #1f2937; }
 .grid { display: grid; }
 .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-.md\:grid-cols-2 { /* For medium screens and up */ }
 .gap-6 { gap: 1.5rem; }
 .mb-8 { margin-bottom: 2rem; }
 .block { display: block; }
@@ -282,7 +330,7 @@ body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color:
 .w-full { width: 100%; }
 .px-4 { padding-left: 1rem; padding-right: 1rem; }
 .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-.border { border-width: 1px; }
+.border { border: 1px solid rgba(255,255,255,0.08); }
 .rounded { border-radius: 0.25rem; }
 .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
 .focus\:ring-2:focus { --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000); }

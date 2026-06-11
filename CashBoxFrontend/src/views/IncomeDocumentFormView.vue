@@ -1,7 +1,7 @@
 <template>
   <div class="page-card wide-card">
     <div class="section-header">
-      <div>
+      <div class="header-centered">
         <h2>{{ isEdit ? 'Kirim hujjatini tahrirlash' : 'Yangi kirim hujjati yaratish' }}</h2>
         <p>{{ isEdit ? 'Kirim hujjati ma\'lumotlarini o\'zgartiring.' : 'Yangi kirim hujjati qo\'shish uchun ma\'lumotlarni kiriting.' }}</p>
       </div>
@@ -22,19 +22,10 @@
           Sana
           <input v-model="form.date" type="date" required />
         </label>
-        <label>
-          Status
-          <select v-model.number="form.status" :disabled="!isEdit" required>
-            <option :value="1">Yaratildi</option>
-            <option :value="2">Tasdiqlandi</option>
-            <option :value="3">Rad etildi</option>
-            <option :value="4">O'zgartirildi</option>
-          </select>
-        </label>
       </div>
 
       <div class="items-section">
-        <h3>Mahsulotlar tarkibi</h3>
+        <h3>Mahsulotlar tarkibi (Tahrirlash uchun qatorni 2 marta bosing)</h3>
         <table class="items-table">
           <thead>
             <tr>
@@ -42,27 +33,37 @@
               <th style="width: 120px;">Miqdor</th>
               <th style="width: 150px;">Narx</th>
               <th style="width: 150px;">Jami</th>
-              <th style="width: 40px;"></th>
+              <th v-if="!isEdit" style="width: 40px;"></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in form.tables" :key="index">
-              <td>
-                <select v-model="item.productId" required @change="updateItemName(item)">
-                  <option :value="null" disabled>Tanlang</option>
-                  <option v-for="p in products" :key="p.id || p.Id" :value="p.id || p.Id">{{ p.name }}</option>
-                </select>
-              </td>
-              <td><input v-model.number="item.quantity" type="number" step="any" min="0.01" required /></td>
-              <td><input v-model.number="item.price" type="number" step="any" min="0" required /></td>
-              <td class="item-total">{{ formatSum(item.quantity * item.price) }}</td>
-              <td>
-                <button type="button" class="btn-remove" @click="removeItem(index)">&times;</button>
-              </td>
-            </tr>
+            <template v-if="isEdit">
+              <tr v-for="item in form.tables" :key="item.id" @dblclick="router.push(`/income-documents/table-edit/${item.id}?docId=${form.id}`)" class="readonly-row">
+                <td>{{ getProductDisplayName(item.productId) }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ formatSum(item.price) }}</td>
+                <td class="item-total">{{ formatSum(item.quantity * item.price) }}</td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr v-for="(item, index) in form.tables" :key="index">
+                <td>
+                  <select v-model="item.productId" required>
+                    <option :value="null" disabled>Tanlang</option>
+                    <option v-for="p in products" :key="p.id || p.Id" :value="p.id || p.Id">{{ p.name }}</option>
+                  </select>
+                </td>
+                <td><input v-model.number="item.quantity" type="number" step="any" min="0.01" required /></td>
+                <td><input v-model.number="item.price" type="number" step="any" min="0" required /></td>
+                <td class="item-total">{{ formatSum(item.quantity * item.price) }}</td>
+                <td>
+                  <button type="button" class="btn-remove" @click="removeItem(index)">&times;</button>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
-        <button type="button" class="btn-add-item" @click="addItem">+ Mahsulot qo'shish</button>
+        <button v-if="!isEdit" type="button" class="btn-add-item" @click="addItem">+ Mahsulot qo'shish</button>
       </div>
 
       <div class="form-footer">
@@ -138,16 +139,21 @@ export default {
       if (!isEdit.value) return;
       try {
         const response = await incomeDocumentService.getById(route.params.id);
-        const data = response.data?.data || response.data;
+        // Backend ma'lumotni 'data', 'value' kalitlari ichida yoki to'g'ridan-to'g'ri qaytarishi mumkin
+        const data = response.data?.data || response.data?.value || response.data;
+
         if (data) {
           form.value = {
             id: data.id ?? data.Id ?? data.ID,
             supplierId: data.supplierId ?? data.SupplierId ?? data.SupplierID,
-            // Sanani yuklashda barcha variantlarni tekshiramiz
-            date: (data.docOn || data.DocOn || data.date || '').slice(0, 10),
+            
+            // Sana formatini to'g'irlash (ISO string -> YYYY-MM-DD)
+            date: (data.docOn || data.DocOn || data.date || data.Date || '').slice(0, 10),
+            
             status: data.statusId ?? data.StatusId ?? data.status ?? 1,
-            // Bola table (tables) elementlarini IDsi bilan birga yuklaymiz
-            tables: (data.tables || data.Tables || []).map(t => ({
+
+            // Bola table (tables yoki items) ma'lumotlarini ID bilan birga yuklash
+            tables: (data.tables || data.Tables || data.items || data.Items || []).map(t => ({
               id: t.id ?? t.Id ?? t.ID ?? 0,
               productId: t.productId ?? t.ProductId ?? t.ProductID,
               quantity: t.quantity ?? t.Quantity ?? 0,
@@ -185,6 +191,11 @@ export default {
 
     const formatSum = (val) => new Intl.NumberFormat('uz-UZ').format(val || 0) + ' UZS';
 
+    const getProductDisplayName = (id) => {
+      const p = products.value.find(x => (x.id || x.Id) === id);
+      return p ? p.name : 'Mahsulot #' + id;
+    };
+
     const updateItemName = (item) => {
       const p = products.value.find(x => x.id === item.productId);
       if (p) item.productName = p.name;
@@ -201,7 +212,7 @@ export default {
           DocOn: new Date(form.value.date + 'T00:00:00Z').toISOString(), // Sanani UTC ISO formatida yuborish
           StatusId: isEdit.value ? parseInt(form.value.status) : 1, // Yangi hujjat uchun har doim 1 (Yaratildi)
           DocSum: calculateTotalSum.value, // Ota jami summasi = bola jadvallar yig'indisi
-          tables: form.value.tables.map(t => ({
+          Tables: form.value.tables.map(t => ({
             Id: isEdit.value ? (t.id || 0) : 0,
             ProductId: parseInt(t.productId),
             Price: parseFloat(t.price),
@@ -246,6 +257,7 @@ export default {
       addItem,
       removeItem,
       formatSum,
+      getProductDisplayName,
       updateItemName,
       successMessage,
       isSaving,
@@ -253,7 +265,8 @@ export default {
       suppliers,
       products,
       saveDocument,
-      cancel
+      cancel,
+      router
     };
   }
 };
@@ -267,7 +280,7 @@ export default {
 }
 
 .wide-card {
-  max-width: 800px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -275,6 +288,11 @@ export default {
   margin-bottom: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   padding-bottom: 1rem;
+}
+
+.header-centered {
+  text-align: center;
+  width: 100%;
 }
 
 .entity-form {
@@ -287,7 +305,7 @@ export default {
 
 .form-header-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }

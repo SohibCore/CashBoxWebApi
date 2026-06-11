@@ -41,7 +41,8 @@
               type="email" 
               :value="userEmail" 
               disabled 
-              style="background: #f1f5f9; cursor: not-allowed;" 
+              placeholder="Email"
+              style="background: rgba(255,255,255,0.05) !important; color: #94a3b8; cursor: not-allowed;" 
             />
           </div>
         </label>
@@ -106,254 +107,233 @@
 
       <p v-if="assignError" class="error">{{ assignError }}</p>
       <p v-if="assignSuccess" class="success">{{ assignSuccess }}</p>
+
+      <div class="button-row">
+        <button type="button" class="btn-save" :disabled="isSaving || !selectedUserId || !hasChanges" @click="saveChanges">
+          <span v-if="isSaving" class="spinner"></span>
+          <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>{{ isSaving ? 'Saqlanmoqda...' : 'Saqlash' }}</span>
+        </button>
+        <button type="button" class="btn-cancel" @click="cancelChanges" :disabled="isSaving || !selectedUserId || !hasChanges">
+          <span>Bekor qilish</span>
+        </button>
+      </div>
     </form>
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
-import { getUsers, getRoles, assignUserRoles, removeUserRole, getUserRoles, getMe, extractApiData } from '../api';
+import { getUsers, getRoles, assignUserRoles, removeUserRole, getUserRoles, getMe, extractApiData, getField } from '../api';
 
-export default {
-  setup() {
-    const route = useRoute();
-    const users = ref([]);
-    const roles = ref([]);
-    const selectedUserId = ref(Number(route.query.userId) || 0);
-    const userEmail = ref(route.query.email || '');
-    const selectedRoleIds = ref([]);
-    const roleDropdownOpen = ref(false);
-    const rolePickerRef = ref(null);
-    const assignError = ref('');
-    const assignSuccess = ref('');
-    const loadingUserRoles = ref(false);
-    const roleActionLoading = ref(false);
+const route = useRoute();
+const users = ref([]);
+const roles = ref([]);
+const selectedUserId = ref(Number(route.query.userId) || 0);
+const userEmail = ref(route.query.email || '');
+const selectedRoleIds = ref([]);
+const roleDropdownOpen = ref(false);
+const rolePickerRef = ref(null);
+const assignError = ref('');
+const assignSuccess = ref('');
+const loadingUserRoles = ref(false);
+const roleActionLoading = ref(false);
+const isSaving = ref(false);
+const originalRoleIds = ref([]);
 
-    const getField = (obj, keys) => {
-      if (!obj) return null;
-      for (const key of keys) {
-        if (obj[key] !== undefined && obj[key] !== null) {
-          return obj[key];
-        }
+const hasChanges = computed(() => {
+  if (selectedRoleIds.value.length !== originalRoleIds.value.length) return true;
+  return !selectedRoleIds.value.every(id => originalRoleIds.value.includes(id));
+});
+
+const selectedRoles = computed(() =>
+  selectedRoleIds.value
+    .map((id) => roles.value.find((r) => r.id === id))
+    .filter(Boolean)
+);
+
+const availableRoles = computed(() =>
+  roles.value.filter((role) => !selectedRoleIds.value.includes(role.id))
+);
+
+const loadUsers = async () => {
+  try {
+    const response = await getUsers();
+    const result = extractApiData(response);
+    const rawUsers = Array.isArray(result) ? result : [];
+    users.value = rawUsers.map((user) => ({
+      id: getField(user, ['id', 'Id', 'userId', 'userID']),
+      userName: getField(user, ['userName', 'UserName', 'username', 'Username']),
+      fullName: getField(user, ['fullName', 'FullName']),
+      email: getField(user, ['email', 'Email'])
+    }));
+
+    try {
+      const meResponse = await getMe();
+      const currentUser = extractApiData(meResponse);
+      const currentUserMapped = {
+        id: getField(currentUser, ['id', 'Id', 'userId', 'userID']),
+        userName: getField(currentUser, ['userName', 'UserName', 'username', 'Username']),
+        fullName: getField(currentUser, ['fullName', 'FullName']),
+        email: getField(currentUser, ['email', 'Email'])
+      };
+      const exists = users.value.some((u) => u.id === currentUserMapped.id);
+      if (!exists && currentUserMapped.id) {
+        users.value.push(currentUserMapped);
       }
-      return null;
-    };
-
-    const selectedRoles = computed(() =>
-      selectedRoleIds.value
-        .map((id) => roles.value.find((r) => r.id === id))
-        .filter(Boolean)
-    );
-
-    const availableRoles = computed(() =>
-      roles.value.filter((role) => !selectedRoleIds.value.includes(role.id))
-    );
-
-    const loadUsers = async () => {
-      try {
-        const response = await getUsers();
-        const result = response.data;
-        const rawUsers = Array.isArray(result)
-          ? result
-          : Array.isArray(result?.data)
-          ? result.data
-          : Array.isArray(result?.items)
-          ? result.items
-          : Array.isArray(result?.value)
-          ? result.value
-          : [];
-        users.value = rawUsers.map((user) => ({
-          id: getField(user, ['id', 'Id', 'userId', 'userID']),
-          userName: getField(user, ['userName', 'UserName', 'username', 'Username']),
-          fullName: getField(user, ['fullName', 'FullName']),
-          email: getField(user, ['email', 'Email'])
-        }));
-
-        try {
-          const meResponse = await getMe();
-          const currentUser = extractApiData(meResponse);
-          const currentUserMapped = {
-            id: getField(currentUser, ['id', 'Id', 'userId', 'userID']),
-            userName: getField(currentUser, ['userName', 'UserName', 'username', 'Username']),
-            fullName: getField(currentUser, ['fullName', 'FullName']),
-            email: getField(currentUser, ['email', 'Email'])
-          };
-          const exists = users.value.some((u) => u.id === currentUserMapped.id);
-          if (!exists && currentUserMapped.id) {
-            users.value.push(currentUserMapped);
-          }
-        } catch (meError) {
-          console.error('Error fetching current user:', meError);
-        }
-      } catch (error) {
-        console.error('Load users error:', error);
-      }
-    };
-
-    const loadRoles = async () => {
-      try {
-        const response = await getRoles();
-        const result = response.data;
-        const rawRoles = Array.isArray(result)
-          ? result
-          : Array.isArray(result?.data)
-          ? result.data
-          : Array.isArray(result?.items)
-          ? result.items
-          : Array.isArray(result?.value)
-          ? result.value
-          : [];
-        roles.value = rawRoles.map((role) => ({
-          id: getField(role, ['id', 'Id', 'roleId', 'RoleId']),
-          name: getField(role, ['name', 'Name', 'roleName', 'RoleName', 'title', 'Title']) || ''
-        }));
-      } catch (error) {
-        console.error('Load roles error:', error);
-      }
-    };
-
-    const loadUserRoles = async (userId) => {
-      if (!userId) {
-        selectedRoleIds.value = [];
-        return;
-      }
-      loadingUserRoles.value = true;
-      assignError.value = '';
-      try {
-        const response = await getUserRoles(userId);
-        const data = extractApiData(response);
-        const rawList = Array.isArray(data) ? data : [];
-        const roleIds = rawList
-          .map((item) => getField(item, ['roleId', 'RoleId']))
-          .filter((id) => id != null);
-        selectedRoleIds.value = [...new Set(roleIds)];
-      } catch (error) {
-        console.error('Load user roles error:', error);
-        assignError.value = 'Foydalanuvchi rollarini yuklashda xatolik yuz berdi.';
-        selectedRoleIds.value = [];
-      } finally {
-        loadingUserRoles.value = false;
-      }
-    };
-
-    const onUserChange = async () => {
-      assignSuccess.value = '';
-      assignError.value = '';
-      roleDropdownOpen.value = false;
-      const found = users.value.find(u => u.id === selectedUserId.value);
-      if (found) userEmail.value = found.email || '';
-      await loadUserRoles(selectedUserId.value);
-    };
-
-    const toggleRoleDropdown = () => {
-      if (!selectedUserId.value || roles.value.length === 0) return;
-      roleDropdownOpen.value = !roleDropdownOpen.value;
-    };
-
-    const closeRoleDropdown = () => {
-      roleDropdownOpen.value = false;
-    };
-
-    const handleClickOutside = (event) => {
-      if (rolePickerRef.value && !rolePickerRef.value.contains(event.target)) {
-        closeRoleDropdown();
-      }
-    };
-
-    const addRole = async (role) => {
-      if (!selectedUserId.value || selectedRoleIds.value.includes(role.id)) return;
-      assignError.value = '';
-      assignSuccess.value = '';
-      roleActionLoading.value = true;
-      try {
-        await assignUserRoles(selectedUserId.value, [role.id]);
-        selectedRoleIds.value = [...selectedRoleIds.value, role.id];
-        assignSuccess.value = `"${role.name}" roli biriktirildi.`;
-        if (availableRoles.value.length === 0) {
-          closeRoleDropdown();
-        }
-      } catch (error) {
-        console.error('Assign role error:', error.response?.data || error.message);
-        assignError.value = error.response?.data?.message || error.response?.data || 'Rol biriktirishda xatolik yuz berdi.';
-      } finally {
-        roleActionLoading.value = false;
-      }
-    };
-
-    const removeRole = async (roleId) => {
-      if (!selectedUserId.value) return;
-      const role = roles.value.find((r) => r.id === roleId);
-      assignError.value = '';
-      assignSuccess.value = '';
-      roleActionLoading.value = true;
-      try {
-        await removeUserRole(selectedUserId.value, roleId);
-        selectedRoleIds.value = selectedRoleIds.value.filter((id) => id !== roleId);
-        assignSuccess.value = role ? `"${role.name}" roli olib tashlandi.` : 'Rol olib tashlandi.';
-      } catch (error) {
-        console.error('Remove role error:', error.response?.data || error.message);
-        assignError.value = error.response?.data?.message || error.response?.data || 'Rolni olib tashlashda xatolik yuz berdi.';
-      } finally {
-        roleActionLoading.value = false;
-      }
-    };
-
-    onMounted(async () => {
-      document.addEventListener('click', handleClickOutside);
-      await loadUsers();
-      await loadRoles();
-      if (selectedUserId.value) {
-        await loadUserRoles(selectedUserId.value);
-        if (!userEmail.value) {
-          const found = users.value.find(u => u.id === selectedUserId.value);
-          if (found) userEmail.value = found.email || '';
-        }
-      }
-    });
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside);
-    });
-
-    return {
-      users,
-      roles,
-      selectedUserId,
-      userEmail,
-      selectedRoleIds,
-      selectedRoles,
-      availableRoles,
-      roleDropdownOpen,
-      rolePickerRef,
-      assignError,
-      assignSuccess,
-      loadingUserRoles,
-      roleActionLoading,
-      onUserChange,
-      toggleRoleDropdown,
-      addRole,
-      removeRole
-    };
+    } catch (meError) {
+      console.error('Error fetching current user:', meError);
+    }
+  } catch (error) {
+    console.error('Load users error:', error);
   }
 };
+
+const loadRoles = async () => {
+  try {
+    const response = await getRoles();
+    const result = extractApiData(response);
+    const rawRoles = Array.isArray(result) ? result : [];
+    roles.value = rawRoles.map((role) => ({
+      id: getField(role, ['id', 'Id', 'roleId', 'RoleId']),
+      name: getField(role, ['name', 'Name', 'roleName', 'RoleName', 'title', 'Title']) || ''
+    }));
+  } catch (error) {
+    console.error('Load roles error:', error);
+  }
+};
+
+const loadUserRoles = async (userId) => {
+  if (!userId) {
+    selectedRoleIds.value = [];
+    return;
+  }
+  loadingUserRoles.value = true;
+  assignError.value = '';
+  try {
+    const response = await getUserRoles(userId);
+    const data = extractApiData(response);
+    const rawList = Array.isArray(data) ? data : [];
+    const roleIds = rawList
+      .map((item) => getField(item, ['roleId', 'RoleId']))
+      .filter((id) => id != null);
+    selectedRoleIds.value = [...new Set(roleIds)];
+      originalRoleIds.value = [...selectedRoleIds.value];
+  } catch (error) {
+    console.error('Load user roles error:', error);
+    assignError.value = 'Foydalanuvchi rollarini yuklashda xatolik yuz berdi.';
+    selectedRoleIds.value = [];
+  } finally {
+    loadingUserRoles.value = false;
+  }
+};
+
+const onUserChange = async () => {
+  selectedRoleIds.value = [];
+  originalRoleIds.value = [];
+  assignSuccess.value = '';
+  assignError.value = '';
+  roleDropdownOpen.value = false;
+  const found = users.value.find(u => u.id === selectedUserId.value);
+  if (found) userEmail.value = found.email || '';
+  await loadUserRoles(selectedUserId.value);
+};
+
+const toggleRoleDropdown = () => {
+  if (!selectedUserId.value || roles.value.length === 0) return;
+  roleDropdownOpen.value = !roleDropdownOpen.value;
+};
+
+const closeRoleDropdown = () => {
+  roleDropdownOpen.value = false;
+};
+
+const handleClickOutside = (event) => {
+  if (rolePickerRef.value && !rolePickerRef.value.contains(event.target)) {
+    closeRoleDropdown();
+  }
+};
+
+const addRole = async (role) => {
+  if (!selectedUserId.value || selectedRoleIds.value.includes(role.id)) return;
+  assignError.value = '';
+  assignSuccess.value = '';
+  roleActionLoading.value = true;
+  try {
+    await assignUserRoles(selectedUserId.value, [role.id]);
+    selectedRoleIds.value = [...selectedRoleIds.value, role.id];
+    assignSuccess.value = `"${role.name}" roli biriktirildi.`;
+    if (availableRoles.value.length === 0) {
+      closeRoleDropdown();
+    }
+  } catch (error) {
+    console.error('Assign role error:', error.response?.data || error.message);
+    assignError.value = error.response?.data?.message || error.response?.data || 'Rol biriktirishda xatolik yuz berdi.';
+  } finally {
+    roleActionLoading.value = false;
+  }
+};
+
+const removeRole = async (roleId) => {
+  if (!selectedUserId.value) return;
+  const role = roles.value.find((r) => r.id === roleId);
+  assignError.value = '';
+  assignSuccess.value = '';
+  roleActionLoading.value = true;
+  try {
+    await removeUserRole(selectedUserId.value, roleId);
+    selectedRoleIds.value = selectedRoleIds.value.filter((id) => id !== roleId);
+    assignSuccess.value = role ? `"${role.name}" roli olib tashlandi.` : 'Rol olib tashlandi.';
+  } catch (error) {
+    console.error('Remove role error:', error.response?.data || error.message);
+    assignError.value = error.response?.data?.message || error.response?.data || 'Rolni olib tashlashda xatolik yuz berdi.';
+  } finally {
+    roleActionLoading.value = false;
+  }
+};
+
+onMounted(async () => {
+  document.addEventListener('click', handleClickOutside);
+  await loadUsers();
+  await loadRoles();
+  if (selectedUserId.value) {
+    await loadUserRoles(selectedUserId.value);
+    if (!userEmail.value) {
+      const found = users.value.find(u => u.id === selectedUserId.value);
+      if (found) userEmail.value = found.email || '';
+    }
+  }
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <style scoped>
 .role-assignment-page.page-card {
-  background: white;
+  background: #0d1117;
   padding: 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
 }
 
 .role-assignment-page.wide-card {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
 .section-header {
   margin-bottom: 1.5rem;
+}
+
+.entity-form {
+  background: #111827 !important;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .form-grid {
@@ -375,7 +355,7 @@ export default {
   gap: 0.5rem;
   margin: 0;
   font-weight: 600;
-  color: #0f172a;
+  color: #94a3b8;
 }
 
 .field-label {
@@ -417,7 +397,7 @@ export default {
   width: 2rem;
   height: 2rem;
   border-radius: 0.5rem;
-  background: #eff6ff;
+  background: transparent !important;
   color: #2563eb;
 }
 
@@ -433,18 +413,25 @@ export default {
 .field-with-icon select, .field-with-icon input {
   width: 100%;
   min-height: 3rem;
-  padding: 0.75rem 2.25rem 0.75rem 3.15rem;
+  padding: 0.75rem 2.25rem 0.75rem 3.25rem;
   margin: 0;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.7rem;
   font-size: 0.95rem;
   font-weight: 400;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #f1f5f9;
   box-sizing: border-box;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.65rem center;
+}
+
+.field-with-icon input:focus, .field-with-icon select:focus {
+  border-color: #3b82f6;
+  outline: none;
+  background: #1e293b !important;
 }
 
 .role-picker-trigger {
@@ -455,23 +442,23 @@ export default {
   width: 100%;
   min-height: 3rem;
   margin: 0;
-  padding: 0.5rem 2.25rem 0.5rem 0.65rem;
-  border: 1px solid #cbd5e1;
+  padding: 0.5rem 2.25rem 0.5rem 3.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.7rem;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.05) !important;
   cursor: pointer;
   text-align: left;
   font: inherit;
   font-weight: 400;
-  color: #0f172a;
+  color: #f1f5f9;
 }
 
 .role-picker-trigger:hover:not(:disabled) {
-  border-color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .role-picker-trigger:disabled {
-  background: #f1f5f9;
+  background: rgba(255, 255, 255, 0.02);
   cursor: not-allowed;
   opacity: 0.85;
 }
@@ -498,12 +485,20 @@ export default {
   gap: 0.2rem;
   max-width: 100%;
   padding: 0.2rem 0.35rem 0.2rem 0.55rem;
-  background: #dbeafe;
-  color: #1e40af;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 999px;
   font-size: 0.82rem;
   font-weight: 600;
   line-height: 1.3;
+}
+
+.role-picker-trigger .field-icon {
+  position: absolute;
+  left: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .role-chip-remove {
@@ -517,15 +512,15 @@ export default {
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: #1e40af;
+  color: #60a5fa;
   font-size: 1.1rem;
   line-height: 1;
   cursor: pointer;
 }
 
 .role-chip-remove:hover:not(:disabled) {
-  background: #bfdbfe;
-  color: #1e3a8a;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
 }
 
 .role-chip-remove:disabled {
@@ -554,8 +549,8 @@ export default {
   top: calc(100% + 0.35rem);
   max-height: 220px;
   overflow-y: auto;
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0.65rem;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
 }
@@ -574,10 +569,10 @@ export default {
   margin: 0;
   padding: 0.65rem 1rem;
   border: none;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 0;
-  background: #fff;
-  color: #0f172a;
+  background: transparent;
+  color: #f1f5f9;
   font-size: 0.92rem;
   font-weight: 400;
   text-align: left;
@@ -589,7 +584,7 @@ export default {
 }
 
 .role-dropdown-item:hover:not(:disabled) {
-  background: #eff6ff;
+  background: rgba(59, 130, 246, 0.2);
 }
 
 .role-dropdown-item:disabled {
@@ -607,5 +602,64 @@ export default {
   margin-top: 1rem;
   color: #16a34a;
   font-size: 0.95rem;
+}
+
+.button-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 0.6rem;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-save:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.8rem 2rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>

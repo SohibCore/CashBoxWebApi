@@ -199,8 +199,12 @@ export async function deleteUser(id) {
   return api.delete(`/api/user/delete/${id}`);
 }
 
-export async function getOrganizations(params = {}) {
+export async function getOrganizations(params = {}) { // Umumiy getOrganizations funksiyasi
   return api.get('/api/organization/getlist', { params });
+}
+
+export async function getOrganizationsForRegister(params = {}) { // Faqat register uchun
+  return api.get('/api/organization/GetListForRegister', { params });
 }
 
 export async function getOrganizationById(id) {

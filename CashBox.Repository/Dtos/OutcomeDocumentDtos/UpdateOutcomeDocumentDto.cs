@@ -7,6 +7,6 @@
         public int SupplierId { get; set; }
         public decimal DocSum { get; set; }
 
-        public ICollection<OutcomeDocumentTableDlDto> Tables = new List<OutcomeDocumentTableDlDto>();
+        public ICollection<OutcomeDocumentTableDlDto> Tables { get; set; } = new List<OutcomeDocumentTableDlDto>();
     }
 }

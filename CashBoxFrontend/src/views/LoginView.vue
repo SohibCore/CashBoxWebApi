@@ -107,7 +107,7 @@
               localStorage.setItem('userId', currentUser.id);
             }
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            router.push('/users');
+            router.push('/income-documents');
           } else {
             throw new Error('Token topilmadi');
           }

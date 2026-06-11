@@ -1,5 +1,6 @@
 <template>
-  <div class="page-card wide-card">
+  <div class="currencies-page">
+    <div class="page-card wide-card">
     <div class="section-header"> 
       <div>
         <h2>Valyutalar</h2>
@@ -8,14 +9,28 @@
     </div>
 
     <div class="section-actions">
-      <router-link to="/currencies/new" class="toggle-create">
-        <span>+</span> Yangi valyuta yaratish
-      </router-link>
-      <span class="user-count">{{ currencies.length }} ta valyuta</span>
+      <span class="user-count">{{ currencies.length }} ta valyuta</span> <!-- 'toggle-create' bu yerdan olib tashlandi -->
     </div>
 
     <div class="data-panel">
-      <h3>Valyutalar ro'yxati</h3>
+      <div class="table-header"> <!-- Yangi table-header divi qo'shildi -->
+        <h3>Valyutalar ro'yxati</h3>
+        <!-- "+ Yangi valyuta yaratish" tugmasi bu yerga ko'chirildi -->
+        <router-link to="/currencies/new" class="btn-primary">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Yangi valyuta yaratish
+        </router-link>
+      </div>
       <table>
         <thead>
           <tr>
@@ -61,6 +76,7 @@
         </tbody>
       </table>
     </div>
+  </div>
   </div>
 </template>
 
@@ -127,7 +143,16 @@ export default {
 </script>
 
 <style scoped>
+/* Sahifaning umumiy fonini belgilaymiz */
+.currencies-page {
+  background: #0d1117 !important;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .page-card {
+  /* Karta fonini va hoshiyasini dark theme ga moslaymiz */
   background: #111827;
   padding: 24px;
   border-radius: 12px;
@@ -141,59 +166,70 @@ export default {
   margin: 0;
 }
 
-.section-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  padding-bottom: 1rem;
+.section-header { /* Boshqa sahifalarga mos header stillari */
+  margin-bottom: 1.5rem;
 }
 
+.section-header h2 { color: #f1f5f9; margin: 0; }
+.section-header p { color: #94a3b8; margin: 4px 0 0; }
+
+/* Amallar qatori (filtr va hisoblagich) */
 .section-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  gap: 1rem;
   align-items: center;
   margin-bottom: 1rem;
-  gap: 1rem;
-  flex-wrap: wrap;
 }
 
-.search-and-count {
+.user-count { /* Foydalanuvchi sonini ko'rsatuvchi stil */
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Jadval kartochkasi stillari */
+.data-panel {
+  background: #111827; /* Jadval cardining foni */
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.07); /* Jadval cardining hoshiyasi */
+  overflow: hidden; /* Ichki kontentni o'ramaydigan stillar */
+}
+
+/* Jadval sarlavhasi (header) va tugma stillari */
+.table-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07); /* Header ostidagi chiziq */
 }
 
-.search-input {
-  padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.75rem;
-  font-size: 0.95rem;
+.table-header h3 { /* Jadval sarlavhasi matni */
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 15px;
 }
 
-.toggle-create {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #2563eb;
-  color: white;
-  padding: 0.85rem 1rem;
-  border-radius: 0.75rem;
+/* Tugma stillari */
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
   border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   cursor: pointer;
   text-decoration: none;
-  font-size: 0.95rem; /* Inherit o'rniga aniq qiymat */
-  font-family: inherit;
-  height: 38px; /* Chiqim hujjatlaridagi tugma balandligi */
-  justify-content: center; /* Kontentni vertikal markazlash */
-  font-weight: 600; /* Qalinroq matn */
+  font-weight: 600;
+  transition: background 0.2s;
 }
 
-.toggle-create:hover {
-  background: #1d4ed8;
-  color: white;
+.btn-primary:hover {
+  background: #2563eb;
 }
 
 th {
@@ -206,7 +242,6 @@ th {
   letter-spacing: 0.6px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   font-weight: 600;
-  white-space: nowrap;
 }
 
 td {

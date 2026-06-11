@@ -1,5 +1,7 @@
 <template>
   <div class="page-card wide-card">
+    <NavigationHistory />
+    
     <div class="section-header">
       <div>
         <h2>Foydalanuvchilar</h2>
@@ -8,14 +10,20 @@
     </div>
 
     <div class="section-actions">
-      <router-link to="/users/new" class="toggle-create">
-        <span>+</span> Yangi foydalanuvchi
-      </router-link>
       <span class="user-count">{{ users.length }} ta foydalanuvchi</span>
     </div>
 
     <div class="data-panel">
-      <h3>Foydalanuvchi ro‘yxati</h3>
+      <div class="table-header">
+        <h3>Foydalanuvchi ro‘yxati</h3>
+        <router-link to="/users/new" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Yangi foydalanuvchi qo'shish
+        </router-link>
+      </div>
       <table>
         <thead>
           <tr>
@@ -168,6 +176,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import NavigationHistory from './NavigationHistory.vue';
 import { 
   getUsers, 
   deleteUser, 
@@ -178,7 +187,9 @@ import {
   assignUserRoles, 
   removeUserRole,
   extractApiData,
-  getField
+  getField,
+  getMe,
+  normalizeUser
 } from '../api';
 
 export default {
@@ -203,6 +214,22 @@ export default {
     };
 
     const loadUsers = async () => {
+      let currentUserRole = '';
+      try {
+        const meResponse = await getMe();
+        const user = normalizeUser(extractApiData(meResponse));
+        currentUserRole = user?.role || '';
+      } catch (err) {
+        console.error('Foydalanuvchi rolini yuklashda xatolik:', err);
+        users.value = [];
+        return;
+      }
+
+      if (currentUserRole.toLowerCase() !== 'admin') {
+        users.value = []; // Admin bo'lmasa ma'lumotlarni ko'rsatmaymiz
+        return;
+      }
+
       try {
         const response = await getUsers();
         const result = extractApiData(response);
@@ -394,18 +421,19 @@ export default {
       filteredAvailableRoles,
       isSaving,
       modalError,
-      modalSuccess
+      modalSuccess,
+      NavigationHistory
     };
   }
 };
 </script>
 
-<style>
+ <style scoped>
 .page-card {
-  background: white;
+  background: #111827;
   padding: 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .wide-card {
@@ -422,6 +450,9 @@ export default {
   text-align: center;
   margin-bottom: 1.5rem;
 }
+
+.section-header h2 { color: #f1f5f9; }
+.section-header p { color: #94a3b8; }
 
 .entity-form {
   margin-bottom: 1.5rem;
@@ -460,7 +491,7 @@ export default {
 }
 
 .user-count {
-  color: #475569;
+  color: #94a3b8;
   font-weight: 600;
 }
 
@@ -476,11 +507,11 @@ export default {
   margin-top: 0.3rem;
   display: flex; /* Flexbox xususiyatini saqlab qolamiz */
   gap: 0.25rem; /* Bo'shliqni kamaytiramiz */
-  background: white;
+  background: #1e293b;
   padding: 0.25rem; /* Paddingni kamaytiramiz */
   border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   z-index: 10;
   white-space: nowrap;
 }
@@ -490,8 +521,8 @@ export default {
   align-items: center;
   gap: 0.3rem;
   border: 1px solid transparent;
-  background: #ffffff;
-  color: #0f172a;
+  background: transparent;
+  color: #f1f5f9;
   padding: 0.3rem 0.5rem; /* Paddingni kamaytiramiz */
   font-size: 0.72rem; /* Font hajmini kichiklashtiramiz */
   border-radius: 0.4rem;
@@ -505,8 +536,8 @@ export default {
 }
 
 .dropdown-btn:hover {
-  background: #eff6ff;
-  border-color: #cbd5e1;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .dropdown-btn.danger {
@@ -524,15 +555,11 @@ export default {
   transform: rotate(180deg);
 }
 
-.expanded-row td {
-  background: #eff6ff;
-}
-
 .expanded-actions {
   padding: 0.75rem 1rem;
   display: flex;
   justify-content: flex-end;
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .action-card {
@@ -540,11 +567,11 @@ export default {
   gap: 0.75rem;
   flex-wrap: wrap;
   align-items: center;
-  background: white;
+  background: #1e293b;
   padding: 0.5rem 0.75rem;
   border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .small-action {
@@ -580,16 +607,17 @@ export default {
 }
 
 .section-card {
-  background: white;
+  background: #111827;
   border-radius: 1rem;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 label {
   display: block;
   font-weight: 600;
+  color: #94a3b8;
 }
 
 input,
@@ -597,9 +625,12 @@ select {
   width: 100%;
   padding: 0.75rem;
   margin-top: 0.5rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
   border-radius: 0.7rem;
   font-size: 0.95rem;
+  outline: none;
 }
 
 button {
@@ -626,9 +657,37 @@ button {
 .data-panel {
   width: 100%; /* Ensure it takes full width */
   overflow-x: visible; /* Allow content to overflow if necessary, but text will wrap */
-  background: #f8fafc;
-  padding: 1.5rem;
+  background: #111827;
   border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.table-header h3 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 15px;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 table {
@@ -640,28 +699,27 @@ table {
 
 thead th {
   text-align: left;
-  padding: 0.65rem 0.5rem; /* OrganizationsView ga moslash */
-  border-bottom: 1px solid #e2e8f0;
-  background-color: #f0f2f5;
-  color: #333;
+  padding: 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background-color: #0f172a;
+  color: #475569;
   font-weight: 600;
-  font-size: 0.82rem; /* OrganizationsView ga moslash */
-  line-height: 1.3; /* OrganizationsView ga moslash */
-  white-space: normal; /* Matnni o'rashga ruxsat berish */
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 11px;
 }
 
 tbody tr:hover {
-  background-color: #f0f7ff;
+  background-color: rgba(255, 255, 255, 0.03);
   cursor: pointer;
 }
 
 tbody td {
-  padding: 0.75rem 0.5rem; /* OrganizationsView ga moslash */
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 0.88rem; /* OrganizationsView ga moslash */
-  line-height: 1.35; /* OrganizationsView ga moslash */
-  vertical-align: top; /* OrganizationsView ga moslash */
+  padding: 0.9rem 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  color: #94a3b8;
   word-break: break-word; /* Matnni o'rashga ruxsat berish */
+  font-size: 13.5px;
 }
 
 .actions {
@@ -714,7 +772,7 @@ button.danger {
 }
 
 .modal-content {
-  background: white;
+  background: #111827;
   border-radius: 1rem;
   padding: 2rem;
   max-width: 800px;
@@ -722,7 +780,8 @@ button.danger {
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .modal-header {
@@ -742,7 +801,7 @@ button.danger {
 .modal-tabs {
   display: flex;
   gap: 1rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   margin-bottom: 1.5rem;
 }
 
@@ -808,11 +867,13 @@ button.danger {
 }
 
 .add-role-btn {
-  background: #f1f5f9;
-  color: #475569;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 0.8rem;
   padding: 0.4rem 0.8rem;
   border-radius: 0.5rem;
+  cursor: pointer;
 }
 
 .error-msg { color: #dc2626; margin-top: 1rem; }

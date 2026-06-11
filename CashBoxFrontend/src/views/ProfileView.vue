@@ -3,21 +3,21 @@
     <div class="section-header">
       <div>
         <h2>Profil</h2>
-        <p>Foydalanuvchi ma'lumotlari va to'liq profilni ko'rish.</p>
+        <p>Tizimga kirgan foydalanuvchining shaxsiy ma'lumotlari.</p>
       </div>
     </div>
 
     <div v-if="user" class="profile-grid">
-      <div class="profile-item"><strong>Login:</strong> {{ user.userName }}</div>
-      <div class="profile-item"><strong>Email:</strong> {{ user.email || '-' }}</div>
-      <div class="profile-item"><strong>To'liq ism:</strong> {{ user.fullName || '-' }}</div>
-      <div class="profile-item"><strong>Qisqa nom:</strong> {{ user.shortName || '-' }}</div>
-      <div class="profile-item"><strong>PINFL:</strong> {{ user.pinfl || '-' }}</div>
-      <div class="profile-item"><strong>Telefon:</strong> {{ user.phoneNumber || '-' }}</div>
-      <div class="profile-item"><strong>Manzil:</strong> {{ user.address || '-' }}</div>
-      <div class="profile-item"><strong>Tug'ilgan sana:</strong> {{ formatDisplayDate(user.dateOfBirth) || '-' }}</div>
-      <div class="profile-item"><strong>Passport seriya:</strong> {{ user.passportSeries || '-' }}</div>
-      <div class="profile-item"><strong>Tashkilot:</strong> {{ organizationName(user.organizationId) }}</div>
+      <div class="profile-item"><span class="label">Login:</span> <span class="value">{{ user.userName }}</span></div>
+      <div class="profile-item"><span class="label">Email:</span> <span class="value">{{ user.email || '-' }}</span></div>
+      <div class="profile-item"><span class="label">To'liq ism:</span> <span class="value">{{ user.fullName || '-' }}</span></div>
+      <div class="profile-item"><span class="label">Qisqa nom:</span> <span class="value">{{ user.shortName || '-' }}</span></div>
+      <div class="profile-item"><span class="label">PINFL:</span> <span class="value">{{ user.pinfl || '-' }}</span></div>
+      <div class="profile-item"><span class="label">Telefon:</span> <span class="value">+998 {{ user.phoneNumber || '-' }}</span></div>
+      <div class="profile-item"><span class="label">Manzil:</span> <span class="value">{{ user.address || '-' }}</span></div>
+      <div class="profile-item"><span class="label">Tug'ilgan sana:</span> <span class="value">{{ formatDisplayDate(user.dateOfBirth) || '-' }}</span></div>
+      <div class="profile-item"><span class="label">Passport:</span> <span class="value">{{ user.passportSeries || '-' }}</span></div>
+      <div class="profile-item"><span class="label">Tashkilot:</span> <span class="value">{{ organizationName(user.organizationId) }}</span></div>
     </div>
 
     <div v-if="!user" class="empty-state">
@@ -145,55 +145,34 @@ export default {
 };
 </script>
 
-<style>
-.page-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
-}
+<style scoped>
+.page-card { background: #0d1117; padding: 1.5rem; border-radius: 1rem; }
+.wide-card { max-width: 1400px; margin: 0 auto; }
+.section-header { margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 1rem; }
+.section-header h2 { color: #f1f5f9; margin: 0; }
+.section-header p { color: #94a3b8; margin: 5px 0 0; }
 
-.wide-card {
-  max-width: 1000px;
-  margin: 0 auto;
-}
+.profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+@media (max-width: 768px) { .profile-grid { grid-template-columns: 1fr; } }
 
-.section-header {
-  margin-bottom: 1.5rem;
-}
-
-.profile-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.profile-item {
-  background: #f8fafc;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
-}
-
-.empty-state {
-  padding: 1.5rem;
-  background: #f8fafc;
-  border-radius: 0.75rem;
-  border: 1px dashed #cbd5e1;
-}
-
-.button-row {
+.profile-item { 
+  background: #111827; 
+  padding: 1.25rem; 
+  border-radius: 0.75rem; 
+  border: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  gap: 5px;
 }
+.label { font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: 600; letter-spacing: 0.5px; }
+.value { color: #f1f5f9; font-size: 15px; font-weight: 500; }
 
-button {
-  border: none;
-  background: #2563eb;
-  color: white;
-  padding: 0.9rem 1.25rem;
-  border-radius: 0.75rem;
-  cursor: pointer;
+.empty-state { padding: 3rem; text-align: center; color: #64748b; background: #111827; border-radius: 0.75rem; border: 1px dashed rgba(255,255,255,0.1); }
+.button-row { display: flex; justify-content: flex-start; margin-top: 1rem; }
+
+button { 
+  border: none; background: #2563eb; color: white; padding: 0.9rem 2rem; border-radius: 0.75rem; cursor: pointer; 
+  font-weight: 600; transition: all 0.2s;
 }
+button:hover { background: #1d4ed8; transform: translateY(-1px); }
 </style>

@@ -26,10 +26,11 @@ namespace CashBox.Service.Services.IncomeDocumentServices
                 {
                     Id = u.Id,
                     SupplierId = u.SupplierId,
-                    SupplierName = u.Supplier.Code,
+                    SupplierName = u.Supplier.Code, 
                     DocSum = u.DocSum,
                     DocOn = u.DocOn,
                     StatusName = u.Status.ShortName,
+                    StatusId = u.StatusId
                 }).SortFilter(filter)
             .ToListAsync();
             return result;
@@ -94,22 +95,17 @@ namespace CashBox.Service.Services.IncomeDocumentServices
 
         public async Task UpdateAsync(UpdateIncomeDocumentDlDto dto)
         {
-            var entity = await _context.IncomeDocuments    
+            var entity = await _context.IncomeDocuments
                 .Include(x => x.Tables)
                 .FirstOrDefaultAsync(x => x.StatusId != StatusIdConst.DELETE
                     && x.OrganizationId == _account.OrganizationId && x.Id == dto.Id);
 
             if (entity == null)
                 throw new KeyNotFoundException($"{dto.Id} topilmadi");
-            
-            if (entity.SupplierId != dto.SupplierId)
-                entity.SupplierId = dto.SupplierId;
 
-            if (entity.DocOn != dto.DocOn)
-                entity.DocOn = DateTime.SpecifyKind(dto.DocOn, DateTimeKind.Utc);
-
-            if(entity.DocSum != dto.DocSum)
-                entity.DocSum = dto.Tables.Sum(x => x.Price * x.Quantity);
+            entity.SupplierId = dto.SupplierId;
+            entity.DocOn = DateTime.SpecifyKind(dto.DocOn, DateTimeKind.Utc);
+            entity.DocSum = dto.Tables.Sum(x => x.Price * x.Quantity);
 
             entity.StatusId = StatusIdConst.MODIFIED;
             entity.ModifiedAt = DateTime.UtcNow;
@@ -125,6 +121,7 @@ namespace CashBox.Service.Services.IncomeDocumentServices
                 Quantity = x.Quantity,
                 TotalSum = x.Price * x.Quantity,
             }).ToList();
+
             await _context.SaveChangesAsync();
         }
 
@@ -139,7 +136,7 @@ namespace CashBox.Service.Services.IncomeDocumentServices
             await _context.SaveChangesAsync();
         }
 
-        public async Task<long> Accept(int id)
+        public async Task<long> Accept(long id)
         {
             var entity = await _context.IncomeDocuments.FindAsync(id);
 
@@ -151,7 +148,7 @@ namespace CashBox.Service.Services.IncomeDocumentServices
             return entity.Id;
         }
 
-        public async Task<long> NotAccept(int id)
+        public async Task<long> NotAccept(long id)
         {
             var entity = await _context.IncomeDocuments.FindAsync(id);
 

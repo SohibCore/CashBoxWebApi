@@ -1,5 +1,7 @@
 <template>
   <div class="page-card wide-card">
+    <NavigationHistory />
+    
     <div class="section-header">
       <div>
         <h2>{{ isEdit ? 'Valyutani tahrirlash' : 'Yangi valyuta yaratish' }}</h2>
@@ -35,6 +37,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import NavigationHistory from './NavigationHistory.vue';
 import { getCurrencyById, createCurrency, updateCurrency } from '../api'; // getCurrencies olib tashlandi, getCurrencyById qo'shildi
 
 export default {
@@ -138,6 +141,9 @@ export default {
   padding-bottom: 1rem;
 }
 
+.section-header h2 { color: #f1f5f9; }
+.section-header p { color: #94a3b8; }
+
 .entity-form {
   background: rgba(255, 255, 255, 0.02);
   padding: 2rem;
@@ -175,6 +181,7 @@ input {
 input:focus {
   outline: none;
   border-color: #2563eb;
+  background: #1e293b !important;
 }
 
 .button-row {
@@ -183,30 +190,40 @@ input:focus {
   margin-top: 2rem;
 }
 
+.button-row button[type="submit"] {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  font-weight: 600;
+}
+
 .btn-secondary {
-  background: #e2e8f0;
-  color: #475569;
-  border: 1px solid #cbd5e1;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background: #cbd5e1;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .error {
-  color: #dc2626;
+  color: #ef4444;
   margin-top: 1.5rem;
   padding: 0.75rem;
-  background: #fef2f2;
+  background: rgba(220, 38, 38, 0.1);
   border-radius: 0.5rem;
-  border: 1px solid #fee2e2;
+  border: 1px solid rgba(220, 38, 38, 0.2);
 }
 
 .success {
-  color: #16a34a;
+  color: #10b981;
   margin-top: 1.5rem;
   padding: 0.75rem;
-  background: #f0fdf4;
-  border: 1px solid #dcfce7;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 </style>

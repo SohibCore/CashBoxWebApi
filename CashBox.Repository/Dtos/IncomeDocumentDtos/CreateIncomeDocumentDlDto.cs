@@ -14,6 +14,6 @@ namespace CashBox.Repository.Dtos.IncomeDocumentDtos
         [Required]
         [Range(0.0000000000000000001, int.MaxValue)]
         public decimal DocSum { get; set; }
-        public ICollection<IncomeDocumentTableDlDto> Tables { get; set; } = new List<IncomeDocumentTableDlDto>();
+        public List<IncomeDocumentTableDlDto> Tables { get; set; } = new List<IncomeDocumentTableDlDto>();
     }
 }

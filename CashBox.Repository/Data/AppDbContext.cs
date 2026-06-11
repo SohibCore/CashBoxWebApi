@@ -1,4 +1,5 @@
 ﻿using CashBox.Repository.Entity;
+using CashBox.Repository.Entity.Reports;
 using CashBox.Repository.Enum;
 using Microsoft.EntityFrameworkCore;
 using Repository.Entity;
@@ -25,7 +26,9 @@ namespace Repository.Data
         public DbSet<IncomeDocument> IncomeDocuments { get; set; }
         public DbSet<IncomeDocumentTable> IncomeDocumentTables { get; set; }
         public DbSet<OutcomeDocument> OutcomeDocuments { get; set; }
-        public DbSet<IncomeDocumentTable> OutcomeDocumentTables { get; set; }
+        public DbSet<OutcomeDocumentTable> OutcomeDocumentTables { get; set; }
+        public DbSet<DocumentReport> DocumentReports { get; set; }
+        public DbSet<IncomeReportTable> DocumentTurnoverReports { get; set; }
         public DbSet<Status> Statuses{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
