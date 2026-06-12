@@ -113,7 +113,7 @@ export default {
     const form = ref({
       id: null,
       supplierId: null,
-      date: new Date().toISOString().slice(0, 10), 
+      date: new Date().toISOString().slice(0, 10),
       status: 1,
       tables: []
     });

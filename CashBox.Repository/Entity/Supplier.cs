@@ -12,14 +12,15 @@ namespace CashBox.Repository.Entity
         [Column("ID")]
         public int Id { get; set; }
 
-        [Required]
         [Column("INN")]
         [StringLength(10)]
         public string Inn { get; set; } = null!;
 
-        [Required]
         [Column("CODE")]
         public string Code { get; set; } = null!;
+
+        //[Column("ORGANIZATION_ID")]
+        //public int OrganizationId { get; set; }
 
         [Column("CREATED_USER_ID")]
         public int? CreatedUserId { get; set; }

@@ -12,6 +12,5 @@
         public decimal Credit { get; set; }
         public decimal ClosingDebit { get; set; }
         public decimal ClosingCredit { get; set; }
-        public decimal Price { get; set; }
     }
 }

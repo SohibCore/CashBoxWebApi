@@ -28,9 +28,9 @@ namespace CashBox.Repository.Entity
         public decimal TotalSum { get; set; }
 
         [ForeignKey(nameof(OwnerId))]
-        public OutcomeDocument? OutcomeDocument { get; set; }
+        public OutcomeDocument OutcomeDocument { get; set; } = null!;
 
         [ForeignKey(nameof(ProductId))]
-        public Product? Product { get; set; }
+        public Product Product { get; set; } = null!;
     }
 }

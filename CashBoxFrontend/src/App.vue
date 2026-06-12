@@ -22,6 +22,10 @@
           </router-link>
 
           <div class="nav-section-label">Katalog</div>
+          <router-link to="/document-report" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Hisobot</span>
+          </router-link>
           <router-link to="/products" class="nav-link">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             <span>Mahsulotlar</span>
@@ -57,9 +61,12 @@
           </template>
         </nav>
         
-        <button @click="logout" class="logout-btn">
-          <span class="icon">🚪</span> <span>Chiqish</span>
-        </button>
+        <div class="sidebar-footer">
+          <button @click="logout" class="logout-btn" title="Tizimdan chiqish">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Chiqish</span>
+          </button>
+        </div>
       </aside>
 
       <!-- Asosiy kontent qismi -->
@@ -96,8 +103,26 @@ const isAuthPage = computed(() => route.path.startsWith('/auth/'));
 // Sahifa o'zgarganda token borligini tekshirib turish (Login/Logout uchun)
 const updateAuthStatus = () => {
   token.value = localStorage.getItem('token');
+
+  let tokenRole = '';
+  if (token.value) {
+    try {
+      const payload = JSON.parse(atob(token.value.split('.')[1]));
+      tokenRole =
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+        payload.role ||
+        '';
+      // Agar bir nechta role bo'lsa, array bo'lib kelishi mumkin
+      if (Array.isArray(tokenRole)) {
+        tokenRole = tokenRole[0];
+      }
+    } catch (e) {
+      console.warn('Token decode error', e);
+    }
+  }
+
   const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-  const rawRole = storedUser.role || storedUser.Role || 'user';
+  const rawRole = tokenRole || storedUser.role || storedUser.Role || 'user';
   role.value = Array.isArray(rawRole) ? rawRole[0] : rawRole;
 };
 
@@ -124,7 +149,7 @@ const logout = () => {
 
 body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color: #f1f5f9; height: 100vh; overflow: hidden; }
 .app-shell { display: flex; flex: 1; background: #0d1117; overflow: hidden; }
-.sidebar { width: 220px; background: #0a0f1e; border-right: 1px solid rgba(255,255,255,0.07); padding: 0; transition: all 0.3s ease; }
+.sidebar { width: 260px; background: #0a0f1e; border-right: 1px solid rgba(255,255,255,0.07); padding: 0; transition: all 0.3s ease; display: flex; flex-direction: column; }
 .sidebar.collapsed { width: 64px; }
 .sidebar-logo {
   display: flex;
@@ -141,8 +166,8 @@ body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color:
   background: rgba(255, 255, 255, 0.03);
 }
 .logo-icon {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   border-radius: 8px;
@@ -150,13 +175,13 @@ body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color:
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 18px;
   flex-shrink: 0;
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
 }
 .logo-text {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 22px;
   color: white;
   white-space: nowrap;
   font-family: 'Space Grotesk', sans-serif;
@@ -165,11 +190,11 @@ body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color:
   justify-content: center;
   padding: 16px 0;
 }
-.nav-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #475569; padding: 16px 16px 8px; }
-.nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: #94a3b8; text-decoration: none; font-size: 13px; transition: 0.2s; }
+.nav-section-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #475569; padding: 20px 20px 10px; }
+.nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #94a3b8; text-decoration: none; font-size: 15px; transition: 0.2s; }
 .nav-link:hover { background: rgba(255,255,255,0.04); color: #f1f5f9; }
 .nav-link.router-link-active { background: rgba(59,130,246,0.15); color: #60a5fa; border-left: 3px solid #3b82f6; }
-.nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-icon { width: 20px; height: 20px; flex-shrink: 0; }
 .sidebar.collapsed .nav-section-label, .sidebar.collapsed span { display: none; }
 
 .content-area { flex: 1; display: flex; flex-direction: column; background: #0d1117; }
@@ -247,21 +272,37 @@ body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color:
   margin: 20px 0;
 }
 
-.logout-btn {
-  background-color: #ef4444;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  transition: background-color 0.2s;
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   margin-top: auto;
 }
 
+.logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
 .logout-btn:hover {
-  background-color: #dc2626;
+  background: #ef4444;
+  color: white;
+}
+
+.sidebar.collapsed .logout-btn {
+  justify-content: center;
+  padding: 10px 0;
 }
 
 /* Asosiy kontent qismi */
@@ -317,9 +358,7 @@ body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color:
 .text-2xl { font-size: 1.5rem; }
 .font-bold { font-weight: 700; }
 .mb-6 { margin-bottom: 1.5rem; }
-.text-gray-800 { color: #1f2937; }
 .grid { display: grid; }
-.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
 .gap-6 { gap: 1.5rem; }
 .mb-8 { margin-bottom: 2rem; }
 .block { display: block; }
@@ -336,7 +375,6 @@ body { margin: 0; font-family: 'Outfit', sans-serif; background: #0d1117; color:
 .focus\:ring-2:focus { --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000); }
 .focus\:ring-blue-500:focus { --tw-ring-color: #3b82f6; }
 .outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
-.bg-white { background-color: #fff; }
 .mb-6 { margin-bottom: 1.5rem; }
 .flex { display: flex; }
 .justify-between { justify-content: space-between; }

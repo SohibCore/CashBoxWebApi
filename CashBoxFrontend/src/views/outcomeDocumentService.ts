@@ -13,9 +13,9 @@ api.interceptors.request.use((config) => {
 });
 
 export const outcomeDocumentService = {
-  // Hujjatlar ro'yxatini olish
-  getList(filter?: any) {
-    return api.get('/api/OutcomeDocument/GetList', { params: filter });
+  // Hujjatlar ro'yxatini olish (filter parametrisiz, IncomeDocumentService bilan bir xil)
+  getList() {
+    return api.get('/api/OutcomeDocument/GetList');
   },
   // ID bo'yicha bitta hujjatni olish
   getById(id: string | number) {

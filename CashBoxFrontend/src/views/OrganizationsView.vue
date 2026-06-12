@@ -15,54 +15,55 @@
       </div>
     </div>
 
-    <div class="data-panel">
-      <div class="table-header">
-        <h3>Tashkilotlar ro‘yxati</h3>
-        <router-link to="/organizations/new" class="btn-primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Yangi tashkilot qo'shish
-        </router-link>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>INN</th>
-            <th>To‘liq nom</th>
-            <th>Qisqa nom</th>
-            <th>Viloyat</th>
-            <th>Hudud</th>
-            <th>Amallar</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="org in filteredOrganizations" :key="org.id" @dblclick="startEdit(org)">
-            <td>{{ org.id || '-' }}</td>
-            <td>{{ org.inn || '-' }}</td>
-            <td>{{ org.fullName || '-' }}</td>
-            <td>{{ org.shortName || '-' }}</td>
-            <td>{{ org.regionName || '-' }}</td>
-            <td>{{ org.district || '-' }}</td>
-            <td class="actions">
-              <div class="action-dropdown-wrapper">
-                <button
-                  type="button"
-                  @click="toggleRow(org.id)"
-                  :class="['icon-btn', { expanded: expandedOrgId === org.id }]"
-                  title="Amallarni ko'rsatish"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                </button>
-                <div v-if="expandedOrgId === org.id" class="action-dropdown">
-                  <button type="button" @click="startEdit(org)" class="dropdown-btn">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+    <Transition name="fade" mode="out-in">
+      <div class="data-panel" :key="filteredOrganizations.length">
+        <div class="table-header">
+          <h3>Tashkilotlar ro‘yxati</h3>
+          <router-link to="/organizations/new" class="btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Yangi tashkilot qo'shish
+          </router-link>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>INN</th>
+              <th>To‘liq nom</th>
+              <th>Qisqa nom</th>
+              <th>Viloyat</th>
+              <th>Hudud</th>
+              <th>Amallar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="org in filteredOrganizations" :key="org.id" @dblclick="startEdit(org)">
+              <td>{{ org.id || '-' }}</td>
+              <td>{{ org.inn || '-' }}</td>
+              <td>{{ org.fullName || '-' }}</td>
+              <td>{{ org.shortName || '-' }}</td>
+              <td>{{ org.regionName || '-' }}</td>
+              <td>{{ org.district || '-' }}</td>
+              <td class="actions">
+                <div class="action-dropdown-wrapper">
+                  <button
+                    type="button"
+                    @click="toggleRow(org.id)"
+                    :class="['icon-btn', { expanded: expandedOrgId === org.id }]"
+                    title="Amallarni ko'rsatish"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </button>
+                  <div v-if="expandedOrgId === org.id" class="action-dropdown">
+                    <button type="button" @click="startEdit(org)" class="dropdown-btn">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                     </svg>
                     Tahrirlash
                   </button>
@@ -82,7 +83,7 @@
         </tbody>
       </table>
     </div>
-
+    </Transition>
   </div>
 </template>
 
@@ -114,23 +115,6 @@ export default {
     };
 
     const loadOrganizations = async () => {
-      let currentUserRole = '';
-      try {
-        const meResponse = await getMe();
-        const user = normalizeUser(extractApiData(meResponse));
-        currentUserRole = user?.role || '';
-      } catch (err) {
-        console.error('Foydalanuvchi rolini yuklashda xatolik:', err);
-        // Xatolik yuz bersa, default "User" deb hisoblaymiz yoki ma'lumot yuklamaymiz
-        organizations.value = [];
-        return;
-      }
-
-      if (currentUserRole.toLowerCase() !== 'admin') {
-        organizations.value = []; // Agar Admin bo'lmasa, ma'lumotlarni yuklamaymiz
-        return;
-      }
-
       try {
         const response = await getOrganizations();
         organizations.value = extractApiData(response).map(org => ({
@@ -468,5 +452,16 @@ tbody tr:hover {
 
 .icon-btn.expanded svg {
   transform: rotate(180deg);
+}
+</style>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -401,3 +401,5 @@ export async function getOutcomeDocumentById(id) { return api.get(`/api/OutcomeD
 export async function createOutcomeDocument(data) { return api.post('/api/OutcomeDocument/Create', data); }
 export async function updateOutcomeDocument(id, data) { return api.put(`/api/OutcomeDocument/Update?id=${id}`, data); }
 export async function deleteOutcomeDocument(id) { return api.delete(`/api/OutcomeDocument/Delete?id=${id}`); }
+
+export { api };

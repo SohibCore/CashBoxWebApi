@@ -5,6 +5,7 @@ using CashBox.Service.Services.ContractorService;
 using CashBox.Service.Services.CorrencyRateServices;
 using CashBox.Service.Services.CorrencyServices;
 using CashBox.Service.Services.DistrictServices;
+using CashBox.Service.Services.DocumentReportServices;
 using CashBox.Service.Services.IncomeDocumentServices;
 using CashBox.Service.Services.NewFolder;
 using CashBox.Service.Services.OrganizationServices;
@@ -40,6 +41,8 @@ builder.Services.AddCors(options =>  // UIning ishlashi uchun http
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<AccountService>();
@@ -76,6 +79,7 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IIncomeDocumentService, IncomeDocumentService>();
 builder.Services.AddScoped<IOutcomeDocumentService, OutcomeDocumentService>();
+builder.Services.AddScoped<IDocumentReportService, DocumentReportService>();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -106,6 +110,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+
 
 app.UseCors("AllowLocalhostFrontend");
 app.UseAuthentication();

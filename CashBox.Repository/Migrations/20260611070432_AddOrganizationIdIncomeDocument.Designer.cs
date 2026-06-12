@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace CashBox.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260611070432_AddOrganizationIdIncomeDocument")]
+    partial class AddOrganizationIdIncomeDocument
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,6 +260,206 @@ namespace CashBox.Repository.Migrations
                     b.HasIndex("OrganizationId");
 
                     b.ToTable("SYS_PRODUCT");
+                });
+
+            modelBuilder.Entity("CashBox.Repository.Entity.Reports.DocumentReport", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("ID");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("ClosingCredit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("CLOSING_CREDIT");
+
+                    b.Property<decimal>("ClosingDebit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("CLOSING_DEBIT");
+
+                    b.Property<int?>("CreateUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("CREATE_USER_ID");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CREATED_AT");
+
+                    b.Property<decimal>("Credit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("CREDIT");
+
+                    b.Property<decimal>("Debit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("DEBIT");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("MODIFIED_AT");
+
+                    b.Property<int?>("ModifiedUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("MODIFIED_USER_ID");
+
+                    b.Property<decimal>("OpeningCredit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("OPENING_CREDIT");
+
+                    b.Property<decimal>("OpeningDebit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("OPENING_DEBIT");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ORGANIZATION_ID");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer")
+                        .HasColumnName("STATUS_ID");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("integer")
+                        .HasColumnName("SUPPLIER_ID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("DOCUMENT_REPORT");
+                });
+
+            modelBuilder.Entity("CashBox.Repository.Entity.Reports.IncomeReportTable", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("ID");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("CreateUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("CREATE_USER_ID");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CREATED_AT");
+
+                    b.Property<decimal>("Credit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("CREDIT");
+
+                    b.Property<decimal>("Debit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("DEBIT");
+
+                    b.Property<long?>("DocumentReportId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("MODIFIED_AT");
+
+                    b.Property<int?>("ModifiedUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("MODIFIED_USER_ID");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ORGANIZATION_ID");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("PRICE");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("PRODUCT_ID");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("numeric")
+                        .HasColumnName("QUANTITY");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("integer")
+                        .HasColumnName("SUPPLIER_ID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentReportId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("INCOME_REPORT");
+                });
+
+            modelBuilder.Entity("CashBox.Repository.Entity.Reports.OutcomeReportTable", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("ID");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("CreateUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("CREATE_USER_ID");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CREATED_AT");
+
+                    b.Property<decimal>("Credit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("CREDIT");
+
+                    b.Property<decimal>("Debit")
+                        .HasColumnType("numeric")
+                        .HasColumnName("DEBIT");
+
+                    b.Property<long?>("DocumentReportId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("MODIFIED_AT");
+
+                    b.Property<int?>("ModifiedUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("MODIFIED_USER_ID");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ORGANIZATION_ID");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("PRICE");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("PRODUCT_ID");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("numeric")
+                        .HasColumnName("QUANTITY");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("integer")
+                        .HasColumnName("SUPPLIER_ID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentReportId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("OUTCOME_REPORT");
                 });
 
             modelBuilder.Entity("CashBox.Repository.Entity.Role", b =>
@@ -959,6 +1162,55 @@ namespace CashBox.Repository.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("CashBox.Repository.Entity.Reports.DocumentReport", b =>
+                {
+                    b.HasOne("CashBox.Repository.Enum.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CashBox.Repository.Entity.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Status");
+
+                    b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("CashBox.Repository.Entity.Reports.IncomeReportTable", b =>
+                {
+                    b.HasOne("CashBox.Repository.Entity.Reports.DocumentReport", null)
+                        .WithMany("IncomeReport")
+                        .HasForeignKey("DocumentReportId");
+
+                    b.HasOne("CashBox.Repository.Entity.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("CashBox.Repository.Entity.Reports.OutcomeReportTable", b =>
+                {
+                    b.HasOne("CashBox.Repository.Entity.Reports.DocumentReport", null)
+                        .WithMany("OutcomeReport")
+                        .HasForeignKey("DocumentReportId");
+
+                    b.HasOne("CashBox.Repository.Entity.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Supplier");
+                });
+
             modelBuilder.Entity("CashBox.Repository.Entity.UserRole", b =>
                 {
                     b.HasOne("CashBox.Repository.Entity.Role", "Role")
@@ -1047,6 +1299,13 @@ namespace CashBox.Repository.Migrations
             modelBuilder.Entity("CashBox.Repository.Entity.OutcomeDocument", b =>
                 {
                     b.Navigation("Tables");
+                });
+
+            modelBuilder.Entity("CashBox.Repository.Entity.Reports.DocumentReport", b =>
+                {
+                    b.Navigation("IncomeReport");
+
+                    b.Navigation("OutcomeReport");
                 });
 
             modelBuilder.Entity("CashBox.Repository.Entity.Role", b =>

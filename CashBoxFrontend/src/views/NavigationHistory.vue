@@ -111,6 +111,8 @@ const removeTab = (index) => {
   position: sticky;
   top: 0;
   z-index: 50;
+  z-index: 100; /* Yuqoriroq z-index */
+  background: #0d1117; /* Sahifa foni bilan bir xil */
   background: #0d1117; /* Sahifa foni bilan bir xil */
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -122,9 +124,11 @@ const removeTab = (index) => {
   gap: 8px;
   padding: 6px 12px;
   background: #1e293b;
+  background: #111827; /* Karta foni bilan bir xil */
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   color: #cbd5e1;
+  color: #94a3b8;
   font-size: 13px;
   cursor: pointer;
   transition: 0.2s;
@@ -133,6 +137,8 @@ const removeTab = (index) => {
 }
 .nav-tab:hover { border-color: #3b82f6; color: #f1f5f9; }
 .nav-tab.active { background: #2563eb; border-color: #3b82f6; color: white; }
+.nav-tab:hover { border-color: #3b82f6; color: #f1f5f9; background: rgba(59, 130, 246, 0.1); }
+.nav-tab.active { background: #2563eb; border-color: #3b82f6; color: white; font-weight: 600; }
 .tab-close {
   border: none;
   background: transparent;

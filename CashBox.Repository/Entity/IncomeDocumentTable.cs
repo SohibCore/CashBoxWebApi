@@ -14,10 +14,10 @@ namespace CashBox.Repository.Entity
 
         [Column("OWNER_ID")]
         public long OwnerId { get; set; }
-        
+
         [Column("PRODUCT_ID")]
         public int ProductId { get; set; }
-        
+
         [Column("PRICE")]
         public decimal Price { get; set; }
         [Column("QUANTITY")]
@@ -27,7 +27,7 @@ namespace CashBox.Repository.Entity
         public decimal TotalSum { get; set; }
 
         [ForeignKey(nameof(OwnerId))]
-        public IncomeDocument? IncomeDocument { get; set; }
+        public IncomeDocument IncomeDocument { get; set; } = null!;
 
         [ForeignKey(nameof(ProductId))]
         public Product Product { get; set; } = null!;

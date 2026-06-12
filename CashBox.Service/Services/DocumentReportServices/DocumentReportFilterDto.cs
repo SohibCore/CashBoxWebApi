@@ -9,5 +9,8 @@
         public decimal? Credit { get; set; }
         public decimal? OpeningDebit { get; set; }
         public decimal? OpeningCredit { get; set; }
+        public int? SupplierId { get; set; }
+        public DateTime DateFrom { get; set; }
+        public DateTime DateTo { get; set; }
     }
 }

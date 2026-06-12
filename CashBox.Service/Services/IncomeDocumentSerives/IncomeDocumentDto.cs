@@ -4,6 +4,7 @@
     {
         public long Id { get; set; }
         public DateTime DocOn { get; set; }
+        public string Inn { get; set; } = null!;
         public int SupplierId { get; set; }
         public string SupplierName { get; set; } = null!;
         public string StatusName { get; set; } = null!;

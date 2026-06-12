@@ -25,6 +25,7 @@ import ProductFormView from './views/ProductFormView.vue';
 import OutcomeDocumentView from './views/OutcomeDocumentView.vue';
 import OutcomeDocumentFormView from './views/OutcomeDocumentFormView.vue';
 import OutcomeDocumentTableEditView from './views/OutcomeDocumentTableEditView.vue';
+import DocumentReportView from './views/DocumentReportView.vue';
 
 const routes = [
   {
@@ -73,7 +74,9 @@ const routes = [
   { path: '/outcome-documents', component: OutcomeDocumentView, meta: { requiresAuth: true } },
   { path: '/outcome-documents/new', component: OutcomeDocumentFormView, meta: { requiresAuth: true } },
   { path: '/outcome-documents/edit/:id', component: OutcomeDocumentFormView, meta: { requiresAuth: true } },
-  { path: '/outcome-documents/table-edit/:id', component: OutcomeDocumentTableEditView, meta: { requiresAuth: true } }
+  { path: '/outcome-documents/table-edit/:id', component: OutcomeDocumentTableEditView, meta: { requiresAuth: true } },
+  { path: '/outcome-documents/table-edit/:id', component: OutcomeDocumentTableEditView, meta: { requiresAuth: true } },
+  { path: '/document-report', component: DocumentReportView, meta: { requiresAuth: true } }
 ];
 
 const router = createRouter({

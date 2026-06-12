@@ -1,9 +1,5 @@
 ﻿using CashBox.Core;
-using CashBox.Repository.Dtos.DocumentReportDto;
-using CashBox.Repository.Dtos.DocumentReportDtos;
-using CashBox.Repository.Entity.Reports;
 using CashBox.Service.Services.AccountServices;
-using CashBox.Service.Services.DocumentReportServices.QueryObjects;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 
@@ -19,171 +15,123 @@ namespace CashBox.Service.Services.DocumentReportServices
             _account = account;
         }
 
-        public async Task<List<DocumentReportListDto>> GetListAsync(DocumentReportFilterDto filter)
+        public async Task<List<DocumentReportListDto>> GetHeaderReportAsync(DocumentReportFilterDto filter)
         {
-            var result = await _context.DocumentReports
-                .Where(x => x.StatusId != StatusIdConst.DELETE && x.OrganizationId == _account.OrganizationId)
-                .Select(x => new DocumentReportListDto
+            var beginCredit = _context.IncomeDocuments
+                 .Include(x => x.Tables)
+                 .Where(x => x.OrganizationId == _account.OrganizationId
+                          && x.StatusId == StatusIdConst.ACCEPT && x.DocOn < filter.DateFrom)
+                 .SelectMany(x => x.Tables)
+                 .GroupBy(x => new
+                 {
+                     x.IncomeDocument.Supplier.Inn,
+                     x.IncomeDocument.SupplierId,
+                     x.IncomeDocument.Supplier.Code,
+                 })
+                 .Select(x => new DocumentReportListDto
+                 {
+                     Inn = x.Key.Inn,
+                     SupplierId = x.Key.SupplierId,
+                     SupplierName = x.Key.Code,
+                     OpeningCredit = x.Sum(a => a.TotalSum),
+                     OpeningDebit = 0,
+                     Credit = 0,
+                     Debit = 0,
+                     ClosingCredit = 0,
+                     ClosingDebit = 0,
+                 });
+            var beginDebit = _context.OutcomeDocuments
+                 .Include(x => x.Tables)
+                 .Where(x => x.OrganizationId == _account.OrganizationId
+                          && x.StatusId == StatusIdConst.ACCEPT && x.DocOn < filter.DateFrom)
+                 .SelectMany(x => x.Tables)
+                 .GroupBy(x => new
+                 {
+                     x.OutcomeDocument.Supplier.Inn,
+                     x.OutcomeDocument.SupplierId,
+                     x.OutcomeDocument.Supplier.Code,
+                 })
+                 .Select(x => new DocumentReportListDto
+                 {
+                     Inn = x.Key.Inn,
+                     SupplierId = x.Key.SupplierId,
+                     SupplierName = x.Key.Code,
+                     OpeningCredit = 0,
+                     OpeningDebit = x.Sum(a => a.TotalSum),
+                     Credit = 0,
+                     Debit = 0,
+                     ClosingCredit = 0,
+                     ClosingDebit = 0,
+                 });
+            var credit = _context.IncomeDocuments
+                 .Include(x => x.Tables)
+                 .Where(x => x.OrganizationId == _account.OrganizationId
+                          && x.StatusId == StatusIdConst.ACCEPT && filter.DateFrom <= x.DocOn && x.DocOn <= filter.DateTo)
+                 .SelectMany(x => x.Tables)
+                 .GroupBy(x => new
+                 {
+                     x.IncomeDocument.Supplier.Inn,
+                     x.IncomeDocument.SupplierId,
+                     x.IncomeDocument.Supplier.Code,
+                 })
+                 .Select(x => new DocumentReportListDto
+                 {
+                     Inn = x.Key.Inn,
+                     SupplierId = x.Key.SupplierId,
+                     SupplierName = x.Key.Code,
+                     OpeningCredit = 0,
+                     OpeningDebit = 0,
+                     Credit = x.Sum(a => a.TotalSum),
+                     Debit = 0,
+                     ClosingCredit = 0,
+                     ClosingDebit = 0,
+                 });
+            var debit = _context.OutcomeDocuments
+                 .Include(x => x.Tables)
+                 .Where(x => x.OrganizationId == _account.OrganizationId
+                          && x.StatusId == StatusIdConst.ACCEPT && filter.DateFrom <= x.DocOn && x.DocOn <= filter.DateTo)
+                 .SelectMany(x => x.Tables)
+                 .GroupBy(x => new
+                 {
+                     x.OutcomeDocument.Supplier.Inn,
+                     x.OutcomeDocument.SupplierId,
+                     x.OutcomeDocument.Supplier.Code,
+                 })
+                 .Select(x => new DocumentReportListDto
+                 {
+                     Inn = x.Key.Inn,
+                     SupplierId = x.Key.SupplierId,
+                     SupplierName = x.Key.Code,
+                     OpeningCredit = 0,
+                     OpeningDebit = 0,
+                     Credit = 0,
+                     Debit = x.Sum(a => a.TotalSum),
+                     ClosingCredit = 0,
+                     ClosingDebit = 0,
+                 });
+
+            var result = await beginCredit.Concat(beginDebit).Concat(credit).Concat(debit)
+                .GroupBy(x => new
                 {
-                    Id = x.Id,
-                    SupplierId = x.SupplierId,
-                    SupplierName = x.Supplier.Code,
-                    Inn = x.Supplier.Inn,
-                    OpeningDebit = x.OpeningDebit,
-                    OpeningCredit = x.OpeningCredit,
-                    Debit = x.Debit,
-                    Credit = x.Credit,
-                    ClosingCredit = x.ClosingCredit,
-                    ClosingDebit = x.ClosingDebit
-                }).SortFilter(filter)
-                .ToListAsync();
+                    x.Inn,
+                    x.SupplierId,
+                    x.SupplierName
+                }).
+                Select(x => new DocumentReportListDto()
+                {
+                    Inn = x.Key.Inn,
+                    SupplierId = x.Key.SupplierId,
+                    SupplierName = x.Key.SupplierName,
+                    OpeningCredit = x.Sum(a => a.OpeningCredit),
+                    OpeningDebit = x.Sum(a => a.OpeningDebit),
+                    Credit = x.Sum(a => a.Credit),
+                    Debit = x.Sum(a => a.Debit),
+
+                    ClosingDebit = (x.Sum(a => a.OpeningDebit) + x.Sum(a => a.Debit)) - (x.Sum(a => a.OpeningCredit) + x.Sum(a => a.Credit)) > 0 ? (x.Sum(a => a.OpeningDebit) + x.Sum(a => a.Debit)) - (x.Sum(a => a.OpeningCredit) + x.Sum(a => a.Credit)) : 0,
+                    ClosingCredit = (x.Sum(a => a.OpeningDebit) + x.Sum(a => a.Debit)) - (x.Sum(a => a.OpeningCredit) + x.Sum(a => a.Credit)) < 0 ? -1 * ((x.Sum(a => a.OpeningDebit) + x.Sum(a => a.Debit)) - (x.Sum(a => a.OpeningCredit) + x.Sum(a => a.Credit))) : 0,
+                }).ToListAsync();
 
             return result;
-        }
-        public async Task<DocumentReportDto> GetAsync(long id)
-        {
-            var documentReport = await _context.DocumentReports
-                .Include(x => x.IncomeReport)
-                .Include(x => x.OutcomeReport)
-                .Include(x => x.Supplier)
-                .FirstOrDefaultAsync(x => x.StatusId != StatusIdConst.DELETE && x.Id == id && x.OrganizationId == _account.OrganizationId);
-
-            if (documentReport == null)
-                throw new KeyNotFoundException();
-
-            return new DocumentReportDto
-            {
-                Id = documentReport.Id,
-                SupplierId = documentReport.SupplierId,
-                SupplierName = documentReport.Supplier.Code,
-                Inn = documentReport.Supplier.Inn,
-                OpeningDebit = documentReport.OpeningDebit,
-                OpeningCredit = documentReport.OpeningCredit,
-                Debit = documentReport.Debit,
-                Credit = documentReport.Credit,
-                ClosingDebit = documentReport.ClosingDebit,
-                ClosingCredit = documentReport.ClosingCredit,
-                InReports = documentReport.IncomeReport.Select(x => new IncomeReport
-                {
-                    Id = x.Id,
-                    SupplierId = x.SupplierId,
-                    SupplierName = x.Supplier.Code,
-                    ProductId = x.ProductId,
-                    //ProductName = x.
-                    Price = x.Price,
-                    Quantity = x.Quantity,
-                    Debit = 0,
-                    Credit = x.Credit,
-                }).ToList(),
-                OutReports = documentReport.OutcomeReport.Select(x => new OutcomeReport
-                {
-                    Id = x.Id,
-                    SupplierId = x.SupplierId,
-                    SupplierName = x.Supplier.Code,
-                    ProductId = x.ProductId,
-                    //ProductName = x.
-                    Price = x.Price,
-                    Quantity = x.Quantity,
-                    Debit = x.Debit,
-                    Credit = 0
-                }).ToList()
-            };
-        }
-        public async Task<long> CreateAsync(CreateDocumentReportDto dto)
-        {
-            var entity = new DocumentReport
-            {
-                SupplierId = dto.SupplierId,
-                OpeningDebit = dto.OpeningDebit,
-                OpeningCredit = dto.OpeningCredit,
-                OrganizationId = _account.OrganizationId,
-                Debit = dto.Debit,
-                Credit = dto.Credit,
-                ClosingDebit = dto.ClosingDebit,
-                ClosingCredit = dto.ClosingCredit,
-                CreatedAt = DateTime.UtcNow,
-                CreateUserId = _account.UserId,
-
-                IncomeReport = dto.IncomeReports.Select(x => new IncomeReportTable
-                {
-                    SupplierId = x.SupplierId,
-                    ProductId = x.ProductId,
-                    Price = x.Price,
-                    Quantity = x.Quantity,
-                    Debit = x.Debit,
-                    Credit = x.Credit,
-                }).ToList(),
-
-                OutcomeReport = dto.OutcomeReports.Select(x => new OutcomeReportTable
-                {
-                    SupplierId = x.SupplierId,
-                    ProductId = x.ProductId,
-                    Price = x.Price,
-                    Quantity = x.Quantity,
-                    Debit = x.Debit,
-                    Credit = x.Credit,
-                }).ToList()
-            };
-
-            await _context.DocumentReports.AddAsync(entity);
-            await _context.SaveChangesAsync();
-            return entity.Id;
-        }
-        public async Task UpdateAsync(UpdateDocumentReportDlDto dto)
-        {
-            var entity = await _context.DocumentReports
-                .Include(x => x.IncomeReport)
-                .Include(x => x.OutcomeReport)
-                .FirstOrDefaultAsync(x => x.StatusId != StatusIdConst.DELETE && x.Id == dto.Id && x.OrganizationId == _account.OrganizationId);
-
-            if (entity == null)
-                throw new KeyNotFoundException();
-
-            entity.SupplierId = dto.SupplierId;
-            entity.OpeningCredit = dto.OpeningCredit;
-            entity.OpeningDebit = dto.OpeningDebit;
-            entity.Debit = dto.Debit;
-            entity.Credit = dto.Credit;
-            entity.ClosingCredit = dto.ClosedCredit;
-            entity.ClosingDebit = dto.ClosingDebit;
-
-            entity.ModifiedAt = DateTime.UtcNow;
-            entity.ModifiedUserId = _account.UserId;
-
-            _context.RemoveRange(entity.IncomeReport);
-            _context.RemoveRange(entity.OutcomeReport);
-
-            entity.IncomeReport = dto.IncomeUpdate.Select(x => new IncomeReportTable
-            {
-                SupplierId = x.SupplierId,
-                ProductId = x.ProductId,
-                Price = x.Price,
-                Quantity = x.Quantity,
-                Debit = x.Debit,
-                Credit = x.Credit,
-            }).ToList();
-
-            entity.OutcomeReport = dto.OutcomeUpdate.Select(x => new OutcomeReportTable
-            {
-                SupplierId = x.SupplierId,
-                ProductId = x.ProductId,
-                Price = x.Price,
-                Quantity = x.Quantity,
-                Debit = x.Debit,
-                Credit = x.Credit,
-            }).ToList();
-
-            await _context.SaveChangesAsync();
-        }
-        public async Task DeleteAsync(long id)
-        {
-            var entity = await _context.DocumentReports.FindAsync(id);
-
-            if (entity == null)
-                throw new KeyNotFoundException();
-
-            entity.StatusId = StatusIdConst.DELETE;
-            await _context.SaveChangesAsync();
         }
     }
 }

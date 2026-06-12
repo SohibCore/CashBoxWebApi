@@ -13,89 +13,91 @@
       <span class="user-count">{{ users.length }} ta foydalanuvchi</span>
     </div>
 
-    <div class="data-panel">
-      <div class="table-header">
-        <h3>Foydalanuvchi ro‘yxati</h3>
-        <router-link to="/users/new" class="btn-primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Yangi foydalanuvchi qo'shish
-        </router-link>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Login</th>
-            <th>F.I.O.</th>
-            <th>Email</th>
-            <th>Qisqa nom</th>
-            <th>PINFL</th>
-            <th>Telefon</th>
-            <th>Manzil</th>
-            <th>Tug‘ilgan sana</th>
-            <th>Passport seriya</th>
-            <th>Tashkilot</th>
-            <th>Amallar</th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-for="user in users" :key="user.id">
-            <tr @dblclick="startEdit(user)" style="cursor: pointer;">
-              <td>{{ user.id || '-' }}</td>
-              <td>{{ user.userName || '-' }}</td>
-              <td>{{ user.fullName || '-' }}</td>
-              <td>{{ user.email || '-' }}</td>
-              <td>{{ user.shortName || '-' }}</td>
-              <td>{{ user.pinfl || '-' }}</td>
-              <td>{{ user.phoneNumber || '-' }}</td>
-              <td>{{ user.address || '-' }}</td>
-              <td>{{ formatDate(user.dateOfBirth) || '-' }}</td>
-              <td>{{ user.passportSeries || '-' }}</td>
-              <td>{{ organizationName(user.organizationId) }}</td>
-              <td class="actions">
-                <div class="action-dropdown-wrapper">
-                  <button @click="toggleRow(user.id)" :class="['icon-btn', { expanded: expandedUserId === user.id }]" title="Amallarni ko'rsatish">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                  </button>
-                  <div v-if="expandedUserId === user.id" class="action-dropdown">
-                    <button @click="startEdit(user)" class="dropdown-btn">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                      </svg>
-                      Tahrirlash
-                    </button>
-                    <button @click="goToRoleAssign(user)" class="dropdown-btn">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                      </svg>
-                      Rol biriktirish
-                    </button>
-                    <button @click="deleteRow(user.id)" class="dropdown-btn danger">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                      </svg>
-                      O'chirish
-                    </button>
-                  </div>
-                </div>
-              </td>
+    <Transition name="fade" mode="out-in">
+      <div class="data-panel" :key="users.length">
+        <div class="table-header">
+          <h3>Foydalanuvchi ro‘yxati</h3>
+          <router-link to="/users/new" class="btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Yangi foydalanuvchi qo'shish
+          </router-link>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Login</th>
+              <th>F.I.O.</th>
+              <th>Email</th>
+              <th>Qisqa nom</th>
+              <th>PINFL</th>
+              <th>Telefon</th>
+              <th>Manzil</th>
+              <th>Tug‘ilgan sana</th>
+              <th>Passport seriya</th>
+              <th>Tashkilot</th>
+              <th>Amallar</th>
             </tr>
-          </template>
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            <template v-for="user in users" :key="user.id">
+              <tr @dblclick="startEdit(user)" style="cursor: pointer;">
+                <td>{{ user.id || '-' }}</td>
+                <td>{{ user.userName || '-' }}</td>
+                <td>{{ user.fullName || '-' }}</td>
+                <td>{{ user.email || '-' }}</td>
+                <td>{{ user.shortName || '-' }}</td>
+                <td>{{ user.pinfl || '-' }}</td>
+                <td>{{ user.phoneNumber || '-' }}</td>
+                <td>{{ user.address || '-' }}</td>
+                <td>{{ formatDate(user.dateOfBirth) || '-' }}</td>
+                <td>{{ user.passportSeries || '-' }}</td>
+                <td>{{ organizationName(user.organizationId) }}</td>
+                <td class="actions">
+                  <div class="action-dropdown-wrapper">
+                    <button @click="toggleRow(user.id)" :class="['icon-btn', { expanded: expandedUserId === user.id }]" title="Amallarni ko'rsatish">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </button>
+                    <div v-if="expandedUserId === user.id" class="action-dropdown">
+                      <button @click="startEdit(user)" class="dropdown-btn">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Tahrirlash
+                      </button>
+                      <button @click="goToRoleAssign(user)" class="dropdown-btn">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="9" cy="7" r="4"></circle>
+                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Rol biriktirish
+                      </button>
+                      <button @click="deleteRow(user.id)" class="dropdown-btn danger">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          <line x1="10" y1="11" x2="10" y2="17"></line>
+                          <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                        O'chirish
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </Transition>
 
     <!-- Foydalanuvchi boshqaruv modali -->
     <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
@@ -214,22 +216,6 @@ export default {
     };
 
     const loadUsers = async () => {
-      let currentUserRole = '';
-      try {
-        const meResponse = await getMe();
-        const user = normalizeUser(extractApiData(meResponse));
-        currentUserRole = user?.role || '';
-      } catch (err) {
-        console.error('Foydalanuvchi rolini yuklashda xatolik:', err);
-        users.value = [];
-        return;
-      }
-
-      if (currentUserRole.toLowerCase() !== 'admin') {
-        users.value = []; // Admin bo'lmasa ma'lumotlarni ko'rsatmaymiz
-        return;
-      }
-
       try {
         const response = await getUsers();
         const result = extractApiData(response);
