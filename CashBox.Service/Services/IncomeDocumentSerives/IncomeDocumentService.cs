@@ -21,7 +21,7 @@ namespace CashBox.Service.Services.IncomeDocumentServices
         public async Task<List<IncomeDocumentListDto>> GetListAsync(IncomeDocumentFilterDto filter)
         {
             var result = await _context.IncomeDocuments
-                .Where(x => x.StatusId != StatusIdConst.DELETE && x.OrganizationId == _account.OrganizationId)
+                .Where(x => x.StatusId != StatusIdConst.DELETE )
                 .Select(u => new IncomeDocumentListDto
                 {
                     Id = u.Id,

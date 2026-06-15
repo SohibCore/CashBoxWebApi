@@ -1,3 +1,5 @@
+using CashBox.Service.Integrations.UzasboServices;
+using CashBox.Service.Integrations.WeatherServices;
 using CashBox.Service.Services.AccountServices;
 using CashBox.Service.Services.AuthService;
 using CashBox.Service.Services.ConractorAccountServices;
@@ -17,6 +19,7 @@ using CashBox.Service.Services.RoleServices;
 using CashBox.Service.Services.SupplierServices;
 using CashBox.Service.Services.UserRoleService;
 using CashBox.Service.Services.UserServices;
+using CashBox.WebApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +28,9 @@ using Repository.Data;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+AppSettings.Init(builder.Configuration.Get<AppSettings>());
+builder.Services.AddSingleton(AppSettings.Instance.UzasboSetting);
 
 builder.Services.AddControllers();
 
@@ -45,7 +51,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddSingleton<AccountService>();
+builder.Services.AddScoped<AccountService>();
 
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
 
@@ -80,6 +86,9 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IIncomeDocumentService, IncomeDocumentService>();
 builder.Services.AddScoped<IOutcomeDocumentService, OutcomeDocumentService>();
 builder.Services.AddScoped<IDocumentReportService, DocumentReportService>();
+
+builder.Services.AddHttpClient<IWeatherService, WeatherService>();
+builder.Services.AddHttpClient<IUzasboService, UzasboService>();
 
 builder.Services.AddSwaggerGen(options =>
 {

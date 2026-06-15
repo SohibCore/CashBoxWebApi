@@ -4,7 +4,7 @@ namespace CashBox.Service.Services.IncomeDocumentServes.QueryObjects
 {
     public static class IncomeDocumentSortFilter
     {
-        public static IQueryable<IncomeDocumentListDto> SortFilter(this IQueryable<IncomeDocumentListDto> query, IncomeDocumentFilterDto filter)
+        public static IQueryable<IncomeDocumentListDto> SortFilter(this IQueryable<IncomeDocumentListDto> query, IncomeDocumentFilterDto filter)    
         {
             if (filter.Id.HasValue)
                 query = query.Where(x => x.Id == filter.Id);
