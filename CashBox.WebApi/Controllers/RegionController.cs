@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
-    
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class RegionController : ControllerBase
@@ -15,6 +14,7 @@ namespace CashBox.WebApi.Controllers
         {
             _regionService = regionService;
         }
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] RegionFilterDto regionFilterDto)
@@ -22,6 +22,7 @@ namespace CashBox.WebApi.Controllers
             var regions = await _regionService.GetListAsync(regionFilterDto);
             return Ok(regions);
         }
+
         [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] int id)
@@ -29,6 +30,7 @@ namespace CashBox.WebApi.Controllers
             var region = await _regionService.GetAsync(id);
             return Ok(region);
         }
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRegionDto createRegionDto)
@@ -36,6 +38,7 @@ namespace CashBox.WebApi.Controllers
             await _regionService.CreateAsync(createRegionDto);
             return Ok();
         }
+
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateRegionDto updateRegionDto)
@@ -43,6 +46,7 @@ namespace CashBox.WebApi.Controllers
             await _regionService.UpdateAsync(id, updateRegionDto);
             return Ok();
         }
+
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)

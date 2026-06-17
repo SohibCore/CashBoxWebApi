@@ -1,8 +1,10 @@
 ﻿using CashBox.Service.Integrations.UzasboServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashBox.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UzasboController : ControllerBase
@@ -15,7 +17,7 @@ namespace CashBox.WebApi.Controllers
         }
 
         [HttpGet("{tin}")]
-        public async Task<IActionResult> Get(string tin)
+        public async Task<IActionResult> Get([FromRoute] string tin)
         {
             var result = await _service.GetFacturaAsync(tin);
 

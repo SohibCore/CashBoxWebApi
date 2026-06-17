@@ -12,15 +12,30 @@ namespace CashBox.Repository.Entity
         [Column("ID")]
         public int Id { get; set; }
 
+        [Column("SHORT_NAME")]
+        public string? ShortName { get; set; } = null!;
+
         [Column("INN")]
         [StringLength(10)]
         public string Inn { get; set; } = null!;
 
-        [Column("CODE")]
-        public string Code { get; set; } = null!;
+        [Column("NAME")]
+        public string? Name { get; set; } = null!;
 
-        //[Column("ORGANIZATION_ID")]
-        //public int OrganizationId { get; set; }
+        [Column("CODE")]
+        public string? Code { get; set; } = null!;
+
+        [Column("ADDRESS")]
+        public string? Address { get; set; } = null!;
+
+        [Column("MFO")]
+        public string? Mfo { get; set; }
+
+        [Column("ACCOUNT")]
+        public string? Account { get; set; }
+
+        [Column("DIRECTOR")]
+        public string? Director { get; set; }
 
         [Column("CREATED_USER_ID")]
         public int? CreatedUserId { get; set; }

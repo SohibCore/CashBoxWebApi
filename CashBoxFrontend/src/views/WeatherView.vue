@@ -3,31 +3,34 @@
     <div class="section-header">
       <div>
         <h2>Ob-havo ma'lumotlari</h2>
-        <p>Shahar nomini kiriting va joriy ob-havo holatini bilib oling.</p>
       </div>
     </div>
 
     <div class="search-section">
-      <div class="search-input-wrapper">
+      <div class="search-box">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <input 
           v-model="cityName" 
           @keyup.enter="loadWeather"
           type="text" 
-          placeholder="Shahar nomi (masalan: Tashkent)..." 
+          placeholder="Shahar nomi (masalan: Toshkent)..." 
           class="search-input" 
         />
-        <button @click="loadWeather" :disabled="loading" class="btn-primary">
-          <svg v-if="!loading" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <span v-else class="spinner"></span>
-          Qidirish
+        <button @click="loadWeather" :disabled="loading" class="search-button">
+          <span v-if="loading" class="spinner"></span>
+          <span v-else>Qidirish</span>
         </button>
       </div>
     </div>
 
     <div v-if="error" class="error-banner">
       {{ error }}
+    </div>
+
+    <div v-if="loading && !weather" class="loading-state">
+      <span class="spinner"></span> Ma'lumot yuklanmoqda...
     </div>
 
     <div v-if="weather" class="weather-content">
@@ -73,7 +76,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getWeather } from '../api'; // api.js dagi funksiyani import qilish
+import { getWeather, extractApiData } from '../api'; // api.js dagi funksiyalarni import qilish
 
 const cityName = ref('Tashkent');
 const weather = ref(null);
@@ -81,17 +84,27 @@ const loading = ref(false);
 const error = ref('');
 
 const loadWeather = async () => {
+  console.log('loadWeather function called');
   if (!cityName.value.trim()) return;
   
   loading.value = true;
   error.value = '';
+  console.log('Ob-havo uchun so\'rov yuborilmoqda:', cityName.value);
   try {
     const response = await getWeather(cityName.value);
-    // Backend to'g'ridan-to'g'ri WeatherResponseDto qaytaradi
-    weather.value = response.data?.data || response.data;
+    
+    // Request qaysi URLga ketganini tekshirish
+    console.log('Request URL:', response.config.url);
+    console.log('Full Request URL:', response.config.baseURL + response.config.url);
+    console.log('Backend javobi:', response.data);
+
+    // extractApiData backenddan kelayotgan o'ralgan (wrapped) ma'lumotni ochib beradi
+    weather.value = extractApiData(response);
   } catch (err) {
     console.error(err);
-    error.value = "Ob-havo ma'lumotlarini yuklab bo'lmadi. Shahar nomi to'g'riligini tekshiring.";
+    // Backenddan kelgan aniq xatolik xabarini ko'rsatamiz
+    const serverError = err.response?.data?.message || err.response?.data?.title || JSON.stringify(err.response?.data) || err.message;
+    error.value = `Xatolik: ${serverError}. Shahar nomi to'g'riligini va internetni tekshiring.`;
     weather.value = null;
   } finally {
     loading.value = false;
@@ -102,10 +115,61 @@ onMounted(loadWeather);
 </script>
 
 <style scoped>
+.page-card { background: #0d1117; padding: 2rem; border-radius: 1rem; min-height: 400px; }
 .weather-page { max-width: 800px; margin: 0 auto; }
-.search-section { margin-bottom: 2rem; display: flex; justify-content: center; }
-.search-input-wrapper { display: flex; gap: 10px; width: 100%; max-width: 500px; }
-.search-input { flex: 1; }
+.section-header { text-align: center; margin-bottom: 2rem; }
+.search-section { margin-bottom: 2.5rem; display: flex; justify-content: center; }
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem; /* Kattaroq border-radius */
+  padding: 8px; /* Umumiy qidiruv qutisini kattaroq qilish */
+  width: 100%;
+  max-width: 550px; /* Umumiy qidiruv qutisini kengaytirish */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.search-box:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+}
+.search-icon {
+  margin-left: 0.8rem; /* Ikonka va input orasidagi masofani sozlash */
+  color: #64748b;
+}
+.search-input { 
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0.6rem 1rem; /* Input fieldning o'zini ixchamroq qilish */
+  color: #f1f5f9;
+  font-size: 0.9rem; /* Matn hajmini kichraytirish */
+  outline: none;
+}
+
+.search-button {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem; /* Tugma paddingini sozlash */
+  border-radius: 0.8rem; /* Tugma border-radiusini sozlash */
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+}
+
+.search-button:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.search-button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .weather-main-card {
   background: #1e293b;
@@ -141,9 +205,12 @@ onMounted(loadWeather);
   text-align: center;
 }
 
+.loading-state { text-align: center; padding: 3rem; color: #94a3b8; }
+
 .spinner {
-  width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;
+  display: inline-block;
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>

@@ -23,7 +23,7 @@ namespace CashBox.Service.Services.OutcomeDocumentService
         public async Task<List<OutcomeDocumentListDto>> GetListAsync(OutcomeDocumentFilterDto filter)
         {
             var result = await _context.OutcomeDocuments
-                .Where(x => x.StatusId != StatusIdConst.DELETE && x.OrganizationId == _account.OrganizationId)
+                .Where(x => x.StatusId != StatusIdConst.DELETE /*&& x.OrganizationId == _account.OrganizationId*/)
                 .Select(x => new OutcomeDocumentListDto
                 {
                     Id = x.Id,
@@ -63,7 +63,7 @@ namespace CashBox.Service.Services.OutcomeDocumentService
                 {
                     Id = t.Id,
                     ProductId = t.ProductId,
-                    ProductName = t.Product?.Name,  
+                    ProductName = t.Product?.Name,
                     Quantity = t.Quantity,
                     Price = t.Price,
                     TotalSum = t.Price * t.Quantity

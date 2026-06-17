@@ -1,7 +1,5 @@
 <template>
   <div class="page-card wide-card products-page">
-    <NavigationHistory />
-    
     <div class="section-header"> 
       <div>
         <h2>Mahsulotlar</h2>
@@ -13,6 +11,17 @@
       <div class="search-and-count">
         <input type="text" v-model="searchQuery" placeholder="Nom yoki kod bo'yicha qidirish..." class="search-input" />
         <span class="user-count">{{ filteredProducts.length }} ta mahsulot</span>
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <button @click="exportToExcel" :disabled="isExporting" class="btn-export">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          {{ isExporting ? 'Yuklanmoqda...' : 'Excel' }}
+        </button>
       </div>
     </div>
 
@@ -90,8 +99,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import NavigationHistory from './NavigationHistory.vue';
-import { getProducts, deleteProduct, extractApiData, getField } from '../api';
+import { getProducts, deleteProduct, extractApiData, getField, api } from '../api';
 
 export default {
   name: 'ProductsView',
@@ -100,6 +108,27 @@ export default {
     const products = ref([]);
     const expandedProductId = ref(null);
     const searchQuery = ref('');
+    const isExporting = ref(false);
+
+    const exportToExcel = async () => {
+      isExporting.value = true;
+      try {
+        const response = await api.get('/api/Export/products', {
+          responseType: 'blob'
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Mahsulotlar.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('Export error:', err);
+        alert('Xatolik yuz berdi!');
+      } finally {
+        isExporting.value = false;
+      }
+    };
 
     const filteredProducts = computed(() => {
       const q = searchQuery.value.toLowerCase();
@@ -160,12 +189,13 @@ export default {
       products,
       searchQuery,
       filteredProducts,
+      isExporting,
+      exportToExcel,
       expandedProductId,
       toggleRow,
       startEdit,
       deleteItem,
       formatDate,
-      NavigationHistory
     };
   }
 };
@@ -381,4 +411,23 @@ tbody tr:hover {
   justify-content: center;
   transition: background 0.2s ease;
 }
+
+.btn-export {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-export:hover:not(:disabled) {
+  background: #10b981;
+  color: white;
+}
+.btn-export:disabled { opacity: 0.6; cursor: not-allowed; }
 </style>

@@ -26,7 +26,7 @@ namespace CashBox.Service.Services.OrganizationServices
                 FullName = organization.FullName,
                 ShortName = organization.ShortName,
                 RegionId = organization.RegionId,
-                District = organization.District
+                DistrictId = organization.DistrictId
             };
 
         }
@@ -38,7 +38,7 @@ namespace CashBox.Service.Services.OrganizationServices
                 FullName = createOrganizationDto.FullName,
                 ShortName = createOrganizationDto.ShortName,
                 RegionId = createOrganizationDto.RegionId,
-                District = createOrganizationDto.District,
+                DistrictId = createOrganizationDto.DistrictId,
             };
             await _context.Organizations.AddAsync(organization);
             await _context.SaveChangesAsync();
@@ -62,8 +62,8 @@ namespace CashBox.Service.Services.OrganizationServices
             if (updateOrganizationDto.RegionId != 0)
                 organization.RegionId = updateOrganizationDto.RegionId;
 
-            if (updateOrganizationDto.District != null)
-                organization.District = updateOrganizationDto.District;
+            if (updateOrganizationDto.DistrictId.HasValue)
+                organization.DistrictId = updateOrganizationDto.DistrictId.Value;
 
             await _context.SaveChangesAsync();
         }
@@ -77,21 +77,25 @@ namespace CashBox.Service.Services.OrganizationServices
             _context.Organizations.Remove(organization);
             await _context.SaveChangesAsync();
         }
-
         public async Task<List<OrganizationDto>> GetListAsync(OrganizationFilterDto organizationFilterDto)
         {
             var organization = _context.Organizations.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(organizationFilterDto.FullName))
                 organization = organization.Where(x => x.FullName.ToLower().Contains(organizationFilterDto.FullName.ToLower()));
+
             if (!string.IsNullOrWhiteSpace(organizationFilterDto.Inn))
                 organization = organization.Where(x => x.Inn.ToLower().Contains(organizationFilterDto.Inn.ToLower()));
+
             if (!string.IsNullOrWhiteSpace(organizationFilterDto.ShortName))
                 organization = organization.Where(x => x.ShortName.ToLower().Contains(organizationFilterDto.ShortName.ToLower()));
-            if (!string.IsNullOrWhiteSpace(organizationFilterDto.District))
-                organization = organization.Where(x => x.District.ToLower().Contains(organizationFilterDto.District.ToLower()));
+
+            if (organizationFilterDto.DistrictId.HasValue)
+                organization = organization.Where(x => x.DistrictId == organizationFilterDto.DistrictId);
+
             if (organizationFilterDto.Id != 0 && organizationFilterDto.Id != null)
                 organization = organization.Where(x => x.Id == organizationFilterDto.Id);
+
             if (organizationFilterDto.RegionId != 0 && organizationFilterDto.RegionId != null)
                 organization = organization.Where(x => x.RegionId == organizationFilterDto.RegionId);
 
@@ -105,7 +109,7 @@ namespace CashBox.Service.Services.OrganizationServices
                     Inn = u.Inn,
                     RegionId = u.RegionId,
                     RegionName = u.Region.FullName,
-                    District = u.District,
+                    DistrictId = u.DistrictId,
                 }).ToListAsync();
         }
     }

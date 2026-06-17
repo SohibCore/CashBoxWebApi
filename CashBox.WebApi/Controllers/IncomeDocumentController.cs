@@ -15,42 +15,49 @@ namespace CashBox.WebApi.Controllers
         {
             _service = service;
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] IncomeDocumentFilterDto incomeDocumentFilterDto)
+        public async Task<IActionResult> GetList([FromQuery] IncomeDocumentFilterDto dto)
         {
-            var incomeDocuments = await _service.GetListAsync(incomeDocumentFilterDto);
+            var incomeDocuments = await _service.GetListAsync(dto);
             return Ok(incomeDocuments);
         }
+
         [HttpGet("{Id}")]
         public async Task<IActionResult> Get([FromRoute] long id)
         {
             var incomeDocument = await _service.GetAsync(id);
             return Ok(incomeDocument);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateIncomeDocumentDlDto createIncomeDocumentDto)
+        public async Task<IActionResult> Create([FromBody] CreateIncomeDocumentDlDto dto)
         {
-            var id = await _service.CreateAsync(createIncomeDocumentDto);
-            return Ok(id);  
+            var incomeDocument = await _service.CreateAsync(dto);
+            return Ok(incomeDocument);  
         }
+
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateIncomeDocumentDlDto updateIncomeDocument)
+        public async Task<IActionResult> Update([FromBody] UpdateIncomeDocumentDlDto dto)
         {
-            await _service.UpdateAsync(updateIncomeDocument);
-            return Ok();
+            await _service.UpdateAsync(dto);
+            return Ok("Hujjat yangilandi");
         }
+
         [HttpDelete("{Id}")]
         public async Task<IActionResult> Delete([FromRoute] long id)
         {
             await _service.DeleteAsync(id);
-            return Ok();
+            return Ok("Hujjat o'chirildi");
         }
+
         [HttpPatch("{id}")]
         public async Task<IActionResult> Accept([FromRoute] long id)
         {
             var result = await _service.Accept(id);
             return Ok(result);
         }
+
         [HttpPatch("{id}")]
         public async Task<IActionResult> NotAccept([FromRoute] long id)
         {

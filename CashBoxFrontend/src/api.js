@@ -36,29 +36,30 @@ api.interceptors.response.use(
 );
 
 export async function getWeather(name) {
-  return api.get('/api/Weather', { params: { name } });
+  console.log('getWeather function in api.js called with name:', name);
+  return api.get('/api/Weather/Get', { params: { name } });
 }
 
 export async function register(data) {
   const mapped = mapUserPayload(data);
   console.log('Register service payload:', mapped);
-  return api.post('/api/auth/register', mapped);
+  return api.post('/api/Auth/Register', mapped);
 }
 
 export async function login(data) {
-  return api.post('/api/auth/login', mapAuthPayload(data));
+  return api.post('/api/Auth/Login', mapAuthPayload(data));
 }
 
 export async function getUsers() {
-  return api.get('/api/user/getlist');
+  return api.get('/api/User/GetList');
 }
 
 export async function getMe() {
-  return api.get('/api/auth/getme');
+  return api.get('/api/Auth/GetMe');
 }
 
 export async function getRoles() {
-  return api.get('/api/role/getlist');
+  return api.get('/api/Role/GetList');
 }
 
 export async function getStates() {
@@ -86,23 +87,23 @@ const mapUserRolePayload = (data) => {
 
 export async function createUserRole(data) {
   const mapped = mapUserRolePayload(data);
-  return api.post('/api/userrole/create', mapped);
+  return api.post('/api/UserRole/Create', mapped);
 }
 
 export async function assignUserRoles(userId, roleIds) {
-  return api.post('/api/userrole/AssignRole', roleIds, {
+  return api.post('/api/UserRole/AssignRole', roleIds, {
     params: { userId }
   });
 }
 
 export async function removeUserRole(userId, roleId) {
-  return api.delete('/api/userrole/Remove', {
+  return api.delete('/api/UserRole/Remove', {
     params: { userId, roleId }
   });
 }
 
 export async function getUserRoles(userId) {
-  return api.get('/api/userrole/GetList', {
+  return api.get('/api/UserRole/GetList', {
     params: { userId }
   });
 }
@@ -122,8 +123,8 @@ export const extractApiData = (response) => {
   const body = response.data !== undefined ? response.data : response;
   if (!body) return null;
   if (Array.isArray(body)) return body;
-  // Backenddan kelishi mumkin bo'lgan turli formatlarni unwrap qilish
-  return body.data ?? body.items ?? body.value ?? body;
+  // Backenddan kelishi mumkin bo'lgan turli formatlarni (data, items, value yoki list) unwrap qilish
+  return body.data ?? body.items ?? body.value ?? body.list ?? body;
 };
 
 export const normalizeUser = (data) => {
@@ -192,27 +193,27 @@ const mapUserPayload = (data) => {
 export async function createUser(data) {
   const mapped = mapUserPayload(data);
   console.log('User create payload:', mapped);
-  return api.post('/api/user/create', mapped);
+  return api.post('/api/User/Create', mapped);
 }
 
 export async function updateUser(id, data) {
-  return api.put(`/api/user/update/${id}`, mapUserPayload(data));
+  return api.put(`/api/User/Update/${id}`, mapUserPayload(data));
 }
 
 export async function deleteUser(id) {
-  return api.delete(`/api/user/delete/${id}`);
+  return api.delete(`/api/User/Delete/${id}`);
 }
 
 export async function getOrganizations(params = {}) { // Umumiy getOrganizations funksiyasi
-  return api.get('/api/organization/getlist', { params });
+  return api.get('/api/Organization/GetList', { params });
 }
 
 export async function getOrganizationsForRegister(params = {}) { // Faqat register uchun
-  return api.get('/api/organization/GetListForRegister', { params });
+  return api.get('/api/Organization/GetListForRegister', { params });
 }
 
 export async function getOrganizationById(id) {
-  return api.get(`/api/organization/get/${id}`);
+  return api.get(`/api/Organization/Get/${id}`);
 }
 
 const mapOrganizationPayload = (data) => {
@@ -236,23 +237,23 @@ const mapOrganizationPayload = (data) => {
 export async function createOrganization(data) {
   const mapped = mapOrganizationPayload(data);
   console.log('Organization create payload:', mapped);
-  return api.post('/api/organization/create', mapped);
+  return api.post('/api/Organization/Create', mapped);
 }
 
 export async function updateOrganization(id, data) {
-  return api.put(`/api/organization/update/${id}`, mapOrganizationPayload(data));
+  return api.put(`/api/Organization/Update/${id}`, mapOrganizationPayload(data));
 }
 
 export async function deleteOrganization(id) {
-  return api.delete(`/api/organization/delete/${id}`);
+  return api.delete(`/api/Organization/Delete/${id}`);
 }
 
 export async function getCurrencies() {
-  return api.get('/api/currency/getlist');
+  return api.get('/api/Currency/GetList');
 }
 
 export async function getCurrencyById(id) {
-  return api.get(`/api/currency/get/${id}`);
+  return api.get(`/api/Currency/Get/${id}`);
 }
 
 const mapCurrencyPayload = (data) => {
@@ -267,23 +268,23 @@ export async function createCurrency(data) {
   const { id, Id, ...rest } = data;
   const mapped = mapCurrencyPayload(rest);
   console.log('Currency create payload:', mapped);
-  return api.post('/api/currency/create', mapped);
+  return api.post('/api/Currency/Create', mapped);
 }
 
 export async function updateCurrency(id, data) {
-  return api.put(`/api/currency/update/${id}`, mapCurrencyPayload(data));
+  return api.put(`/api/Currency/Update/${id}`, mapCurrencyPayload(data));
 }
 
 export async function deleteCurrency(id) {
-  return api.delete(`/api/currency/delete/${id}`);
+  return api.delete(`/api/Currency/Delete/${id}`);
 }
 
 export async function getRegions() {
-  return api.get('/api/region/getlist');
+  return api.get('/api/Region/GetList');
 }
 
 export async function getRegionById(id) {
-  return api.get(`/api/region/get/${id}`);
+  return api.get(`/api/Region/Get/${id}`);
 }
 
 const mapRegionPayload = (data) => {
@@ -303,25 +304,25 @@ const mapRegionPayload = (data) => {
 };
 
 export async function createRegion(data) {
-  return api.post('/api/region/create', mapRegionPayload(data));
+  return api.post('/api/Region/Create', mapRegionPayload(data));
 }
 
 export async function updateRegion(id, data) {
-  return api.put(`/api/region/update/${id}`, mapRegionPayload(data));
+  return api.put(`/api/Region/Update/${id}`, mapRegionPayload(data));
 }
 
 export async function deleteRegion(id) {
-  return api.delete(`/api/region/delete/${id}`);
+  return api.delete(`/api/Region/Delete/${id}`);
 }
 
 export async function getDistricts(regionId = null) {
-  return api.get('/api/district/getlist', {
+  return api.get('/api/District/GetList', {
     params: regionId ? { regionId } : {}
   });
 }
 
 export async function getDistrictById(id) {
-  return api.get(`/api/district/get/${id}`);
+  return api.get(`/api/District/Get/${id}`);
 }
 
 const mapDistrictPayload = (data) => {
@@ -341,15 +342,15 @@ const mapDistrictPayload = (data) => {
 };
 
 export async function createDistrict(data) {
-  return api.post('/api/district/create', mapDistrictPayload(data));
+  return api.post('/api/District/Create', mapDistrictPayload(data));
 }
 
 export async function updateDistrict(id, data) {
-  return api.put(`/api/district/update/${id}`, mapDistrictPayload(data));
+  return api.put(`/api/District/Update/${id}`, mapDistrictPayload(data));
 }
 
 export async function deleteDistrict(id) {
-  return api.delete(`/api/district/delete/${id}`);
+  return api.delete(`/api/District/Delete/${id}`);
 }
 // ========== SUPPLIERS ==========
 const mapSupplierPayload = (data) => {
@@ -361,11 +362,11 @@ const mapSupplierPayload = (data) => {
     return result;
   }, {});
 };
-export async function getSuppliers(params = {}) { return api.get('/api/supplier/getlist', { params }); }
-export async function getSupplierById(id) { return api.get(`/api/supplier/get/${id}`); }
-export async function createSupplier(data) { return api.post('/api/supplier/create', mapSupplierPayload(data)); }
-export async function updateSupplier(id, data) { return api.put(`/api/supplier/update/${id}`, mapSupplierPayload(data)); }
-export async function deleteSupplier(id) { return api.delete(`/api/supplier/delete/${id}`); }
+export async function getSuppliers(params = {}) { return api.get('/api/Supplier/GetList', { params }); }
+export async function getSupplierById(id) { return api.get(`/api/Supplier/Get/${id}`); }
+export async function createSupplier(data) { return api.post('/api/Supplier/Create', mapSupplierPayload(data)); }
+export async function updateSupplier(id, data) { return api.put(`/api/Supplier/Update/${id}`, mapSupplierPayload(data)); }
+export async function deleteSupplier(id) { return api.delete(`/api/Supplier/Delete/${id}`); }
 
 // ========== PRODUCTS ==========
 const mapProductPayload = (data) => {
@@ -377,11 +378,11 @@ const mapProductPayload = (data) => {
     return result;
   }, {});
 };
-export async function getProducts(params = {}) { return api.get('/api/product/getlist', { params }); }
-export async function getProductById(id) { return api.get(`/api/product/get/${id}`); }
-export async function createProduct(data) { return api.post('/api/product/create', mapProductPayload(data)); }
-export async function updateProduct(id, data) { return api.put(`/api/product/update/${id}`, mapProductPayload(data)); }
-export async function deleteProduct(id) { return api.delete(`/api/product/delete/${id}`); }
+export async function getProducts(params = {}) { return api.get('/api/Product/GetList', { params }); }
+export async function getProductById(id) { return api.get(`/api/Product/Get/${id}`); }
+export async function createProduct(data) { return api.post('/api/Product/Create', mapProductPayload(data)); }
+export async function updateProduct(id, data) { return api.put(`/api/Product/Update/${id}`, mapProductPayload(data)); }
+export async function deleteProduct(id) { return api.delete(`/api/Product/Delete/${id}`); }
 
 // ========== INCOME DOCUMENTS ==========
 const mapIncomeDocumentPayload = (data) => {
@@ -393,11 +394,11 @@ const mapIncomeDocumentPayload = (data) => {
     return result;
   }, {});
 };
-export async function getIncomeDocuments(params = {}) { return api.get('/api/incomedocument/getlist', { params }); }
-export async function getIncomeDocumentById(id) { return api.get(`/api/incomedocument/get/${id}`); }
-export async function createIncomeDocument(data) { return api.post('/api/incomedocument/create', mapIncomeDocumentPayload(data)); }
-export async function updateIncomeDocument(id, data) { return api.put(`/api/incomedocument/update/${id}`, mapIncomeDocumentPayload(data)); }
-export async function deleteIncomeDocument(id) { return api.delete(`/api/incomedocument/delete/${id}`); }
+export async function getIncomeDocuments(params = {}) { return api.get('/api/IncomeDocument/GetList', { params }); }
+export async function getIncomeDocumentById(id) { return api.get(`/api/IncomeDocument/Get/${id}`); }
+export async function createIncomeDocument(data) { return api.post('/api/IncomeDocument/Create', mapIncomeDocumentPayload(data)); }
+export async function updateIncomeDocument(id, data) { return api.put(`/api/IncomeDocument/Update/${id}`, mapIncomeDocumentPayload(data)); }
+export async function deleteIncomeDocument(id) { return api.delete(`/api/IncomeDocument/Delete/${id}`); }
 
 // ========== OUTCOME DOCUMENTS ==========
 export async function getOutcomeDocuments() { return api.get('/api/OutcomeDocument/GetList'); }

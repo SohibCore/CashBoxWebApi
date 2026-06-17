@@ -1,30 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import AppShell from '../AppShell.vue';
-import AuthWrapper from '../AuthWrapper.vue';
-
-// Auth Views
-import LoginView from '../views/LoginView.vue';
-import RegisterView from '../views/RegisterView.vue';
-
-// Main App Views
-import ProfileView from '../views/ProfileView.vue';
-import ProfileFillView from '../views/ProfileFillView.vue';
-import UsersView from '../views/UsersView.vue';
-import UserFormView from '../views/UserFormView.vue';
-import UserRoleAssignmentView from '../views/UserRoleAssignmentView.vue';
-import OrganizationsView from '../views/OrganizationsView.vue';
-import CurrenciesView from '../views/CurrenciesView.vue';
-import RegionsView from '../views/RegionsView.vue';
-import DistrictsView from '../views/DistrictsView.vue';
-import IncomeDocumentListView from '../views/IncomeDocumentListView.vue';
-import IncomeDocumentFormView from '../views/IncomeDocumentFormView.vue';
-import IncomeDocumentTableEditView from '../views/IncomeDocumentTableEditView.vue'; // Assuming this exists for Income
-import WeatherView from '../views/WeatherView.vue';
-
-// Outcome Document Views
-import OutcomeDocumentView from '../views/OutcomeDocumentView.vue';
-import OutcomeDocumentFormView from '../views/OutcomeDocumentFormView.vue';
-import OutcomeDocumentTableEditView from '../views/OutcomeDocumentTableEditView.vue'; // New component
+import AuthView from './AuthView.vue'; // Root Auth wrapper
 
 const routes = [
   {
@@ -33,36 +8,39 @@ const routes = [
   },
   {
     path: '/auth',
-    component: AuthWrapper,
+    component: AuthView,
     redirect: '/auth/login',
     children: [
-      { path: 'login', component: LoginView },
-      { path: 'register', component: RegisterView },
+      { path: 'login', component: () => import('./LoginView.vue') },
+      { path: 'register', component: () => import('./RegisterView.vue') },
     ],
   },
   { path: '/login', redirect: '/auth/login' },
   { path: '/register', redirect: '/auth/register' },
-  { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
-  { path: '/profile/fill', component: ProfileFillView, meta: { requiresAuth: true } },
-  { path: '/users', component: UsersView, meta: { requiresAuth: true } },
-  { path: '/users/new', component: UserFormView, meta: { requiresAuth: true } },
-  { path: '/users/edit/:id', component: UserFormView, meta: { requiresAuth: true } },
-  { path: '/user-role', component: UserRoleAssignmentView, meta: { requiresAuth: true } },
-  { path: '/organizations', component: OrganizationsView, meta: { requiresAuth: true } },
-  { path: '/currencies', component: CurrenciesView, meta: { requiresAuth: true } },
-  { path: '/regions', component: RegionsView, meta: { requiresAuth: true } },
-  { path: '/districts', component: DistrictsView, meta: { requiresAuth: true } },
-  { path: '/income-documents', component: IncomeDocumentListView, meta: { requiresAuth: true } },
-  { path: '/income-documents/create', component: IncomeDocumentFormView, meta: { requiresAuth: true } },
-  { path: '/income-documents/:id/edit', component: IncomeDocumentFormView, meta: { requiresAuth: true } },
-  { path: '/income-documents/table-edit/:id', component: IncomeDocumentTableEditView, meta: { requiresAuth: true } },
-  { path: '/weather', component: WeatherView, meta: { requiresAuth: true } },
+  { path: '/profile', component: () => import('./ProfileView.vue'), meta: { requiresAuth: true } },
+  { path: '/profile/fill', component: () => import('./CompleteProfileView.vue'), meta: { requiresAuth: true } },
+  { path: '/users', component: () => import('./UsersView.vue'), meta: { requiresAuth: true } },
+  { path: '/users/new', component: () => import('./CreateUserView.vue'), meta: { requiresAuth: true } },
+  { path: '/users/edit/:id', component: () => import('./EditUserView.vue'), meta: { requiresAuth: true } },
+  { path: '/user-role', component: () => import('./RoleAssignmentView.vue'), meta: { requiresAuth: true } },
+  { path: '/organizations', component: () => import('./OrganizationsView.vue'), meta: { requiresAuth: true } },
+  { path: '/currencies', component: () => import('./CurrenciesView.vue'), meta: { requiresAuth: true } },
+  { path: '/regions', component: () => import('./RegionsView.vue'), meta: { requiresAuth: true } },
+  { path: '/districts', component: () => import('./DistrictsView.vue'), meta: { requiresAuth: true } },
+  { path: '/income-documents', component: () => import('./IncomeDocumentListView.vue'), meta: { requiresAuth: true } },
+  { path: '/income-documents/create', component: () => import('./IncomeDocumentFormView.vue'), meta: { requiresAuth: true } },
+  { path: '/income-documents/:id/edit', component: () => import('./IncomeDocumentFormView.vue'), meta: { requiresAuth: true } },
+  { path: '/income-documents/table-edit/:id', component: () => import('./IncomeDocumentTableEditView.vue'), meta: { requiresAuth: true } },
+  { path: '/suppliers', component: () => import('./SuppliersView.vue'), meta: { requiresAuth: true } },
+  { path: '/suppliers/new', component: () => import('./SupplierFormView.vue'), meta: { requiresAuth: true } },
+  { path: '/suppliers/edit/:id', component: () => import('./SupplierFormView.vue'), meta: { requiresAuth: true } },
+  { path: '/weather', component: () => import('./WeatherView.vue'), meta: { requiresAuth: true } },
 
   // --- Chiqim Hujjatlari uchun yangi yo'nalishlar ---
-  { path: '/outcome-documents', component: OutcomeDocumentView, meta: { requiresAuth: true } },
-  { path: '/outcome-documents/new', component: OutcomeDocumentFormView, meta: { requiresAuth: true } },
-  { path: '/outcome-documents/edit/:id', component: OutcomeDocumentFormView, meta: { requiresAuth: true } },
-  { path: '/outcome-documents/table-edit/:id', component: OutcomeDocumentTableEditView, meta: { requiresAuth: true } },
+  { path: '/outcome-documents', component: () => import('./OutcomeDocumentView.vue'), meta: { requiresAuth: true } },
+  { path: '/outcome-documents/new', component: () => import('./OutcomeDocumentFormView.vue'), meta: { requiresAuth: true } },
+  { path: '/outcome-documents/edit/:id', component: () => import('./OutcomeDocumentFormView.vue'), meta: { requiresAuth: true } },
+  { path: '/outcome-documents/table-edit/:id', component: () => import('./OutcomeDocumentTableEditView.vue'), meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

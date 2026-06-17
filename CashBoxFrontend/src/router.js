@@ -75,7 +75,6 @@ const routes = [
   { path: '/outcome-documents/new', component: OutcomeDocumentFormView, meta: { requiresAuth: true } },
   { path: '/outcome-documents/edit/:id', component: OutcomeDocumentFormView, meta: { requiresAuth: true } },
   { path: '/outcome-documents/table-edit/:id', component: OutcomeDocumentTableEditView, meta: { requiresAuth: true } },
-  { path: '/outcome-documents/table-edit/:id', component: OutcomeDocumentTableEditView, meta: { requiresAuth: true } },
   { path: '/document-report', component: DocumentReportView, meta: { requiresAuth: true } }
 ];
 

@@ -25,12 +25,9 @@ namespace RepositoryLayer.Entity
 
         [Column("REGION_ID")]
         public int RegionId { get; set; }
-        [ForeignKey(nameof(RegionId))]
-        public Region? Region { get; set; }
 
-        [Column("DISTRICT")]
-        [StringLength(300)]
-        public string District { get; set; } = null!;
+        [Column("DISTRICT_ID")]
+        public int? DistrictId { get; set; }
 
         [Column("CREATE_USER_ID")]
         public int? CreateUserId { get; set; }
@@ -40,5 +37,11 @@ namespace RepositoryLayer.Entity
         public int? ModifiedUserId { get; set; }
         [Column("MODIFIED_AT")]
         public DateTime? ModifiedAt { get; set; }
+
+        [ForeignKey(nameof(RegionId))]
+        public Region Region { get; set; } = null!;
+
+        [ForeignKey(nameof(DistrictId))]
+        public District District { get; set; } = null!;
     }
 }

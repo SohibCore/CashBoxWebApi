@@ -123,7 +123,7 @@ namespace CashBox.Service.Services.UserServices
 
             if (userFilterDto.Id.HasValue)
                 user = user.Where(x => x.Id == userFilterDto.Id);
-            if(userFilterDto.OrganizationId.HasValue)
+            if (userFilterDto.OrganizationId.HasValue)
                 user = user.Where(x => x.OrganizationId == userFilterDto.OrganizationId);
             if (!string.IsNullOrWhiteSpace(userFilterDto.UserName))
                 user = user.Where(x => x.UserName.Contains(userFilterDto.UserName));

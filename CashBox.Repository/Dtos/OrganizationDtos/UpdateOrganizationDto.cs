@@ -6,6 +6,6 @@
         public string? FullName { get; set; } = null!;
         public string? ShortName { get; set; } = null!;
         public int RegionId { get; set; }
-        public string? District { get; set; } = null!;
+        public int? DistrictId { get; set; } = null!;
     }
 }

@@ -16,31 +16,35 @@ namespace CashBox.WebApi.Controllers
         {
             _service = service;
         }
-        [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] OutcomeDocumentFilterDto outcomeDocumentFilterDto)
-        {
-            var outcomeDocument = await _service.GetListAsync(outcomeDocumentFilterDto);
 
-            return Ok(outcomeDocument);
+        [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] OutcomeDocumentFilterDto dto)
+        {
+            var outcomeDocuments = await _service.GetListAsync(dto);
+            return Ok(outcomeDocuments);
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] long id)
         {
             var outcomeDocument = await _service.GetAsync(id);
             return Ok(outcomeDocument);
         }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateOutcomeDocumentDlDto dto)
         {
             await _service.CreateAsync(dto);
             return Ok();
         }
+
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateOutcomeDocumentDto updateOutcomeDocumentDto)
+        public async Task<IActionResult> Update([FromBody] UpdateOutcomeDocumentDto dto)
         {
-            await _service.UpdateAsync(updateOutcomeDocumentDto);
+            await _service.UpdateAsync(dto);
             return Ok();
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] long id)
         {
@@ -54,6 +58,7 @@ namespace CashBox.WebApi.Controllers
             var result = await _service.Accept(id);
                 return Ok(result);
         }
+
         [HttpPatch("{id}")]
         public async Task<IActionResult> NotAccept(long id)
         {

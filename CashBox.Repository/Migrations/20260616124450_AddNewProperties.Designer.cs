@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace CashBox.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260616124450_AddNewProperties")]
+    partial class AddNewProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -315,10 +318,12 @@ namespace CashBox.Repository.Migrations
                         .HasColumnName("ACCOUNT");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("ADDRESS");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("CODE");
 
@@ -353,10 +358,12 @@ namespace CashBox.Repository.Migrations
                         .HasColumnName("MODIFIED_USER_ID");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("NAME");
 
                     b.Property<string>("ShortName")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("SHORT_NAME");
 

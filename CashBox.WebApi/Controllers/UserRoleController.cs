@@ -17,12 +17,6 @@ namespace CashBox.WebApi.Controllers
             _service = service;
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Assign(int userId, int roleId)
-        //{
-        //    await _service.AssignAsync(userId, roleId);
-        //    return Ok("Role assigned");
-        //}
         [HttpPost]
         public async Task<IActionResult> AssignRole([FromQuery]  int userId, [FromBody] List<int> roleIds)
         {

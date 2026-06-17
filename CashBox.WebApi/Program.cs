@@ -8,6 +8,7 @@ using CashBox.Service.Services.CorrencyRateServices;
 using CashBox.Service.Services.CorrencyServices;
 using CashBox.Service.Services.DistrictServices;
 using CashBox.Service.Services.DocumentReportServices;
+using CashBox.Service.Services.ExelServices;
 using CashBox.Service.Services.IncomeDocumentServices;
 using CashBox.Service.Services.NewFolder;
 using CashBox.Service.Services.OrganizationServices;
@@ -49,7 +50,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<AccountService>();
 
@@ -87,6 +88,7 @@ builder.Services.AddScoped<IIncomeDocumentService, IncomeDocumentService>();
 builder.Services.AddScoped<IOutcomeDocumentService, OutcomeDocumentService>();
 builder.Services.AddScoped<IDocumentReportService, DocumentReportService>();
 
+builder.Services.AddScoped<IExelService, ExelService>();
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 builder.Services.AddHttpClient<IUzasboService, UzasboService>();
 

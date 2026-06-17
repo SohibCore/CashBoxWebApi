@@ -19,8 +19,8 @@ namespace CashBox.Service.Services.DocumentReportServices
         {
             var beginCredit = _context.IncomeDocuments
                  .Include(x => x.Tables)
-                 .Where(x => x.OrganizationId == _account.OrganizationId
-                          && x.StatusId == StatusIdConst.ACCEPT && x.DocOn < filter.DateFrom)
+                 .Where(x => /*x.OrganizationId == _account.OrganizationId
+                          &&*/ x.StatusId == StatusIdConst.ACCEPT && x.DocOn < filter.DateFrom)
                  .SelectMany(x => x.Tables)
                  .GroupBy(x => new
                  {

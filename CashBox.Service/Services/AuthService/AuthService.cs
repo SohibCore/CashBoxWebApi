@@ -80,8 +80,8 @@ namespace CashBox.Service.Services.AuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim("OrgId", user.OrganizationId.ToString()),
-             };
+            new Claim("OrganizationId", user.OrganizationId.ToString()  ?? "0"),
+             }; 
 
             foreach (var userRole in user.UserRoles)
             {

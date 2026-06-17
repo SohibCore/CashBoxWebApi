@@ -6,8 +6,9 @@ namespace CashBox.Service.Services.SupplierServices
     {
         Task<SupplierDto> GetAsync(int id);
         Task<List<SupplierDto>> GetListAsync(SupplierFilterDto supplierFilterDto);
-        Task CreateAsync(CreateSupplierDto createSupplierDto);
+        Task<SupplierDto> CreateAsync(CreateSupplierDto createSupplierDto);
         Task UpdateAsync(int id, UpdateSupplierDto updateSupplierDto);
         Task DeleteAsync(int id);
+        Task<SupplierDto> CreateByInnAsync(string inn);
     }
 }

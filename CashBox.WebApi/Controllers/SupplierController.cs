@@ -36,8 +36,8 @@ namespace CashBox.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateSupplierDto createSupplierDto)
         {
-            await _supplierService.CreateAsync(createSupplierDto);
-            return Ok();
+            var sup = await _supplierService.CreateAsync(createSupplierDto);
+            return Ok(sup);
         }
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, UpdateSupplierDto updateSupplierDto)
@@ -50,6 +50,12 @@ namespace CashBox.WebApi.Controllers
         {
             await _supplierService.DeleteAsync(id);
             return Ok();
+        }
+        [HttpPost("inn")]
+        public async Task<IActionResult> CreateByInn(string inn)
+        {
+            var result = await _supplierService.CreateByInnAsync(inn);
+            return Ok(result);
         }
     }
 }

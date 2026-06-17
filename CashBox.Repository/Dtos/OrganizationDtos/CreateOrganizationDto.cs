@@ -20,7 +20,6 @@ namespace CashBox.Repository.Dtos.OrganizationDtos
         public int RegionId { get; set; }
 
         [Required]
-        [StringLength(300)]
-        public string District { get; set; } = null!;
+        public int DistrictId { get; set; } 
     }
 }

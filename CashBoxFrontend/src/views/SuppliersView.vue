@@ -1,7 +1,5 @@
 <template>
   <div class="page-card wide-card suppliers-page">
-    <NavigationHistory />
-    
     <div class="section-header"> 
       <div class="header-centered">
         <h2>Ta'minotchilar</h2>

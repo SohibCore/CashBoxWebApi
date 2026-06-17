@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace CashBox.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260616091629_jjjjjjj")]
+    partial class jjjjjjj
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,15 +313,8 @@ namespace CashBox.Repository.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Account")
-                        .HasColumnType("text")
-                        .HasColumnName("ACCOUNT");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("text")
-                        .HasColumnName("ADDRESS");
-
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("CODE");
 
@@ -330,19 +326,11 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("CREATED_USER_ID");
 
-                    b.Property<string>("Director")
-                        .HasColumnType("text")
-                        .HasColumnName("DIRECTOR");
-
                     b.Property<string>("Inn")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
                         .HasColumnName("INN");
-
-                    b.Property<string>("Mfo")
-                        .HasColumnType("text")
-                        .HasColumnName("MFO");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp without time zone")
@@ -351,14 +339,6 @@ namespace CashBox.Repository.Migrations
                     b.Property<int?>("ModifiedUserId")
                         .HasColumnType("integer")
                         .HasColumnName("MODIFIED_USER_ID");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text")
-                        .HasColumnName("NAME");
-
-                    b.Property<string>("ShortName")
-                        .HasColumnType("text")
-                        .HasColumnName("SHORT_NAME");
 
                     b.HasKey("Id");
 
@@ -710,7 +690,7 @@ namespace CashBox.Repository.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("CREATED_AT");
 
-                    b.Property<int?>("DistrictId")
+                    b.Property<int>("DistrictId")
                         .HasColumnType("integer")
                         .HasColumnName("DISTRICT_ID");
 
@@ -1046,7 +1026,9 @@ namespace CashBox.Repository.Migrations
                 {
                     b.HasOne("RepositoryLayer.Entity.District", "District")
                         .WithMany()
-                        .HasForeignKey("DistrictId");
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("RepositoryLayer.Entity.Region", "Region")
                         .WithMany()
