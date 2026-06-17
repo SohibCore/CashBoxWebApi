@@ -19,6 +19,7 @@ import DistrictsView from '../views/DistrictsView.vue';
 import IncomeDocumentListView from '../views/IncomeDocumentListView.vue';
 import IncomeDocumentFormView from '../views/IncomeDocumentFormView.vue';
 import IncomeDocumentTableEditView from '../views/IncomeDocumentTableEditView.vue'; // Assuming this exists for Income
+import WeatherView from '../views/WeatherView.vue';
 
 // Outcome Document Views
 import OutcomeDocumentView from '../views/OutcomeDocumentView.vue';
@@ -55,6 +56,7 @@ const routes = [
   { path: '/income-documents/create', component: IncomeDocumentFormView, meta: { requiresAuth: true } },
   { path: '/income-documents/:id/edit', component: IncomeDocumentFormView, meta: { requiresAuth: true } },
   { path: '/income-documents/table-edit/:id', component: IncomeDocumentTableEditView, meta: { requiresAuth: true } },
+  { path: '/weather', component: WeatherView, meta: { requiresAuth: true } },
 
   // --- Chiqim Hujjatlari uchun yangi yo'nalishlar ---
   { path: '/outcome-documents', component: OutcomeDocumentView, meta: { requiresAuth: true } },

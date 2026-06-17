@@ -4,9 +4,9 @@ namespace CashBox.WebApi
 {
     public class AppSettings
     {
-        public static AppSettings Instance { get; set; }
-        public Jwt Jwt { get; set; }
-        public UzasboSetting UzasboSetting { get; set; }
+        public static AppSettings Instance { get; set; } = null!;
+        public Jwt Jwt { get; set; } = null!;
+        public UzasboSetting UzasboSetting { get; set; } = null!;
 
         public static void Init(AppSettings instance)
         {
@@ -16,6 +16,6 @@ namespace CashBox.WebApi
 
     public class Jwt
     {
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
     }
 }

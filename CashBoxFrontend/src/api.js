@@ -35,6 +35,10 @@ api.interceptors.response.use(
   }
 );
 
+export async function getWeather(name) {
+  return api.get('/api/Weather', { params: { name } });
+}
+
 export async function register(data) {
   const mapped = mapUserPayload(data);
   console.log('Register service payload:', mapped);

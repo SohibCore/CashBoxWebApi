@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CashBox.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class WeatherController : ControllerBase
     {
         private readonly IWeatherService _weatherService;
