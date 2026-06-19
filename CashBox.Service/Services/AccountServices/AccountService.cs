@@ -1,18 +1,44 @@
-﻿namespace CashBox.Service.Services.AccountServices
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+
+namespace CashBox.Service.Services;
+
+public interface ICurrentUserService
 {
-    public class AccountService
+    int UserId { get; }
+    int OrganizationId { get; }
+}
+
+public class CurrentUserService : ICurrentUserService
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
     {
-        public int UserId
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public int UserId
+    {
+        get
         {
-            get { return _userId; }
-            set { _userId = value; }
+            var claim = _httpContextAccessor.HttpContext?.User?
+                .Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+            return int.TryParse(claim?.Value, out var id) ? id : 0;
         }
-        public int OrganizationId
+    }
+
+    public int OrganizationId
+    {
+        get
         {
-            get { return _organizationId; }
-            set { _organizationId = value; }
+            var claim = _httpContextAccessor.HttpContext?.User?
+                .Claims
+                .FirstOrDefault(c => c.Type == "OrganizationId");
+
+            return int.TryParse(claim?.Value, out var id) ? id : 0;
         }
-        private int _userId;
-        private int _organizationId;
     }
 }

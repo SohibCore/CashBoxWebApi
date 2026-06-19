@@ -25,8 +25,6 @@ namespace CashBox.Repository.Entity
         [Required]
         [Column("ORGANIZATION_ID")]
         public int OrganizationId { get; set; }
-        [ForeignKey(nameof(OrganizationId))]
-        public Organization? Organization { get; set; }
 
         [Required]
         [Column("DELIVERED_AT")]
@@ -43,5 +41,8 @@ namespace CashBox.Repository.Entity
 
         [Column("MODIFIED_AT")]
         public DateTime? ModifiedAt { get; set; }
+
+        [ForeignKey(nameof(OrganizationId))]
+        public Organization Organization { get; set; } = null!;
     }
 }

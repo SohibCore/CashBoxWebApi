@@ -1,3 +1,4 @@
+using CashBox.Service;
 using CashBox.Service.Integrations.UzasboServices;
 using CashBox.Service.Integrations.WeatherServices;
 using CashBox.Service.Services.AccountServices;
@@ -69,6 +70,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+
+
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -119,6 +122,8 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+builder.ConfigureServiceApplication();
 
 var app = builder.Build();
 

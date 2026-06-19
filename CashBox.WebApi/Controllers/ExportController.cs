@@ -29,5 +29,16 @@ namespace CashBox.WebApi.Controllers
                 bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "Mahsulotlar.xlsx");
         }
+        [HttpGet("users")]
+        public async Task<IActionResult> Users()
+        {
+            var data = await _context.Users.ToListAsync();
+
+            var bytes = _service.ExportUsers(data);
+
+            return File(
+                bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Foydalanuvchilar.xlsx");
+        }
     }
 }

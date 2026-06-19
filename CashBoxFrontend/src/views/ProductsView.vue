@@ -111,6 +111,7 @@ export default {
     const isExporting = ref(false);
 
     const exportToExcel = async () => {
+      console.log('exportToExcel function called in ProductsView.vue'); // Debugging uchun
       isExporting.value = true;
       try {
         const response = await api.get('/api/Export/products', {

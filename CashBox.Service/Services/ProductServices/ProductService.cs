@@ -63,7 +63,8 @@ namespace CashBox.Service.Services.ProductServices
 
         public async Task<List<ProductDto>> GetListAsync(ProductFilterDto productFilterDto)
         {
-            var product = _context.Products.AsQueryable();
+            var product = _context.Products
+                .AsQueryable();
 
             if (product != null)
             {
@@ -92,8 +93,8 @@ namespace CashBox.Service.Services.ProductServices
                 Code = u.Code,
                 OrganizationId = u.OrganizationId,
                 DeliveredAt = u.DeliveredAt,
+                //OrganizationName = u.Organization.FullName,
             }).ToListAsync();
-
         }
 
         public async Task UpdateAsync(int id, UpdateProductDto updateProductDto)
@@ -109,11 +110,11 @@ namespace CashBox.Service.Services.ProductServices
             if (!string.IsNullOrWhiteSpace(updateProductDto.Name))
                 product.Name = updateProductDto.Name;
 
-            if (updateProductDto.OrganizationId != 0 && updateProductDto.OrganizationId != null)
-                product.OrganizationId = updateProductDto.OrganizationId;
+            if (updateProductDto.OrganizationId.HasValue)
+                product.OrganizationId = updateProductDto.OrganizationId.Value;
 
-            if (updateProductDto.DeliveredAt != null)
-                product.DeliveredAt = updateProductDto.DeliveredAt;
+            if (updateProductDto.DeliveredAt.HasValue)
+                product.DeliveredAt = updateProductDto.DeliveredAt.Value;
 
             product.ModifiedAt = DateTime.UtcNow;
             product.ModifiedUserId = _account.UserId;

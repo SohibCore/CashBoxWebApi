@@ -10,7 +10,19 @@
     </div>
 
     <div class="section-actions">
-      <span class="user-count">{{ users.length }} ta foydalanuvchi</span>
+      <div class="search-and-count">
+        <span class="user-count">{{ users.length }} ta foydalanuvchi</span>
+      </div>
+      <div class="action-buttons" style="display: flex; gap: 12px;">
+        <button @click="exportToExcel" :disabled="isExporting" class="btn-export" title="Foydalanuvchilarni Excel formatida yuklab olish">
+          <svg v-if="!isExporting" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>{{ isExporting ? 'Yuklanmoqda...' : 'Excel' }}</span>
+        </button>
+      </div>
     </div>
 
     <Transition name="fade" mode="out-in">
@@ -189,7 +201,8 @@ import {
   assignUserRoles, 
   removeUserRole,
   extractApiData,
-  getField,
+  getField, 
+  api, // api ni import qiling
   getMe,
   normalizeUser
 } from '../api';
@@ -200,6 +213,30 @@ export default {
     const users = ref([]);
     const organizations = ref([]);
     const expandedUserId = ref(null);
+
+    const isExporting = ref(false);
+
+    const exportToExcel = async () => {
+      isExporting.value = true;
+      try {
+        const response = await api.get('/api/Export/users', {
+          responseType: 'blob'
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'Foydalanuvchilar.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('Export error:', err);
+        alert('Foydalanuvchilarni eksport qilishda xatolik yuz berdi.');
+      } finally {
+        isExporting.value = false;
+      }
+    };
 
     // Modal holati
     const isModalOpen = ref(false);
@@ -391,6 +428,8 @@ export default {
       expandedUserId,
       startEdit,
       deleteRow,
+      isExporting,
+      exportToExcel,
       toggleRow,
       organizationName,
       formatDate,
@@ -865,4 +904,22 @@ button.danger {
 .error-msg { color: #dc2626; margin-top: 1rem; }
 .success-msg { color: #16a34a; margin-top: 1rem; }
 
+.btn-export {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-export:hover:not(:disabled) {
+  background: #10b981;
+  color: white;
+}
+.btn-export:disabled { opacity: 0.6; cursor: not-allowed; }
 </style>

@@ -1,4 +1,5 @@
-﻿using CashBox.Repository.Dtos.DistrictDtos;
+﻿
+using CashBox.Repository.Dtos.DistrictDtos;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using RepositoryLayer.Entity;
@@ -12,6 +13,7 @@ namespace CashBox.Service.Services.DistrictServices
         {
             _context = contex;
         }
+
         public async Task CreateAsync(CreateDistrictDto createDistrictDto)
         {
             var district = new District
@@ -23,6 +25,7 @@ namespace CashBox.Service.Services.DistrictServices
             await _context.Districts.AddAsync(district);
             await _context.SaveChangesAsync();
         }
+
         public async Task DeleteAsync(int id)
         {
             var district = await _context.Districts.FindAsync(id);
@@ -33,6 +36,7 @@ namespace CashBox.Service.Services.DistrictServices
             _context.Districts.Remove(district);
             await _context.SaveChangesAsync();
         }
+
         public async Task<DistrictDto> GetAsync(int id)
         {
             var district = await _context.Districts.FindAsync(id);

@@ -16,7 +16,7 @@ namespace CashBox.Service.Services.AuthService
         private readonly IConfiguration _config;
         private readonly AccountService _account;
 
-        public AuthService(AppDbContext context, IConfiguration config,AccountService account)
+        public AuthService(AppDbContext context, IConfiguration config, AccountService account)
         {
             _context = context;
             _config = config;
@@ -56,6 +56,7 @@ namespace CashBox.Service.Services.AuthService
             _account.UserId = user.Id;
             _account.OrganizationId = user.OrganizationId.Value;
 
+
             return GenerateJwt(user);
         }
         public async Task RefreshAsync(LoginDto loginDto)
@@ -80,8 +81,8 @@ namespace CashBox.Service.Services.AuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim("OrganizationId", user.OrganizationId.ToString()  ?? "0"),
-             }; 
+            new Claim("OrganizationId", user.OrganizationId.HasValue ? user.OrganizationId.Value.ToString() : "0"),
+             };
 
             foreach (var userRole in user.UserRoles)
             {
