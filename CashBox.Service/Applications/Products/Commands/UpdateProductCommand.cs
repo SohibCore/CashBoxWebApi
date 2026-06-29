@@ -1,5 +1,5 @@
 ﻿using CashBox.Repository.Dtos.ProductDtos;
-using CashBox.Service.Services.AccountServices;
+using CashBox.Service.Services;
 using MediatR;
 using Repository.Data;
 

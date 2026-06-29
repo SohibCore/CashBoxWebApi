@@ -1,4 +1,4 @@
-﻿using CashBox.Service.Services.AccountServices;
+﻿using CashBox.Service.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -52,10 +52,6 @@ namespace CashBox.Service.Services.AuthService
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
                 throw new Exception("Mavjud bo'lmagan foydalanuvchi");
-
-            _account.UserId = user.Id;
-            _account.OrganizationId = user.OrganizationId.Value;
-
 
             return GenerateJwt(user);
         }

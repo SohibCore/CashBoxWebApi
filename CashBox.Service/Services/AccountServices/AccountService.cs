@@ -2,18 +2,16 @@
 using Microsoft.AspNetCore.Http;
 
 namespace CashBox.Service.Services;
-
-public interface ICurrentUserService
+public class IAccountService
 {
     int UserId { get; }
     int OrganizationId { get; }
 }
-
-public class CurrentUserService : ICurrentUserService
+public class AccountService : IAccountService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+    public AccountService(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
     }

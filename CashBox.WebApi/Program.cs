@@ -1,7 +1,7 @@
 using CashBox.Service;
 using CashBox.Service.Integrations.UzasboServices;
 using CashBox.Service.Integrations.WeatherServices;
-using CashBox.Service.Services.AccountServices;
+using CashBox.Service.Services;
 using CashBox.Service.Services.AuthService;
 using CashBox.Service.Services.ConractorAccountServices;
 using CashBox.Service.Services.ContractorService;

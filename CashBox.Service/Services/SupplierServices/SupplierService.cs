@@ -1,8 +1,6 @@
-﻿using CashBox.Repository.Dtos.OrganizationDtos;
-using CashBox.Repository.Dtos.SupplierDtos;
+﻿using CashBox.Repository.Dtos.SupplierDtos;
 using CashBox.Repository.Entity;
 using CashBox.Service.Integrations.UzasboServices;
-using CashBox.Service.Services.AccountServices;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 
